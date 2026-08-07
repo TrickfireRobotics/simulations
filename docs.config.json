@@ -24,7 +24,8 @@
                     "label": "Adding a New Robot",
                     "slug": "gazebo/adding-robots"
                 },
-                { "label": "Architecture", "slug": "gazebo/architecture" }
+                { "label": "Architecture", "slug": "gazebo/architecture" },
+                { "label": "Drone (ArduPilot SITL)", "slug": "gazebo/drone" }
             ]
         },
         {

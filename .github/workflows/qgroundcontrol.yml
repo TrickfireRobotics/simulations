@@ -1,14 +1,14 @@
-name: Build VSG + Chrono Image
+name: Build QGroundControl Image
 
 on:
     push:
         branches: [main]
         paths:
-            - "docker/vsg-chrono.Dockerfile"
+            - "docker/qgroundcontrol.Dockerfile"
     workflow_dispatch:
 
 env:
-    IMAGE_NAME: ghcr.io/trickfirerobotics/simulations-vsg-chrono
+    IMAGE_NAME: ghcr.io/trickfirerobotics/simulations-qgroundcontrol
 
 jobs:
     build:
@@ -20,6 +20,7 @@ jobs:
                     - platform: arm64
                       runner: ubuntu-24.04-arm
         runs-on: ${{ matrix.runner }}
+        timeout-minutes: 120
         permissions:
             contents: read
             packages: write
@@ -41,11 +42,11 @@ jobs:
               uses: docker/build-push-action@v7
               with:
                   context: .
-                  file: docker/vsg-chrono.Dockerfile
+                  file: docker/qgroundcontrol.Dockerfile
                   platforms: linux/${{ matrix.platform }}
                   outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-                  cache-from: type=gha,scope=vsg-chrono-${{ matrix.platform }}
-                  cache-to: type=gha,mode=max,scope=vsg-chrono-${{ matrix.platform }}
+                  cache-from: type=gha,scope=qgroundcontrol-${{ matrix.platform }}
+                  cache-to: type=gha,mode=max,scope=qgroundcontrol-${{ matrix.platform }}
 
             - name: Export digest
               run: |
