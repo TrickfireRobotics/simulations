@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import signal
 import socket
 import subprocess
 from datetime import datetime
@@ -15,6 +16,29 @@ from ..output import die, info, warn
 from ..paths import REPO_DIR, WORKSPACE_DIR
 
 _ANSI_RE = re.compile(r"\x1B\[[0-9;]*[mK]")
+
+
+def _descendant_pids(pid: int) -> list[int]:
+    """get process children"""
+    children: dict[int, list[int]] = {}
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit():
+            continue
+        try:
+            with open(f"/proc/{entry}/stat", encoding="utf-8") as stat_file:
+                stat = stat_file.read()
+        except OSError:
+            continue
+        ppid = int(stat.rsplit(")", 1)[1].split()[1])
+        children.setdefault(ppid, []).append(int(entry))
+
+    pids = []
+    frontier = [pid]
+    while frontier:
+        for child in children.get(frontier.pop(), []):
+            pids.append(child)
+            frontier.append(child)
+    return pids
 
 
 def _robot_type(robot_name: str) -> str | None:
@@ -124,12 +148,20 @@ def _run_logged_command(
                 log_file.write(_strip_ansi(line))
                 log_file.flush()
         except KeyboardInterrupt:
+            # kill children as well
+            descendants = _descendant_pids(process.pid)
             process.terminate()
             try:
                 process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+            # kill dead children
+            for pid in descendants:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
             raise
 
         return_code = process.wait()
