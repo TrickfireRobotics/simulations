@@ -19,6 +19,7 @@ simulations/
 │   └── chrono/      # `sim chrono *` sub-commands
 ├── docker/          # Dockerfile and docker-compose files
 ├── pixi.toml        # Native environment definition (ROS 2 Jazzy + Gazebo Harmonic)
+├── assets/          # Club branding
 ├── robots.json      # Robot configuration registry
 ├── ruff.toml        # Ruff linter/formatter configuration
 └── pyproject.toml   # Python package config
@@ -42,6 +43,26 @@ When adding or modifying a package, keep `package.xml` and `CMakeLists.txt` up t
 ### `chrono/` - Chrono Terrain Simulation
 
 Project Chrono simulations for wheel-soil interaction research using the SCM (Soil Contact Model). Still in early development.
+
+```
+chrono/
+├── CMakeLists.txt
+├── data/               # Chrono runtime data (meshes, colormaps, shaders)
+└── src/
+    ├── main.cpp        # wiring and the run loop
+    ├── sim_config.*    # startup parameters (SimConfig) and runtime state (SimState)
+    ├── scm_scene.*     # the Chrono system: wheel, motor, SCM terrain, reset
+    ├── vis_system.*    # ChVisualSystemVSG subclass - branding and camera swap
+    ├── orbit_camera.*  # turntable camera handler, replaces vsg::Trackball
+    └── sim_gui.*       # the ImGui control panel
+```
+
+The GUI uses the ImGui that Chrono's VSG module already links (`vsgImGui`, exported as an
+interface dependency of `Chrono::Chrono_vsg`). Do not vendor a second copy of ImGui - two
+`ImGuiContext`s in one process will not end well.
+
+`vsg::Trackball` is disabled via the protected `m_camera_trackball` flag, which is why
+`SimVisualSystem` subclasses `ChVisualSystemVSG` rather than just configuring it.
 
 ### `cli/` - Simulation CLI
 

@@ -36,6 +36,8 @@ gazebo/dumpstack.sh_arducopter.*.out
 cli/gazebo/create/tests
 
 # chrono outputs
+# imgui writes the window layout back on every run
+chrono/data/vsg/imgui.ini
 chrono/results/*
 !chrono/results/.gitkeep
 

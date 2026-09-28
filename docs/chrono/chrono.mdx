@@ -3,7 +3,7 @@ title: Running Chrono
 description: How to run Project Chrono SCM terrain simulations.
 ---
 
-Chrono SCM (Soil Contact Model) terrain simulations run inside the Dev Container, where Project Chrono is pre-built into the image.
+Chrono SCM (Soil Contact Model) simulations run inside the Dev Container, where Project Chrono is pre-built into the image.
 
 ## Dev Container
 
@@ -11,7 +11,7 @@ Chrono SCM (Soil Contact Model) terrain simulations run inside the Dev Container
 sim chrono run
 ```
 
-This builds the C++ simulation from `chrono/` (if not already built) and runs it. A Vulkan window opens in the VNC desktop showing the terrain simulation.
+This builds the C++ simulation from `chrono/` (if not already built) and runs it. A Vulkan window opens showing a driven wheel rolling over a deformable soil patch.
 
 <Callout type="info" title="Cleaning">
 
@@ -25,11 +25,58 @@ This builds the C++ simulation from `chrono/` (if not already built) and runs it
 
 </Callout>
 
+## Camera
+
+The camera is a turntable locked to the world vertical axis, so the horizon never tilts and the view never rolls.
+
+| Input | Action |
+| --- | --- |
+| Left or right drag | Orbit (yaw around the vertical axis, pitch clamped near the poles) |
+| Middle drag | Pan |
+| Scroll | Zoom |
+
+By default the camera follows the wheel. Turn that off, or jump back to the starting view, under **Camera** in the TrickFire panel.
+
+## The TrickFire panel
+
+The ImGui panel on the right controls the run and reports telemetry. It uses the ImGui build that already ships with Chrono's VSG module (via `vsgImGui`), so there is no extra dependency to install.
+
+<Accordions>
+    <Accordion title="Run">
+        Pause, single-step while paused, and reset. Reset returns the wheel to its start pose, flattens the ruts and zeroes the clock.
+
+        The step size slider is the integration time step. Larger steps run faster but SCM contact forces get less accurate and the explicit SMC contact can go unstable. The render cap decouples drawing from the solver; 0 draws every step.
+    </Accordion>
+    <Accordion title="Wheel">
+        The speed slider commands the wheel motor live, in rad/s. Below it: pose, velocity, motor angle, measured speed, reaction torque, the net terrain contact force on the wheel, and sinkage under the wheel centre.
+    </Accordion>
+    <Accordion title="Terrain">
+        Switch the false-colour quantity (sinkage, pressure, yield pressure, shear) and the colormap at run time. The legend below the combos always reflects the current selection. Wireframe, bulldozing and active-domain boxes toggle here too.
+    </Accordion>
+    <Accordion title="SCM solver">
+        Ray casts, ray hits, contact patches and eroded nodes for the last step, plus the per-stage timings SCM tracks internally. Useful for working out where a slow step is going.
+    </Accordion>
+</Accordions>
+
+Chrono's own **Simulation** window at the top left keeps model time, real-time factor, FPS and body counts, so the TrickFire panel does not repeat them.
+
+## HiDPI displays
+
+Chrono renders its GUI at a fixed pixel size and does not look up the display scale, so on a HiDPI screen the panels come out very small. Scale the whole GUI with:
+
+```bash title="Inside devcontainer"
+TRICKFIRE_UI_SCALE=1.6 sim chrono run
+```
+
+Set it to your display's scale factor. It affects the font, the logo and the panel metrics together.
+
 ## Troubleshooting
 
 <Accordions>
     <Accordion title="Chrono window doesn't appear">
         Chrono uses [Vulkan](https://en.wikipedia.org/wiki/Vulkan) for rendering. Make sure you followed all the steps for your platform [during setup](../setup/docker)
     </Accordion>
-
+    <Accordion title="The wheel drives off the end of the terrain">
+        The patch is 6 m long and the wheel starts 1.5 m in, so it runs out after roughly 20 s at the default speed. Hit **Reset** in the TrickFire panel, or lower the wheel speed.
+    </Accordion>
 </Accordions>
