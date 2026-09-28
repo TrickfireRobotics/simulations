@@ -74,13 +74,21 @@ def process_robot_description(urdf_file, controller_config):
     ).toxml()
 
 
-def gazebo_launch_actions(world_file, gz_gui_config, gui_launch_arg="gui"):
+def gazebo_launch_actions(
+    world_file, gz_gui_config, gui_launch_arg="gui", gui_delay=2.0, combined_gui=False
+):
     """
     Bring up the gz sim server, plus its GUI if the installed `gz` supports launching
     them as separate processes (falls back to the server's built-in GUI otherwise).
+    `gui_delay` gives the server a head start before the GUI client connects -
+    worlds with heavier meshes/plugins to load may need more than the default.
+    `combined_gui` forces server+GUI into a single process even when split mode
+    is available: worlds with rendering-dependent sensors (e.g. IMU/cameras) need
+    this, since a server running separately from the GUI has no render context of
+    its own for its Sensors system to use, and never produces any sensor data.
     Returns a list of launch actions to splice into a LaunchDescription.
     """
-    use_split_gui = gz_supports_sim_command()
+    use_split_gui = gz_supports_sim_command() and not combined_gui
     gz_server_args = (
         ["-r", "-s", world_file]
         if use_split_gui
@@ -102,7 +110,7 @@ def gazebo_launch_actions(world_file, gz_gui_config, gui_launch_arg="gui"):
         output="screen",
         condition=IfCondition(LaunchConfiguration(gui_launch_arg)),
     )
-    return [gz_server, TimerAction(period=2.0, actions=[gz_gui])]
+    return [gz_server, TimerAction(period=gui_delay, actions=[gz_gui])]
 
 
 def spawn_robot_node(robot_name, robot_desc):

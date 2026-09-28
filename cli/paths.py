@@ -33,6 +33,13 @@ NATIVE_ENVS = NATIVE_BUILD_DIR / "envs"
 NATIVE_ENV_PREFIX = NATIVE_ENVS / "ros_env"
 NATIVE_CONTROL_WS = NATIVE_BUILD_DIR / "gz_ros2_control_ws"
 
+# ArduPilot SITL + ardupilot_gazebo plugin
+ARDUPILOT_DIR = Path("/opt/ardupilot")
+ARDUPILOT_GAZEBO_DIR = Path("/opt/ardupilot_gazebo")
+ARDUCOPTER_BIN = ARDUPILOT_DIR / "build" / "sitl" / "bin" / "arducopter"
+ARDUPILOT_GAZEBO_BUILD_DIR = ARDUPILOT_GAZEBO_DIR / "build"
+ARDUPILOT_GAZEBO_PLUGIN = ARDUPILOT_GAZEBO_BUILD_DIR / "libArduPilotPlugin.so"
+
 MACOS_SOURCE_FILES = GAZEBO_WORKSPACE_DIR / "sim_common" / "macos"
 MACOS_MAMBA_ROOT = NATIVE_BUILD_DIR / "mamba"
 MACOS_ROS_BASE = NATIVE_BUILD_DIR / "ros_base"

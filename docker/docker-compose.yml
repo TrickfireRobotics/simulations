@@ -16,6 +16,14 @@ services:
 
         runtime: "${SIM_GPU_RUNTIME:-}"
 
+        # Lets QGroundControl (running in-container) read the Flysky i6X receiver.
+        # /dev/input/eventN is host-owned root:input mode 660 - trickfire needs to be
+        # in a group with the same numeric GID as the host's "input" group to read it.
+        # INPUT_GID is auto-detected by .devcontainer/host-env.sh; the fallback only
+        # matters if docker/.env wasn't regenerated (host-env.sh's usual Ubuntu GID).
+        group_add:
+            - "${INPUT_GID:-994}"
+
         environment:
             VNC_PORT: "${VNC_PORT:?VNC_PORT must be set, see docker/.env}"
             NOVNC_PORT: "${NOVNC_PORT:?NOVNC_PORT must be set, see docker/.env}"
@@ -30,6 +38,7 @@ services:
             GDK_DPI_SCALE: "${GDK_DPI_SCALE:-}"
             FORCE_VNC: "${FORCE_VNC:-}"
             DISPLAY: "${DISPLAY:-}"
+            XAUTHORITY: "${XAUTHORITY:-}"
             VGL_DISPLAY: "${VGL_DISPLAY:-}"
             VGL_COMPRESS: "${VGL_COMPRESS:-}"
             NVIDIA_VISIBLE_DEVICES: "${NVIDIA_VISIBLE_DEVICES:-}"
@@ -48,6 +57,11 @@ services:
             - type: bind
               source: /tmp/.X11-unix
               target: /tmp/.X11-unix
+              bind:
+                  create_host_path: true
+            - type: bind
+              source: /dev/input
+              target: /dev/input
               bind:
                   create_host_path: true
             - type: bind

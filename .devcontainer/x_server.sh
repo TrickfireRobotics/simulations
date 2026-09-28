@@ -195,8 +195,19 @@ start_services() {
     log "[MAIN] All services started"
 }
 
+fix_config_ownership() {
+    # docker-compose.yml only bind-mounts ~/.config/trickfire, so Docker auto-creates
+    # the ~/.config parent as root before the container's user takes over - leaving it
+    # unwritable by trickfire (breaks anything that wants to create its own directory
+    # there, e.g. QGroundControl's settings dir).
+    if [ -d "$HOME/.config" ] && [ "$(stat -c %U "$HOME/.config" 2>/dev/null)" != "$(whoami)" ]; then
+        sudo chown "$(whoami)" "$HOME/.config"
+    fi
+}
+
 main() {
     parse_args "$@"
+    fix_config_ownership
     try_display_passthrough
 
     if [[ $DISPLAY != :* ]]; then

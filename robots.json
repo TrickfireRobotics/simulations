@@ -8,5 +8,9 @@
         "name": "chassis",
         "url": "https://trickfire.onshape.com/documents/fc2c9f06a678801d77ce900d/w/3174861c9ae36101feac1882/e/51aaca767a20d2161d5ff539",
         "world_base_link": false
+    },
+    {
+        "name": "drone",
+        "type": "ardupilot"
     }
 ]

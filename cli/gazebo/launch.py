@@ -5,15 +5,69 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import signal
 import socket
 import subprocess
 from datetime import datetime
 from pathlib import Path
 
+from .. import paths
 from ..output import die, info, warn
 from ..paths import REPO_DIR, WORKSPACE_DIR
 
 _ANSI_RE = re.compile(r"\x1B\[[0-9;]*[mK]")
+
+
+def _descendant_pids(pid: int) -> list[int]:
+    """get process children"""
+    children: dict[int, list[int]] = {}
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit():
+            continue
+        try:
+            with open(f"/proc/{entry}/stat", encoding="utf-8") as stat_file:
+                stat = stat_file.read()
+        except OSError:
+            continue
+        ppid = int(stat.rsplit(")", 1)[1].split()[1])
+        children.setdefault(ppid, []).append(int(entry))
+
+    pids = []
+    frontier = [pid]
+    while frontier:
+        for child in children.get(frontier.pop(), []):
+            pids.append(child)
+            frontier.append(child)
+    return pids
+
+
+def _robot_type(robot_name: str) -> str | None:
+    from .create.registry import load_robots_json
+
+    entry = next((e for e in load_robots_json() if e["name"] == robot_name), None)
+    return entry.get("type") if entry else None
+
+
+def _configure_ardupilot_env(robot_type: str | None, env: dict[str, str]) -> None:
+    """Point Gazebo at the plugin/models built into the Docker image"""
+    if robot_type != "ardupilot":
+        return
+
+    if not paths.ARDUCOPTER_BIN.is_file() or not paths.ARDUPILOT_GAZEBO_PLUGIN.is_file():
+        die("ArduPilot SITL + ardupilot_gazebo plugin are missing!")
+
+    for var, plugin_paths in (
+        (
+            "GZ_SIM_RESOURCE_PATH",
+            [paths.ARDUPILOT_GAZEBO_DIR / "models", paths.ARDUPILOT_GAZEBO_DIR / "worlds"],
+        ),
+        ("GZ_SIM_SYSTEM_PLUGIN_PATH", [paths.ARDUPILOT_GAZEBO_BUILD_DIR]),
+    ):
+        existing = [p for p in env.get(var, "").split(":") if p]
+        additions = [str(p) for p in plugin_paths if str(p) not in existing]
+        env[var] = ":".join(additions + existing)
+
+    env["ARDUCOPTER_BIN"] = str(paths.ARDUCOPTER_BIN)
 
 
 def in_pixi() -> bool:
@@ -33,14 +87,14 @@ def _validate_robot_layout(robot_name: str) -> tuple[str, str, str]:
     if not bringup_dir.is_dir():
         die(
             f"Package '{bringup_pkg}' not found in {WORKSPACE_DIR}\n"
-            f"        Expected directory: {bringup_dir}"
+            f"Expected directory: {bringup_dir}"
         )
 
     description_dir = WORKSPACE_DIR / description_pkg
     if not description_dir.is_dir():
         die(
             f"Package '{description_pkg}' not found in {WORKSPACE_DIR}\n"
-            f"        Expected directory: {description_dir}"
+            f"Expected directory: {description_dir}"
         )
 
     launch_file = bringup_dir / "launch" / launch_file_name
@@ -75,7 +129,7 @@ def _run_logged_command(
         log_file.write(f"$ {command_display}\n")
         log_file.flush()
 
-        process = subprocess.Popen(  # pylint: disable=consider-using-with
+        process = subprocess.Popen(
             command,
             cwd=cwd,
             env=env,
@@ -94,12 +148,20 @@ def _run_logged_command(
                 log_file.write(_strip_ansi(line))
                 log_file.flush()
         except KeyboardInterrupt:
+            # kill children as well
+            descendants = _descendant_pids(process.pid)
             process.terminate()
             try:
                 process.wait(timeout=5)
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+            # kill dead children
+            for pid in descendants:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
             raise
 
         return_code = process.wait()
@@ -117,9 +179,6 @@ def _x11_port_for(display: str) -> int:
         return 6000
 
 
-_DOCKER_DOCS = "https://docs.trickfirerobotics.com/simulations/setup/docker"
-
-
 def _diagnose_display(display: str, xdpyinfo_stderr: str) -> str:
     """Pin down which layer (local socket, DNS, TCP, or X11 auth) is broken."""
     lines = [f"Cannot connect to display {display}", ""]
@@ -134,26 +193,22 @@ def _diagnose_display(display: str, xdpyinfo_stderr: str) -> str:
 
     try:
         ip = socket.gethostbyname(host)
-        lines.append(f"  [OK]   DNS: '{host}' resolves to {ip}")
+        lines.append(f"[OK] DNS: '{host}' resolves to {ip}")
     except OSError as e:
-        lines += [f"  [FAIL] DNS: '{host}' did not resolve ({e})", "", "Is Docker Desktop running?"]
+        lines += [f"[FAIL] DNS: '{host}' did not resolve ({e})", "", "Is Docker Desktop running?"]
         return "\n".join(lines)
 
     port = _x11_port_for(display)
     try:
         with socket.create_connection((host, port), timeout=3):
-            lines.append(f"  [OK]   TCP: port {port} on {host} is reachable")
+            lines.append(f"[OK] TCP: port {port} on {host} is reachable")
     except OSError as e:
-        lines += [
-            f"  [FAIL] TCP: could not connect to {host}:{port} ({e})",
-            f"See {_DOCKER_DOCS} for XQuartz/VcXsrv setup.",
-        ]
+        lines += f"[FAIL] TCP: could not connect to {host}:{port} ({e})"
         return "\n".join(lines)
 
     lines += [
-        "  [FAIL] X11: connected over TCP, but the X server rejected the session:",
-        f"         {xdpyinfo_stderr.strip() or '(no error output captured)'}",
-        f"See {_DOCKER_DOCS} for X11 authorization (xhost) setup.",
+        "[FAIL] X11: connected over TCP, but the X server rejected the session:",
+        f"{xdpyinfo_stderr.strip() or '(no error output captured)'}",
     ]
     return "\n".join(lines)
 
@@ -195,7 +250,7 @@ def _configure_virtualgl_rendering(env: dict[str, str]) -> list[str]:
         return []
 
     if not shutil.which("vglrun"):
-        warn(f"vglrun not installed - GL rendering will fail. See {_DOCKER_DOCS}")
+        warn("vglrun not installed! GL rendering will fail.")
         return []
 
     vgl_display = os.environ.get("VGL_DISPLAY", ":88")
@@ -213,6 +268,42 @@ def _configure_virtualgl_rendering(env: dict[str, str]) -> list[str]:
 
     info(f"Rendering through VirtualGL ({vgl_display} -> {display})")
     return ["vglrun"]
+
+
+def _describe_display(env: dict[str, str], render_prefix: list[str]) -> str:
+    """Launch banner"""
+    display = env.get("DISPLAY", "?")
+    if in_pixi():
+        return "native (pixi environment, no container)"
+    if env.get("FORCE_VNC"):
+        return f"VNC / noVNC, software rendering ({display})"
+    if render_prefix:
+        return f"VirtualGL ({env.get('VGL_DISPLAY', '?')} -> {display})"
+    return f"direct passthrough ({display})"
+
+
+def _print_launch_banner(
+    *,
+    robot_name: str,
+    robot_type: str | None,
+    env: dict[str, str],
+    render_prefix: list[str],
+    log_path: Path,
+) -> None:
+    simulator = "gazebo + ArduPilot SITL" if robot_type == "ardupilot" else "gazebo"
+    rows = [
+        ("Robot", robot_name),
+        ("Simulator", simulator),
+        ("Display", _describe_display(env, render_prefix)),
+        ("Log", str(log_path)),
+    ]
+
+    divider = "-" * 64
+    label_width = max(len(label) for label, _ in rows) + 1
+    print(divider)
+    for label, value in rows:
+        print(f"{label + ':':<{label_width}} {value}")
+    print(divider)
 
 
 def _configure_rendering(env: dict[str, str]) -> list[str]:
@@ -256,7 +347,13 @@ def _setup_pixi_env() -> None:
         os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 
-def build_and_launch(robot_name: str, *, build_only: bool = False, no_build: bool = False) -> None:
+def build_and_launch(
+    robot_name: str,
+    *,
+    build_only: bool = False,
+    no_build: bool = False,
+    local_qgc: bool = False,
+) -> None:
     """Build the ROS 2 workspace and launch a robot simulation."""
     if build_only and no_build:
         die("Use either --build-only or --no-build, not both")
@@ -268,8 +365,10 @@ def build_and_launch(robot_name: str, *, build_only: bool = False, no_build: boo
 
     build = not no_build
     launch = not build_only
+    robot_type = _robot_type(robot_name)
     env = os.environ.copy()
     render_prefix = _configure_rendering(env)
+    _configure_ardupilot_env(robot_type, env)
     bringup_pkg, description_pkg, launch_file_name = _validate_robot_layout(robot_name)
 
     if build:
@@ -283,7 +382,13 @@ def build_and_launch(robot_name: str, *, build_only: bool = False, no_build: boo
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{robot_name}-gazebo-{datetime.now():%Y-%m-%d_%H-%M}.log"  # noqa: DTZ005
 
-    info(f"Launching {robot_name} - log: {log_path}")
+    _print_launch_banner(
+        robot_name=robot_name,
+        robot_type=robot_type,
+        env=env,
+        render_prefix=render_prefix,
+        log_path=log_path,
+    )
 
     setup_bash = WORKSPACE_DIR / "install" / "setup.bash"
 
@@ -315,6 +420,9 @@ def build_and_launch(robot_name: str, *, build_only: bool = False, no_build: boo
         return
 
     info("Sourcing ROS2 environment and launching simulation...")
+    launch_args = "gui:=true"
+    if robot_type == "ardupilot" and local_qgc:
+        launch_args += " qgc:=false"
     launch_script = f"""
 set -e
 source install/setup.bash
@@ -328,7 +436,7 @@ else
     echo \"       Expected: $SIM_WORLDS_SHARE/worlds\"
 fi
 
-exec {" ".join(render_prefix)} ros2 launch \"{bringup_pkg}\" \"{launch_file_name}\" gui:=true
+exec {" ".join(render_prefix)} ros2 launch \"{bringup_pkg}\" \"{launch_file_name}\" {launch_args}
 """.strip()
 
     try:

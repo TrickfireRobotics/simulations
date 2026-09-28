@@ -123,6 +123,12 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
     p = argparse.ArgumentParser(prog="sim gazebo")
     p.add_argument("--build-only", action="store_true")
     p.add_argument("--no-build", action="store_true")
+    p.add_argument(
+        "-lq",
+        "--local-qgc",
+        action="store_true",
+        help="Don't launch QGroundControl in-container (drone only) - use your own local one",
+    )
     args = p.parse_args(remaining)
 
     from .gazebo.launch import build_and_launch, in_pixi
@@ -132,7 +138,9 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         kwargs={"is_docker": not in_pixi(), "robot_name": robot},
         daemon=True,
     ).start()
-    build_and_launch(robot, build_only=args.build_only, no_build=args.no_build)
+    build_and_launch(
+        robot, build_only=args.build_only, no_build=args.no_build, local_qgc=args.local_qgc
+    )
 
 
 def _dispath_chrono(args) -> None:

@@ -72,6 +72,17 @@ The repo-root `robots.json` is the CLI's registry of available robots. For each 
 
 New entries are added automatically by `sim gazebo create` - see [Adding a New Robot](./adding-robots).
 
+Entries without a `type` are OnShape-CAD robots (the default, implied by the presence of `url`/`world_base_link`). A `"type"` field distinguishes robots that don't go through the OnShape pipeline at all - for example the drone, which is entirely hand-authored and flown via ArduPilot SITL (see [Drone](./drone)):
+
+```json
+{
+    "name": "drone",
+    "type": "ardupilot"
+}
+```
+
+`cli/gazebo/launch.py` checks this field to decide whether a robot needs special launch-time environment setup before handing off to `ros2 launch`.
+
 ## Building
 
 `sim gazebo <robot_name>` (see [Running Gazebo](./gazebo)) drives colcon for you, under the hood it uses a command like this:

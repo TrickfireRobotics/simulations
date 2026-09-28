@@ -1,4 +1,4 @@
-name: Build VSG + Chrono Base Image
+name: Build VSG + Chrono Image
 
 on:
     push:

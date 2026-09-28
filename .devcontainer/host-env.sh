@@ -22,6 +22,10 @@ gpu_available() {
 gpu_runtime=""
 gpu_available && gpu_runtime="nvidia"
 
+# joystick passthrough
+input_gid=""
+[ "$uname_s" = "Linux" ] && input_gid="$(getent group input | cut -d: -f3 || true)"
+
 write_display_env() {
     case "$uname_s" in
     Darwin)
@@ -64,6 +68,7 @@ write_env() {
     echo "# --- host-detected (generated, do not edit) ---"
     write_display_env
     echo "SIM_GPU_RUNTIME=$gpu_runtime"
+    [ -n "$input_gid" ] && echo "INPUT_GID=$input_gid"
 
     if [ -n "$gpu_runtime" ]; then
         echo "NVIDIA_VISIBLE_DEVICES=all"
