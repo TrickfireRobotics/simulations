@@ -23,6 +23,9 @@ class ScmScene {
     chrono::vehicle::SCMTerrain& Terrain() { return *m_terrain; }
     std::shared_ptr<chrono::ChBody> Wheel() const { return m_wheel; }
 
+    /// Name of the wheel this scene was built with (a BuildWheelCatalog() entry).
+    const std::string& WheelName() const { return m_config.wheel_name; }
+
     /// Commanded wheel angular velocity (rad/s). Safe to call every step.
     void SetWheelSpeed(double omega) { m_speed_fun->SetConstant(omega); }
 

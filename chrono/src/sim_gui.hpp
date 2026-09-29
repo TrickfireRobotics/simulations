@@ -1,10 +1,13 @@
 #pragma once
 
+#include <vector>
+
 #include "chrono_vsg/ChGuiComponentVSG.h"
 
 #include "orbit_camera.hpp"
 #include "scm_scene.hpp"
 #include "sim_config.hpp"
+#include "wheel_catalog.hpp"
 
 namespace chrono {
 namespace vehicle {
@@ -20,7 +23,7 @@ namespace trickfire {
 class SimGui : public chrono::vsg3d::ChGuiComponentVSG {
   public:
     SimGui(SimState* state, ScmScene* scene, chrono::vehicle::ChScmVisualizationVSG* scm_vis,
-           float ui_scale);
+           float ui_scale, std::vector<WheelOption> wheel_catalog, int current_wheel_index);
 
     void SetCamera(OrbitCamera* camera) { m_camera = camera; }
 
@@ -41,6 +44,9 @@ class SimGui : public chrono::vsg3d::ChGuiComponentVSG {
 
     int m_plot_type;
     int m_colormap;
+
+    std::vector<WheelOption> m_wheel_catalog;
+    int m_wheel_selection;
 };
 
 }  // namespace trickfire

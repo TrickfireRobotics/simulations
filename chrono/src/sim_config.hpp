@@ -1,22 +1,31 @@
 #pragma once
 
+#include <string>
+
 #include "chrono/core/ChVector3.h"
 #include "chrono/utils/ChConstants.h"
 
 namespace trickfire {
 
-enum class TireType { CYLINDRICAL, LUGGED };
+enum class TireType { CYLINDRICAL, MESH };
 
 /// Startup parameters for the SCM wheel-soil simulation.
 /// Anything that can also be changed at run time from the GUI lives in SimState instead.
 struct SimConfig {
     // --- wheel ---
-    TireType tire_type = TireType::LUGGED;
+    TireType tire_type = TireType::MESH;
     double tire_radius = 0.8;
     double wheel_mass = 500;
     double wheel_inertia = 20;
     double cylinder_radius = 0.5;
     double cylinder_width = 0.4;
+
+    // Which entry of BuildWheelCatalog() this is (see wheel_catalog.hpp), and the mesh
+    // path/scale resolved from it. Set together by main() before ScmScene is built.
+    std::string wheel_name = "lugged";
+    std::string wheel_mesh_path;
+    double wheel_mesh_scale = 1.0;
+    double wheel_mesh_rotation_deg = 0.0;
 
     // --- terrain ---
     double terrain_length = 6;
@@ -79,6 +88,13 @@ struct SimState {
     bool bulldozing = true;
     bool wireframe = true;
     bool active_domains_visible = false;
+
+    // --- wheel selection (GUI dropdown) ---
+    // Chrono has no supported way to swap a body's mesh once it's already on screen, so
+    // picking a different wheel re-execs the whole process with TRICKFIRE_WHEEL set to
+    // pending_wheel instead of hot-swapping it. See main()'s run loop.
+    std::string pending_wheel;
+    bool restart_requested = false;
 };
 
 }  // namespace trickfire

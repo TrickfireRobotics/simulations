@@ -17,6 +17,7 @@ add_executable(sim
     src/sim_config.cpp
     src/sim_gui.cpp
     src/vis_system.cpp
+    src/wheel_catalog.cpp
 )
 
 target_include_directories(sim PRIVATE src)

@@ -25,6 +25,50 @@ This builds the C++ simulation from `chrono/` (if not already built) and runs it
 
 </Callout>
 
+## Choosing a wheel
+
+By default the wheel is Chrono's own `lugged` tractor tire. Pick a different one by name:
+
+```bash title="Inside devcontainer"
+sim chrono run <wheel>
+```
+
+To see what's available:
+
+```bash title="Inside devcontainer"
+sim chrono wheels
+```
+
+`lugged` and `cylindrical` (a plain procedural cylinder, useful for quick collision testing) are
+always there. Any other name comes from a `*.obj` file dropped into `chrono/data/models/wheels/`
+- the filename (without the extension) becomes the wheel's name.
+
+<Callout type="info" title="Per-wheel config">
+
+    A custom mesh rarely matches this scene's assumptions out of the box - CAD tools often export
+    in centimeters or inches rather than meters, the mesh's rolling direction may not line up with
+    the axis this scene spins the wheel about, and a mass or inertia sized for the built-in
+    tractor tire can be wildly wrong for a much smaller wheel.
+
+    Fix any of that with a `<wheel>.toml` file next to `<wheel>.obj`:
+
+    ```toml title="chrono/data/models/wheels/wheel-1.toml"
+    scale = 0.0254      # mesh units -> meters
+    rotation_deg = 90   # corrective yaw in the horizontal plane
+    mass = 3.0          # kg
+    inertia = 0.05      # kg*m^2, applied equally to all three axes
+    radius = 0.258      # m - sets the wheel's start height and SCM active-domain box size
+    ```
+
+    Every field is optional and falls back to the generic default otherwise. See
+    `wheel_catalog.hpp` for the up-to-date field list.
+
+</Callout>
+
+You can also switch wheels without leaving the sim, from the **Wheel** dropdown in the TrickFire
+panel. Chrono has no way to swap a running body's mesh, so picking a new one and hitting **Apply**
+restarts the simulation with that wheel instead of hot-swapping it.
+
 ## Camera
 
 The camera is a turntable locked to the world vertical axis, so the horizon never tilts and the view never rolls.
@@ -48,7 +92,7 @@ The ImGui panel on the right controls the run and reports telemetry. It uses the
         The step size slider is the integration time step. Larger steps run faster but SCM contact forces get less accurate and the explicit SMC contact can go unstable. The render cap decouples drawing from the solver; 0 draws every step.
     </Accordion>
     <Accordion title="Wheel">
-        The speed slider commands the wheel motor live, in rad/s. Below it: pose, velocity, motor angle, measured speed, reaction torque, the net terrain contact force on the wheel, and sinkage under the wheel centre.
+        The **Model** dropdown picks the wheel (see [Choosing a wheel](#choosing-a-wheel) above) - **Apply** restarts the sim with the selection. The speed slider commands the wheel motor live, in rad/s. Below it: pose, velocity, motor angle, measured speed, reaction torque, the net terrain contact force on the wheel, and sinkage under the wheel centre.
     </Accordion>
     <Accordion title="Terrain">
         Switch the false-colour quantity (sinkage, pressure, yield pressure, shear) and the colormap at run time. The legend below the combos always reflects the current selection. Wireframe, bulldozing and active-domain boxes toggle here too.

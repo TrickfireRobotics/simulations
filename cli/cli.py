@@ -66,8 +66,17 @@ def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
 def _build_chrono_parser(subparsers: argparse._SubParsersAction) -> tuple:
     chrono = subparsers.add_parser("chrono", help="chrono simulation (Chrono SCM)")
     wsubs = chrono.add_subparsers(dest="command")
-    wsubs.add_parser("run", help="Run a chrono simulation")
+
+    run_p = wsubs.add_parser("run", help="Run a chrono simulation")
+    run_p.add_argument(
+        "wheel",
+        nargs="?",
+        default=None,
+        help="Wheel to use (default: lugged). See 'sim chrono wheels' for options",
+    )
+
     wsubs.add_parser("clean", help="Clean chrono build files")
+    wsubs.add_parser("wheels", help="List available wheels for 'sim chrono run <wheel>'")
     return chrono, wsubs
 
 
@@ -145,9 +154,12 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
 
 def _dispath_chrono(args) -> None:
     if args.command == "run":
-        chrono.run()
+        chrono.run(args.wheel)
     elif args.command == "clean":
         chrono.clean()
+    elif args.command == "wheels":
+        for name in chrono.list_wheels():
+            print(name)
 
 
 def _dispatch_gazebo(args, create_p) -> None:

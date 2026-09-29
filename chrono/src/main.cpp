@@ -1,3 +1,9 @@
+#include <unistd.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+
 #include "chrono/core/ChDataPath.h"
 
 #include "chrono_vehicle/ChVehicleDataPath.h"
@@ -8,6 +14,7 @@
 #include "sim_config.hpp"
 #include "sim_gui.hpp"
 #include "vis_system.hpp"
+#include "wheel_catalog.hpp"
 
 using namespace chrono;
 using namespace trickfire;
@@ -23,7 +30,29 @@ int main() {
     vehicle::SetVehicleDataPath(CHRONO_VEHICLE_DATA_PATH);
     vehicle::ChWorldFrame::SetYUP();
 
+    auto wheel_catalog = BuildWheelCatalog();
+
+    const char* requested_wheel_env = std::getenv("TRICKFIRE_WHEEL");
+    std::string requested_wheel = requested_wheel_env ? requested_wheel_env : "lugged";
+
+    int wheel_index = FindWheelOption(wheel_catalog, requested_wheel);
+    if (wheel_index < 0) {
+        std::cerr << "Unknown wheel \"" << requested_wheel << "\". Available:";
+        for (const auto& option : wheel_catalog) std::cerr << " " << option.name;
+        std::cerr << "\n";
+        return 1;
+    }
+    const WheelOption& wheel = wheel_catalog[wheel_index];
+
     SimConfig config;
+    config.wheel_name = wheel.name;
+    config.tire_type = wheel.is_mesh ? TireType::MESH : TireType::CYLINDRICAL;
+    config.wheel_mesh_path = wheel.mesh_path;
+    config.wheel_mesh_scale = wheel.mesh_scale;
+    config.wheel_mesh_rotation_deg = wheel.mesh_rotation_deg;
+    if (wheel.mass) config.wheel_mass = *wheel.mass;
+    if (wheel.inertia) config.wheel_inertia = *wheel.inertia;
+    if (wheel.radius) config.tire_radius = *wheel.radius;
     config.ui_scale = ReadUiScale(config.ui_scale);
 
     SimState state;
@@ -33,7 +62,8 @@ int main() {
     scene.Terrain().SetMeshWireframe(state.wireframe);
 
     auto scm_vis = chrono_types::make_shared<vehicle::ChScmVisualizationVSG>(&scene.Terrain());
-    auto gui = chrono_types::make_shared<SimGui>(&state, &scene, scm_vis.get(), config.ui_scale);
+    auto gui = chrono_types::make_shared<SimGui>(&state, &scene, scm_vis.get(), config.ui_scale,
+                                                 wheel_catalog, wheel_index);
 
     auto vis = chrono_types::make_shared<SimVisualSystem>(CameraVerticalDir::Y);
     vis->AttachSystem(&scene.System());
@@ -56,6 +86,8 @@ int main() {
     double render_fps = -1;
 
     while (vis->Run()) {
+        if (state.restart_requested) break;
+
         if (state.reset_requested) {
             scene.Reset();
             state.reset_requested = false;
@@ -79,6 +111,19 @@ int main() {
             scene.SetWheelSpeed(state.wheel_speed);
             scene.AdvanceTo(state.step_size);
         }
+    }
+
+    if (state.restart_requested) {
+        // Chrono has no supported way to swap a body's mesh once it's already bound into
+        // the VSG scene graph, so picking a different wheel re-execs the whole process
+        // instead. setenv() before execl() carries the choice into the fresh process.
+        setenv("TRICKFIRE_WHEEL", state.pending_wheel.c_str(), 1);
+        execl("/proc/self/exe", "sim", static_cast<char*>(nullptr));
+
+        // execl() only returns on failure
+        std::cerr << "Failed to restart with wheel \"" << state.pending_wheel
+                  << "\": " << std::strerror(errno) << "\n";
+        return 1;
     }
 
     return 0;

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdarg>
+#include <utility>
 
 #include <vsgImGui/imgui.h>
 
@@ -64,13 +65,16 @@ constexpr ImGuiTableFlags kTableFlags = ImGuiTableFlags_SizingFixedFit;
 
 }  // namespace
 
-SimGui::SimGui(SimState* state, ScmScene* scene, ChScmVisualizationVSG* scm_vis, float ui_scale)
+SimGui::SimGui(SimState* state, ScmScene* scene, ChScmVisualizationVSG* scm_vis, float ui_scale,
+               std::vector<WheelOption> wheel_catalog, int current_wheel_index)
     : m_state(state),
       m_scene(scene),
       m_scm_vis(scm_vis),
       m_scale(ui_scale),
       m_plot_type(0),
-      m_colormap(0) {
+      m_colormap(0),
+      m_wheel_catalog(std::move(wheel_catalog)),
+      m_wheel_selection(current_wheel_index) {
     auto current_plot = m_scene->PlotType();
     for (size_t i = 0; i < kPlotOptions.size(); i++) {
         if (kPlotOptions[i].type == current_plot) m_plot_type = static_cast<int>(i);
@@ -80,6 +84,8 @@ SimGui::SimGui(SimState* state, ScmScene* scene, ChScmVisualizationVSG* scm_vis,
     for (size_t i = 0; i < kColormaps.size(); i++) {
         if (kColormaps[i].first == current_map) m_colormap = static_cast<int>(i);
     }
+
+    m_state->pending_wheel = m_wheel_catalog[m_wheel_selection].name;
 }
 
 void SimGui::render(vsg::CommandBuffer& cb) {
@@ -137,6 +143,26 @@ void SimGui::RenderRunSection() {
 
 void SimGui::RenderWheelSection() {
     if (!ImGui::CollapsingHeader("Wheel", ImGuiTreeNodeFlags_DefaultOpen)) return;
+
+    if (ImGui::BeginCombo("Model", m_wheel_catalog[m_wheel_selection].name.c_str())) {
+        for (int i = 0; i < static_cast<int>(m_wheel_catalog.size()); i++) {
+            if (ImGui::Selectable(m_wheel_catalog[i].name.c_str(), i == m_wheel_selection)) {
+                m_wheel_selection = i;
+                m_state->pending_wheel = m_wheel_catalog[i].name;
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SameLine();
+    HelpMarker(
+        "Changing the wheel restarts the simulation - Chrono can't swap a body's mesh\n"
+        "once it's already on screen. Drop a *.obj into chrono/data/models/wheels/\n"
+        "to add more options here.");
+
+    bool pending_change = m_wheel_catalog[m_wheel_selection].name != m_scene->WheelName();
+    ImGui::BeginDisabled(!pending_change);
+    if (ImGui::Button("Apply (restarts)")) m_state->restart_requested = true;
+    ImGui::EndDisabled();
 
     float speed = static_cast<float>(m_state->wheel_speed);
     if (ImGui::SliderFloat("Speed (rad/s)", &speed, -3.0f, 3.0f, "%.3f"))

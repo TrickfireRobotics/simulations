@@ -3,6 +3,7 @@
 #include "chrono/assets/ChVisualShapeCylinder.h"
 #include "chrono/collision/bullet/ChCollisionSystemBullet.h"
 #include "chrono/core/ChDataPath.h"
+#include "chrono/core/ChMatrix33.h"
 #include "chrono/geometry/ChTriangleMeshConnected.h"
 
 using namespace chrono;
@@ -57,9 +58,19 @@ void ScmScene::BuildWheel() {
 
     auto material = chrono_types::make_shared<ChContactMaterialSMC>();
     switch (m_config.tire_type) {
-        case TireType::LUGGED: {
-            auto trimesh = ChTriangleMeshConnected::CreateFromWavefrontFile(
-                GetChronoDataFile("models/tractor_wheel/tractor_wheel.obj"));
+        case TireType::MESH: {
+            auto trimesh =
+                ChTriangleMeshConnected::CreateFromWavefrontFile(m_config.wheel_mesh_path);
+
+            // Scale converts the mesh's native units to meters; rotation corrects meshes not
+            // authored with their roll axis matching the one this scene spins the wheel about.
+            ChMatrix33<> transform(m_config.wheel_mesh_scale);
+            if (m_config.wheel_mesh_rotation_deg != 0.0) {
+                transform =
+                    ChMatrix33<>(QuatFromAngleY(m_config.wheel_mesh_rotation_deg * CH_DEG_TO_RAD)) *
+                    transform;
+            }
+            trimesh->Transform(VNULL, transform);
 
             auto vis_shape = chrono_types::make_shared<ChVisualShapeTriangleMesh>();
             vis_shape->SetMesh(trimesh);
