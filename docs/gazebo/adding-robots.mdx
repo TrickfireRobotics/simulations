@@ -7,22 +7,24 @@ The command `sim gazebo create` takes a robot from OnShape and produces two ROS 
 
 ## Getting access
 
-You do not need a dashboard account. Access runs on a 6-digit code that rotates every day at midnight, and any team lead can read today's code off [dashboard.trickfirerobotics.com](https://dashboard.trickfirerobotics.com) → Settings.
+You do not need a dashboard account or any setup. `sim gazebo create` asks for the club's 6-digit sim access code when it needs to talk to OnShape, and any lead can read the current one off [dashboard.trickfirerobotics.com](https://dashboard.trickfirerobotics.com) → API Keys.
 
-<Steps>
-    <Step>Ask a team lead for today's sim access code.</Step>
-    <Step>
-        Run `sim gazebo auth` and paste it in. The code is saved to
-        `~/.config/trickfire/token.json`.
-    </Step>
-    <Step>Create the robot: `sim gazebo create <robot_name> <onshape_url>`.</Step>
-</Steps>
+```bash
+sim gazebo create <robot_name> <onshape_url>
+```
 
-The code stops working when it rotates, so if you come back the next day, ask for a fresh one and run `sim gazebo auth` again. If you do have a dashboard account, a personal API key from Settings → CLI access works the same way and does not expire.
+```text
+This needs the sim access code. Any lead can read the current one off
+https://dashboard.trickfirerobotics.com → API Keys. It rotates at 3am.
+
+Access code: 432204
+```
+
+Nothing is saved to your machine, so every `create` and `update` asks again. The code rotates automatically at 3am Pacific and a lead can rotate it early at any time, so grab a fresh one if yours stops working.
 
 <Callout type="info">
-    Only `sim gazebo create` and `sim gazebo update` need a code. Running an existing robot works
-    with no credentials at all, since the generated packages are committed to this repo.
+    Only `sim gazebo create` and `sim gazebo update` ever ask. Running an existing robot needs no
+    code at all, since the generated packages are committed to this repo.
 </Callout>
 
 ## Flags
@@ -56,13 +58,13 @@ This replaces only `arm_description/urdf/arm.urdf` and `arm_description/meshes/`
         generation, indentation). Check the OnShape assembly for unexpected geometry or joint
         definitions if the generated URDF still looks wrong afterwards.
     </Accordion>
-    <Accordion title="'sim gazebo auth' rejects the code">
-        Codes rotate at midnight, so yesterday's code will not work. Ask a lead to re-read the
-        current one off the dashboard. After several wrong codes the dashboard rate limits your
+    <Accordion title="The access code keeps getting rejected">
+        The code rotates at 3am Pacific, and a lead can rotate it early, so an older one will not
+        work. Ask for the current one. After several wrong codes the dashboard rate limits your
         network for an hour.
     </Accordion>
-    <Accordion title="'sim gazebo create' fails with 'access rejected' mid-session">
-        The code rotated while you were working. Run `sim gazebo auth` with today's code and
-        re-run the create.
+    <Accordion title="Running create from a script or CI">
+        Set `SIM_ACCESS_CODE` and the prompt is skipped. There is no way to store the code
+        permanently, by design.
     </Accordion>
 </Accordions>

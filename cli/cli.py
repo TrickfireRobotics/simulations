@@ -10,7 +10,7 @@ from .drpc import rpc_start
 from .output import die, info
 from .paths import GAZEBO_WORKSPACE_DIR
 
-_GAZEBO_SUBCOMMANDS = frozenset({"clean", "create", "update", "auth"})
+_GAZEBO_SUBCOMMANDS = frozenset({"clean", "create", "update"})
 
 
 def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
@@ -57,8 +57,6 @@ def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
     update_p.add_argument("robot", help="Robot name (must exist in robots.json)")
     update_p.add_argument("--output-dir", default=None)
     update_p.add_argument("--no-reduce", action="store_true")
-
-    gsubs.add_parser("auth", help="Configure dashboard access for OnShape exports")
 
     return gazebo, gsubs, create_p
 
@@ -163,7 +161,6 @@ def _dispath_chrono(args) -> None:
 
 
 def _dispatch_gazebo(args, create_p) -> None:
-    from .auth import auth as cmd_auth
     from .gazebo.create import (
         PACKAGE_DIR,
     )
@@ -220,9 +217,6 @@ def _dispatch_gazebo(args, create_p) -> None:
             output_dir=args.output_dir,
             no_reduce=args.no_reduce,
         )
-
-    elif args.command == "auth":
-        cmd_auth()
 
 
 if __name__ == "__main__":

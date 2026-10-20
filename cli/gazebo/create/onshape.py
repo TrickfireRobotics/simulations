@@ -9,10 +9,9 @@ from urllib.parse import urlparse
 
 import requests
 
-from ... import config as cfg
-from ...auth import DASHBOARD_URL
+from ...access import DASHBOARD_URL, headers, prompt_for_code
 from ...output import die as err
-from ...output import info
+from ...output import info, warn
 
 _ONSHAPE_URL_RE = re.compile(
     r"documents/([0-9a-f]+)/[wv]/([0-9a-f]+)/e/([0-9a-f]+)",
@@ -33,6 +32,13 @@ def parse_onshape_url(url: str) -> tuple:
     parsed = urlparse(url)
     api_url = f"{parsed.scheme}://{parsed.netloc}"
     return api_url, m.group(1), m.group(2), m.group(3)
+
+
+def _error_message(resp: requests.Response, fallback: str) -> str:
+    try:
+        return resp.json().get("error", fallback)
+    except Exception:  # noqa: BLE001 - fall back to the caller's message
+        return fallback
 
 
 def _poll_job(dashboard_url: str, job_id: str) -> requests.Response:
@@ -61,40 +67,40 @@ def _poll_job(dashboard_url: str, job_id: str) -> requests.Response:
 def download(
     robot: str, doc_id: str, ws_id: str, el_id: str, api_url: str, *, force_refresh: bool = False
 ) -> Path:
-    headers = cfg.headers()
-    if not headers:
-        err(
-            "No dashboard access configured. Run 'sim gazebo auth'.\n"
-            " └─ You'll need today's 6-digit access code from a team lead."
-        )
-
     dashboard_url = DASHBOARD_URL
 
-    info("Requesting export from dashboard (may take a few minutes if not cached)...")
+    # Wrong code is an easy typo and the export is slow to re-run, so ask again
+    # in place rather than making the member start the whole command over.
+    for attempt in range(3):
+        code = prompt_for_code(retry=attempt > 0)
 
-    try:
-        resp = requests.post(
-            f"{dashboard_url}/api/sim/export",
-            json={
-                "onshapeUrl": f"{api_url}/documents/{doc_id}/w/{ws_id}/e/{el_id}",
-                "forceRefresh": force_refresh,
-            },
-            headers=headers,
-            stream=True,
-            timeout=30,
-        )
-    except requests.ConnectionError:
-        err(f"Could not connect to {dashboard_url}. Check your network connection.")
-    except requests.Timeout:
-        err("Export request timed out.")
+        info("Requesting export from dashboard (may take a few minutes if not cached)...")
 
-    if resp.status_code == 401:
-        err(
-            "Dashboard access rejected, today's code may have rotated.\n"
-            " └─ Run 'sim gazebo auth' with a fresh code from a team lead."
-        )
+        try:
+            resp = requests.post(
+                f"{dashboard_url}/api/sim/export",
+                json={
+                    "onshapeUrl": f"{api_url}/documents/{doc_id}/w/{ws_id}/e/{el_id}",
+                    "forceRefresh": force_refresh,
+                },
+                headers=headers(code),
+                stream=True,
+                timeout=30,
+            )
+        except requests.ConnectionError:
+            err(f"Could not connect to {dashboard_url}. Check your network connection.")
+        except requests.Timeout:
+            err("Export request timed out.")
+
+        if resp.status_code != 401:
+            break
+
+        warn(_error_message(resp, "Access code rejected."))
+    else:
+        err("Access code rejected. Ask a lead for the current one off the dashboard.")
+
     if resp.status_code == 429:
-        err("Rate limited by the dashboard. Wait a minute and try again.")
+        err("Too many wrong codes from this network. Wait a while and try again.")
     if resp.status_code == 503:
         err("OnShape is not configured on the dashboard server. Contact an admin.")
 
@@ -106,11 +112,7 @@ def download(
         resp = _poll_job(dashboard_url, job_id)
 
     if not resp.ok:
-        try:
-            msg = resp.json().get("error", resp.text)
-        except Exception:  # noqa: BLE001 - fall back to raw response text
-            msg = resp.text
-        err(f"Export failed ({resp.status_code}): {msg}")
+        err(f"Export failed ({resp.status_code}): {_error_message(resp, resp.text)}")
 
     tmpdir = Path(tempfile.mkdtemp(prefix="sim_"))
     workdir = tmpdir / robot

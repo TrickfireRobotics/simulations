@@ -10,8 +10,7 @@ simulations/
 ├── chrono/          # Project Chrono terrain/wheel simulation
 ├── cli/             # Python CLI (the `sim` command)
 │   ├── cli.py       # Main entry point and argument parsing
-│   ├── auth.py      # `sim gazebo auth` - dashboard access code / API key
-│   ├── config.py    # Persistent config storage
+│   ├── access.py    # sim access code prompt for dashboard OnShape requests
 │   ├── drpc.py      # Discord RPC integration
 │   ├── paths.py     # Workspace path utilities
 │   ├── output.py    # Terminal output helpers (info, warn, die)
@@ -80,7 +79,7 @@ Python package providing the `sim` command. Two top-level subcommands:
 
 **Shared:**
 
-- `cli/auth.py` - `sim gazebo auth` (daily access code or dashboard API key)
+- `cli/access.py` - sim access code prompt (asked for on every OnShape request)
 - `cli/paths.py` - Workspace path utilities
 - `cli/output.py` - Terminal output helpers (`info`, `warn`, `die`)
 
