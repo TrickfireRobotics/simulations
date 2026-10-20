@@ -1,0 +1,6 @@
+scale = 0.0254      # mesh was modeled in inches
+rotation_deg = 90   # mesh's rolling direction was off by a quarter turn in the horizontal plane
+
+mass = 3.0
+inertia = 0.05
+radius = 0.258

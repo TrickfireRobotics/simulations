@@ -1,4 +1,3 @@
-
 .PHONY: hooks format
 
 hooks:
