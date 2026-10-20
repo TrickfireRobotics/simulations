@@ -1,5 +1,6 @@
-"""sim auth - configure dashboard API key for OnShape access"""
+"""sim gazebo auth - configure dashboard access for OnShape exports"""
 
+import os
 import sys
 
 import requests
@@ -7,29 +8,42 @@ import requests
 from . import config as cfg
 from .output import die, info
 
-DASHBOARD_URL = "https://dashboard.trickfirerobotics.com"
+DASHBOARD_URL = os.environ.get("SIM_DASHBOARD_URL", "https://dashboard.trickfirerobotics.com")
+
+
+def _prompt() -> tuple[str, str]:
+    print()
+    print("Enter the 6-digit sim access code for today.")
+    print("Any team lead can read it off dashboard.trickfirerobotics.com → Settings.")
+    print("The code rotates at midnight, so you will need a fresh one tomorrow.")
+    print()
+    try:
+        entered = input("Access code (or a dashboard API key): ").strip()
+    except (KeyboardInterrupt, EOFError):
+        sys.exit(130)
+
+    if not entered:
+        die("An access code is required!")
+
+    if cfg.looks_like_code(entered):
+        return cfg.ACCESS_CODE, cfg.normalize_code(entered)
+    if entered.startswith("tf_"):
+        return cfg.API_KEY, entered
+
+    die("That is not a 6-digit code or a dashboard API key.")
 
 
 def auth() -> None:
-    key_input = cfg.load()
+    existing = cfg.load()
+    kind, value = existing if existing else _prompt()
 
-    if not key_input:
-        print()
-        print(f"Go to {DASHBOARD_URL}/settings → 'CLI access' to generate a key.")
-        print()
-        try:
-            key_input = input("Paste your API key: ").strip()
-        except (KeyboardInterrupt, EOFError):
-            sys.exit(130)
-
-        if not key_input:
-            die("API key is required!")
+    header = {"x-api-key": value} if kind == cfg.API_KEY else {"x-access-code": value}
 
     info("Verifying...")
     try:
         resp = requests.post(
             f"{DASHBOARD_URL}/api/service/verify",
-            headers={"x-api-key": key_input},
+            headers=header,
             timeout=10,
         )
     except requests.ConnectionError:
@@ -38,14 +52,20 @@ def auth() -> None:
         die("Connection timed out")
 
     if resp.status_code == 401:
+        if kind == cfg.ACCESS_CODE:
+            die("That code was rejected. Ask a lead for today's code and try again.")
         die("Invalid API key! Generate a new one at Settings → CLI access.")
+    if resp.status_code == 429:
+        die("Too many attempts from this network. Wait a bit and try again.")
     if not resp.ok:
         die(f"Verification failed ({resp.status_code}). Check the dashboard URL.")
 
     data = resp.json()
-    name = data.get("name", "unknown")
 
-    cfg.save(key_input)
+    cfg.save(kind, value)
     print()
-    info(f"Authenticated as: {name}")
+    if kind == cfg.ACCESS_CODE:
+        info(f"Access code accepted, good until {data.get('expiresAtLabel', 'midnight')}")
+    else:
+        info(f"Authenticated as: {data.get('name', 'unknown')}")
     info(f"Saved to {cfg._CONFIG_FILE}")

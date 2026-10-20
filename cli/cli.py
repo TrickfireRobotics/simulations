@@ -58,7 +58,7 @@ def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
     update_p.add_argument("--output-dir", default=None)
     update_p.add_argument("--no-reduce", action="store_true")
 
-    gsubs.add_parser("auth", help="Configure dashboard API key for OnShape access")
+    gsubs.add_parser("auth", help="Configure dashboard access for OnShape exports")
 
     return gazebo, gsubs, create_p
 

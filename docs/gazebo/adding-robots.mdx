@@ -3,17 +3,27 @@ title: Adding a New Robot
 description: How to generate ROS 2 packages from an OnShape CAD model and get a new robot running in Gazebo.
 ---
 
-The command `sim gazebo create` takes a robot from OnShape and produces two ROS 2 packages. To make sure we do not hit the low OnShape API limits, requests to OnShape are routed through the [dashboard](https://github.com/TrickfireRobotics/dashboard.git) that authenticates you and caches common request long-term. Authentication is required. You can do it with the following command:
+The command `sim gazebo create` takes a robot from OnShape and produces two ROS 2 packages. To make sure we do not hit the low OnShape API limits, requests to OnShape are routed through the [dashboard](https://github.com/TrickfireRobotics/dashboard.git) that authenticates you and caches common requests long-term.
 
-```bash
-sim gazebo auth
-```
+## Getting access
 
-Then you can create the robot using:
+You do not need a dashboard account. Access runs on a 6-digit code that rotates every day at midnight, and any team lead can read today's code off [dashboard.trickfirerobotics.com](https://dashboard.trickfirerobotics.com) → Settings.
 
-```bash
-sim gazebo create <robot_name> <onshape_url>
-```
+<Steps>
+    <Step>Ask a team lead for today's sim access code.</Step>
+    <Step>
+        Run `sim gazebo auth` and paste it in. The code is saved to
+        `~/.config/trickfire/token.json`.
+    </Step>
+    <Step>Create the robot: `sim gazebo create <robot_name> <onshape_url>`.</Step>
+</Steps>
+
+The code stops working when it rotates, so if you come back the next day, ask for a fresh one and run `sim gazebo auth` again. If you do have a dashboard account, a personal API key from Settings → CLI access works the same way and does not expire.
+
+<Callout type="info">
+    Only `sim gazebo create` and `sim gazebo update` need a code. Running an existing robot works
+    with no credentials at all, since the generated packages are committed to this repo.
+</Callout>
 
 ## Flags
 
@@ -46,9 +56,13 @@ This replaces only `arm_description/urdf/arm.urdf` and `arm_description/meshes/`
         generation, indentation). Check the OnShape assembly for unexpected geometry or joint
         definitions if the generated URDF still looks wrong afterwards.
     </Accordion>
-    <Accordion title="'sim gazebo auth' fails with 'no access'">
-        Your API key may be invalid or expired. Generate a new one at
-        [dashboard.trickfirerobotics.com](https://dashboard.trickfirerobotics.com) → Settings → CLI
-        access.
+    <Accordion title="'sim gazebo auth' rejects the code">
+        Codes rotate at midnight, so yesterday's code will not work. Ask a lead to re-read the
+        current one off the dashboard. After several wrong codes the dashboard rate limits your
+        network for an hour.
+    </Accordion>
+    <Accordion title="'sim gazebo create' fails with 'access rejected' mid-session">
+        The code rotated while you were working. Run `sim gazebo auth` with today's code and
+        re-run the create.
     </Accordion>
 </Accordions>

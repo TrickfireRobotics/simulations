@@ -61,11 +61,11 @@ def _poll_job(dashboard_url: str, job_id: str) -> requests.Response:
 def download(
     robot: str, doc_id: str, ws_id: str, el_id: str, api_url: str, *, force_refresh: bool = False
 ) -> Path:
-    api_key = cfg.load()
-    if not api_key:
+    headers = cfg.headers()
+    if not headers:
         err(
-            "Not authenticated. Run 'sim auth' to configure dashboard access.\n"
-            " └─ You'll need an account at the TrickFire dashboard."
+            "No dashboard access configured. Run 'sim gazebo auth'.\n"
+            " └─ You'll need today's 6-digit access code from a team lead."
         )
 
     dashboard_url = DASHBOARD_URL
@@ -79,7 +79,7 @@ def download(
                 "onshapeUrl": f"{api_url}/documents/{doc_id}/w/{ws_id}/e/{el_id}",
                 "forceRefresh": force_refresh,
             },
-            headers={"x-api-key": api_key},
+            headers=headers,
             stream=True,
             timeout=30,
         )
@@ -89,7 +89,12 @@ def download(
         err("Export request timed out.")
 
     if resp.status_code == 401:
-        err("API key rejected. Run 'sim auth' to re-authenticate.")
+        err(
+            "Dashboard access rejected, today's code may have rotated.\n"
+            " └─ Run 'sim gazebo auth' with a fresh code from a team lead."
+        )
+    if resp.status_code == 429:
+        err("Rate limited by the dashboard. Wait a minute and try again.")
     if resp.status_code == 503:
         err("OnShape is not configured on the dashboard server. Contact an admin.")
 
