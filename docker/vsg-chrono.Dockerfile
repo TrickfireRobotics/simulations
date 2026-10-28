@@ -98,14 +98,24 @@ RUN git clone -c advice.detachedHead=false --depth 1 --branch v0.7.0 \
 #                                    CHRONO                                    #
 # ---------------------------------------------------------------------------- #
 
-RUN git clone --depth 1 https://github.com/projectchrono/chrono.git /home/trickfire/chrono
+3# Pinned so the image is reproducible: a run's environment.json records this SHA and
+# `sim chrono run` refuses to compare results across different ones. Bump deliberately,
+# re-check docker/patches/ against the new tree, and rebuild the image.
+ARG CHRONO_COMMIT=dbdc98932c496f10d37bae3f914cf148c19e9a49
 
-# fix upstream bug:
-# AddActiveDomain appends without clearing the null-body default domain
-# added by SetupInitial, causing a crash when OnBindAssets iterates all domains.
-RUN sed -i \
-    's|    m_loader->m_active_domains.push_back(ad);|    if (!m_loader->m_user_domains)\n        m_loader->m_active_domains.clear();\n    m_loader->m_active_domains.push_back(ad);|' \
-    /home/trickfire/chrono/src/chrono_vehicle/terrain/SCMTerrain.cpp
+RUN git clone --filter=blob:none --no-checkout \
+    https://github.com/projectchrono/chrono.git /home/trickfire/chrono && \
+    git -C /home/trickfire/chrono checkout --detach ${CHRONO_COMMIT} && \
+    git -C /home/trickfire/chrono submodule update --init --recursive --depth 1 && \
+    git -C /home/trickfire/chrono rev-parse HEAD > /home/trickfire/chrono-commit.txt
+
+# Patches carried against the pinned tree. Each must apply with no fuzz, so a Chrono bump
+# that makes one obsolete fails the image build instead of silently dropping the fix.
+COPY docker/patches/ /tmp/chrono-patches/
+RUN for patch in /tmp/chrono-patches/*.patch; do \
+    echo "applying $(basename "${patch}")" && \
+    git -C /home/trickfire/chrono apply --verbose "${patch}" || exit 1; \
+    done && rm -rf /tmp/chrono-patches
 
 RUN cmake -S /home/trickfire/chrono -B /home/trickfire/chrono/build \
     -GNinja \
