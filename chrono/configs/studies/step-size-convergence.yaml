@@ -1,0 +1,28 @@
+# Phase 6 numerical study: does the answer depend on the time step?
+#
+# If halving the step changes the reported slip or energy by more than the run-to-run
+# spread, the result is a property of the integrator rather than of the rover. This is
+# the cheapest of the plan's sensitivity studies and the one most worth running first.
+
+name: step-size-convergence
+description: Time-step convergence study. Run before trusting any number from a new scenario.
+
+scenario: flat-traverse
+seeds: [1, 2]
+
+grid:
+    step_size: [4.0e-3, 2.0e-3, 1.0e-3, 5.0e-4]
+
+objectives:
+    - metric: energy.wh_per_m
+      direction: minimise
+      label: Energy per metre
+      unit: Wh/m
+    - metric: wheel.mean_longitudinal_slip.mean
+      direction: minimise
+      label: Mean slip
+      unit: ""
+    - metric: numerics.real_time_factor.mean
+      direction: maximise
+      label: Real-time factor
+      unit: ""

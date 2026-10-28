@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TrickFire Chrono wheel package",
+  "description": "chrono/data/wheels/<name>/wheel.yaml, written by `sim chrono wheel import`.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "geometry",
+    "mass_properties",
+    "visual",
+    "collision"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "original_path": {
+          "type": "string"
+        },
+        "content_hash": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string",
+          "enum": [
+            "m",
+            "mm",
+            "cm",
+            "in",
+            "ft"
+          ]
+        },
+        "roll_axis": {
+          "type": "string",
+          "enum": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "hub_origin": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "hub_origin_source": {
+          "type": "string"
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "required": [
+        "radius",
+        "width"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "radius": {
+          "type": "number",
+          "minimum": 0.02,
+          "maximum": 2.0,
+          "description": "m, to the outer tread surface"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 2.0,
+          "description": "m"
+        },
+        "roll_axis": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "a cardinal unit axis such as [0, 1, 0]"
+        }
+      }
+    },
+    "mass_properties": {
+      "type": "object",
+      "required": [
+        "mass",
+        "inertia_xx"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "mass": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "kg"
+        },
+        "com": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "centre of mass in the body's reference frame, m"
+        },
+        "inertia_xx": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+        },
+        "inertia_xy": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+        },
+        "provenance": {
+          "type": "string",
+          "enum": [
+            "placeholder",
+            "estimated",
+            "cad",
+            "datasheet",
+            "measured"
+          ],
+          "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+        },
+        "inertia_provenance": {
+          "type": "string"
+        },
+        "density_kg_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "volume_m3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "required": [
+        "file"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "rotation": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 4,
+          "description": "[roll, pitch, yaw] in degrees, or [w, x, y, z]"
+        },
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "color": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "collision": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "box",
+              "sphere",
+              "cylinder",
+              "mesh",
+              "convex_hull"
+            ]
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 4
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "box full extents, m"
+          },
+          "radius": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "length": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "file": {
+            "type": "string"
+          },
+          "margin": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "collision envelope for mesh shapes, m"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "material": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

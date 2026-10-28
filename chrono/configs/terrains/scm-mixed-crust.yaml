@@ -1,0 +1,29 @@
+# Tier 3: loose sand giving way to firm hardpan, and back.
+#
+# The transition is what matters: a wheel that performs well on either soil alone can
+# still dig in at the boundary, and a long traverse crosses many of them.
+#
+# Both Hanksville soils are placeholders, so this terrain cannot run until they are
+# measured. That is the point - it is the shape of the test, ready for the data.
+
+name: scm-mixed-crust
+version: 1
+description: Tier 3 - loose-to-firm soil transitions. Needs measured Hanksville soils.
+type: scm_flat
+
+size_x: 20.0
+size_y: 4.0
+grid_delta: 0.03
+
+soils: [hanksville-loose-sand, hanksville-hardpan]
+default_soil: hanksville-hardpan
+
+# Regions are in the terrain's own ground-plane coordinates and are tested in order.
+regions:
+    - { x_min: -10.0, x_max: -3.0, y_min: -2.0, y_max: 2.0, soil: hanksville-hardpan }
+    - { x_min: -3.0, x_max: 3.0, y_min: -2.0, y_max: 2.0, soil: hanksville-loose-sand }
+    - { x_min: 3.0, x_max: 10.0, y_min: -2.0, y_max: 2.0, soil: hanksville-hardpan }
+
+bulldozing: true
+active_domains: true
+active_domain_margin: 0.25

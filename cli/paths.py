@@ -21,8 +21,19 @@ GAZEBO_DIR = REPO_DIR / "gazebo"
 GAZEBO_WORKSPACE_DIR = GAZEBO_DIR
 GAZEBO_DOCKER_DIR = DOCKER_DIR
 
-CHRONO_TERRAIN_DIR = REPO_DIR / "chrono"
-CHRONO_WHEELS_DIR = CHRONO_TERRAIN_DIR / "data" / "models" / "wheels"
+CHRONO_DIR = REPO_DIR / "chrono"
+CHRONO_BUILD_DIR = CHRONO_DIR / "build"
+CHRONO_BIN = CHRONO_BUILD_DIR / "sim"
+CHRONO_CONFIGS_DIR = CHRONO_DIR / "configs"
+CHRONO_SCHEMAS_DIR = CHRONO_DIR / "schemas"
+CHRONO_DATA_DIR = CHRONO_DIR / "data"
+CHRONO_WHEELS_DIR = CHRONO_DATA_DIR / "wheels"
+CHRONO_TERRAIN_DATA_DIR = CHRONO_DATA_DIR / "terrain"
+CHRONO_TESTS_DIR = CHRONO_DIR / "tests"
+RESULTS_DIR = REPO_DIR / "results"
+
+# Kept so existing callers and docs that say "chrono/" still resolve
+CHRONO_TERRAIN_DIR = CHRONO_DIR
 
 # Alias used by gazebo launcher modules
 WORKSPACE_DIR = GAZEBO_WORKSPACE_DIR

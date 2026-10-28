@@ -1,0 +1,46 @@
+# The CI smoke test, and the Phase 0 reproducibility check.
+#
+# Short, cheap, and deterministic: the same run on two machines must produce matching
+# summary metrics within documented tolerances. Everything it references is either
+# measured, published, or explicitly labelled as a pipeline reference, so it runs today.
+
+name: smoke
+version: 1
+description: Two-second rigid-ground run. The CI smoke test and reproducibility check.
+
+rover: urc-rover
+terrain: rigid-flat
+battery: reference-24v
+
+initial_position: [0.0, 0.0, 0.0]
+initial_yaw_deg: 0.0
+drop_height: 0.02
+
+end_time: 2.0
+warmup_time: 0.3
+sample_rate_hz: 100
+step_size: 1.0e-3
+
+driver:
+    type: constant
+    value: 2.0
+    ramp_time: 0.5
+
+termination:
+    - { type: rollover, threshold: 50.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 0.05
+      description: the rover moved at all
+    - metric: suspension.chassis_roll_deg.max
+      op: lt
+      value: 10.0
+      description: it stayed upright on flat ground
+    - metric: numerics.real_time_factor.mean
+      op: gt
+      value: 0.01
+      description: the run is not pathologically slow
+
+require_provenance: placeholder

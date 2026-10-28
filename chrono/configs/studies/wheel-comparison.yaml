@@ -1,0 +1,52 @@
+# The standard wheel study.
+#
+# Every candidate wheel, across several terrains, repeated over several seeds. The seeds
+# are what turn six runs into a result with an error bar: SCM plus explicit contact is
+# not perfectly repeatable across thread counts and contact orderings, and a single run
+# per wheel cannot tell a real difference from that noise.
+#
+# Ranked on several objectives rather than collapsed into one score, because the trade is
+# the interesting part: a paddle wheel that climbs anything and cooks the motors is a
+# different answer from a smooth wheel that is efficient and gets stuck.
+
+name: wheel-comparison
+description: The standard study - every candidate wheel across the terrain ladder.
+
+scenario:
+    - flat-traverse
+    - urc-hill
+    - side-slope
+    - rock-field
+
+# Left empty so the command line decides which wheels are in the comparison:
+#   sim chrono sweep wheel-comparison --wheels paddle-v4,grouser-v2,smooth-baseline
+# Fill it in once the candidate set is settled.
+wheels: []
+
+seeds: [1, 2, 3]
+
+objectives:
+    - metric: mobility.distance_m
+      direction: maximise
+      label: Distance completed
+      unit: m
+    - metric: energy.wh_per_m
+      direction: minimise
+      label: Energy per metre
+      unit: Wh/m
+    - metric: motor.peak_temperature_c
+      direction: minimise
+      label: Peak motor temperature
+      unit: C
+    - metric: wheel.mean_longitudinal_slip.mean
+      direction: minimise
+      label: Mean slip
+      unit: ""
+    - metric: wheel.mean_sinkage_m.mean
+      direction: minimise
+      label: Mean sinkage
+      unit: m
+    - metric: stability.margin.mean
+      direction: maximise
+      label: Stability margin
+      unit: ""

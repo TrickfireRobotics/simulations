@@ -1,0 +1,37 @@
+# Phase 2 fixture: cross-axle articulation over offset blocks.
+#
+# This is where a differential's presence or absence is most visible, and where a rocker
+# travel limit is most likely to be reached. The checks are deliberately loose because
+# the limits in the rover config are not yet measured - tighten them once they are.
+
+extends: smoke
+
+name: articulation
+version: 1
+description: Phase 2 fixture - diagonal obstacle crossing for rocker-bogie articulation.
+
+terrain: rigid-diagonal-obstacle
+
+initial_position: [1.0, 0.6, 0.0]
+end_time: 14.0
+warmup_time: 0.5
+
+driver:
+    type: constant
+    value: 1.5
+    ramp_time: 1.0
+
+termination:
+    - { type: distance, threshold: 6.0, pass: true }
+    - { type: rollover, threshold: 45.0, pass: false }
+    - { type: immobility, threshold: 0.05, window_s: 3.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 3.0
+      description: the rover crossed the obstacles
+    - metric: suspension.chassis_roll_deg.max
+      op: lt
+      value: 25.0
+      description: the suspension absorbed the twist rather than the chassis

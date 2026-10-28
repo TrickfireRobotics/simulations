@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Drive actuator and controller",
+  "description": "One motor/controller unit: command path, controller, motor, protection, thermal.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "identity",
+    "limits",
+    "motor"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "model",
+        "hardware_revision",
+        "reduction_ratio"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "manufacturer": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string",
+          "description": "the full part number, not the family"
+        },
+        "hardware_revision": {
+          "type": "string"
+        },
+        "firmware": {
+          "type": "string"
+        },
+        "interface": {
+          "type": "string"
+        },
+        "reduction_ratio": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "velocity",
+            "torque"
+          ]
+        },
+        "rate_limit": {
+          "type": "number",
+          "minimum": 0
+        },
+        "delay_s": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "update_rate_hz": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kp": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ki": {
+          "type": "number",
+          "minimum": 0
+        },
+        "kd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "integrator_limit": {
+          "type": "number",
+          "minimum": 0
+        },
+        "torque_limit_nm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "motor": {
+      "type": "object",
+      "required": [
+        "torque_constant_nm_per_a",
+        "resistance_ohm"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "torque_constant_nm_per_a": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "back_emf_v_per_rad_s": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "resistance_ohm": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "rotor_inertia_kg_m2": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "gear_efficiency": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 1.0
+        },
+        "backlash_rad": {
+          "type": "number",
+          "minimum": 0
+        },
+        "viscous_damping": {
+          "type": "number",
+          "minimum": 0
+        },
+        "coulomb_friction_nm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "bus_voltage_v",
+        "continuous_current_a",
+        "peak_current_a"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bus_voltage_v": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "continuous_current_a": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "peak_current_a": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "peak_duration_s": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "output_speed_rad_s": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "cutoff": {
+          "type": "string",
+          "enum": [
+            "derate",
+            "fold_back",
+            "disable"
+          ]
+        }
+      }
+    },
+    "thermal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ambient_c": {
+          "type": "number",
+          "minimum": -40,
+          "maximum": 80
+        },
+        "resistance_c_per_w": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "capacitance_j_per_c": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "derate_start_c": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 250
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "cutoff_c": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 250
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "quality": {
+          "type": "string",
+          "enum": [
+            "placeholder",
+            "estimated",
+            "cad",
+            "datasheet",
+            "measured"
+          ],
+          "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+        },
+        "datasheet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measured_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

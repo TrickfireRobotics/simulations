@@ -1,0 +1,35 @@
+# Placeholder profile for the loose sand at the URC site.
+#
+# Every value here is a REPLACE_WITH placeholder, so any run that references this soil
+# is refused by both `sim chrono validate` and the simulator itself. That is deliberate:
+# the development plan's whole argument is that a convincing but unmeasured soil
+# produces confident, wrong wheel rankings.
+#
+# To fill it in you need, per the plan's Phase 6:
+#   - plate-sinkage tests          -> bekker_kphi, bekker_kc, bekker_n
+#   - shear (annulus or box) tests -> mohr_cohesion, mohr_friction_deg, janosi_shear
+#   - repeated/dynamic loading     -> elastic_k, damping_r
+# Fit on one dataset and validate on a separate one.
+
+name: hanksville-loose-sand
+description: >
+    Loose aeolian sand near MDRS, Hanksville, Utah. NOT YET MEASURED.
+
+bekker_kphi: REPLACE_WITH_PLATE_SINKAGE_FIT
+bekker_kc: REPLACE_WITH_PLATE_SINKAGE_FIT
+bekker_n: REPLACE_WITH_PLATE_SINKAGE_FIT
+mohr_cohesion: REPLACE_WITH_SHEAR_TEST_FIT
+mohr_friction_deg: REPLACE_WITH_SHEAR_TEST_FIT
+janosi_shear: REPLACE_WITH_SHEAR_TEST_FIT
+elastic_k: REPLACE_WITH_REPEATED_LOADING_FIT
+damping_r: REPLACE_WITH_REPEATED_LOADING_FIT
+
+provenance:
+    quality: placeholder
+    source: null
+    measured_on: null
+    test: null
+    notes: >
+        Nearby Hanksville geology includes clay-rich mudstone and sandy clay units
+        (USGS Bulletin 1150), which is useful context for what to expect but is not a
+        substitute for site terramechanics measurements.

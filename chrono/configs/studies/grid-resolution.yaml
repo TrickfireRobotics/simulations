@@ -1,0 +1,27 @@
+# Phase 6 numerical study: does the answer depend on the SCM grid spacing?
+#
+# A grid coarse relative to the tread cannot represent the contact patch, and a fine one
+# costs time quadratically. This finds where the result stops moving.
+
+name: grid-resolution
+description: SCM grid-resolution study. Pairs with step-size-convergence.
+
+scenario: flat-traverse
+seeds: [1]
+
+grid:
+    terrain.grid_delta: [0.06, 0.04, 0.03, 0.02, 0.015]
+
+objectives:
+    - metric: wheel.mean_sinkage_m.mean
+      direction: minimise
+      label: Mean sinkage
+      unit: m
+    - metric: wheel.total_drawbar_pull_n.mean
+      direction: maximise
+      label: Drawbar pull
+      unit: N
+    - metric: numerics.real_time_factor.mean
+      direction: maximise
+      label: Real-time factor
+      unit: ""

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SCM soil profile",
+  "description": "Bekker pressure-sinkage, Mohr-Coulomb shear and Janosi-Hanamoto parameters.",
+  "type": "object",
+  "required": [
+    "name",
+    "bekker_kphi",
+    "bekker_kc",
+    "bekker_n",
+    "mohr_cohesion",
+    "mohr_friction_deg",
+    "janosi_shear",
+    "elastic_k",
+    "damping_r"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bekker_kphi": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "frictional modulus, Pa/m^n"
+    },
+    "bekker_kc": {
+      "type": "number",
+      "minimum": 0,
+      "description": "cohesive modulus, Pa/m^(n-1)"
+    },
+    "bekker_n": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 3.0,
+      "description": "sinkage exponent, dimensionless"
+    },
+    "mohr_cohesion": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Pa"
+    },
+    "mohr_friction_deg": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 70,
+      "description": "internal friction angle, degrees"
+    },
+    "janosi_shear": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "shear deformation modulus, m"
+    },
+    "elastic_k": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "elastic stiffness, Pa/m"
+    },
+    "damping_r": {
+      "type": "number",
+      "minimum": 0,
+      "description": "damping, Pa s/m"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "quality": {
+          "type": "string",
+          "enum": [
+            "placeholder",
+            "estimated",
+            "cad",
+            "datasheet",
+            "measured"
+          ],
+          "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measured_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "test": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "uncertainty": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

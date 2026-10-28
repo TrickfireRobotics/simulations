@@ -1,0 +1,39 @@
+# Tier 2: SCM over surveyed terrain. NO SOURCE DATA YET.
+#
+# URC does not guarantee a DEM release - the 2027 Q&A says a public DEM may be released,
+# probably as GeoTIFF, but neither release nor timing is promised. So this is the shape
+# of the terrain, ready for whatever data arrives, and the simulator does not depend on
+# getting it.
+#
+# To use it:
+#   sim chrono terrain heightmap <source.tif> --name mdrs-hill \
+#       --crop <minx> <miny> <maxx> <maxy> --resolution 0.05
+# which writes the height map and a metadata sidecar recording the source CRS,
+# transform, resolution, vertical scale, crop and content hash, then fill in the
+# heightmap_file, size and height range below from that sidecar.
+
+name: scm-heightmap-template
+version: 1
+description: Tier 2 - template for SCM over a surveyed height map. Needs source data.
+type: scm_heightmap
+
+heightmap_file: REPLACE_WITH_GENERATED_HEIGHTMAP_PNG
+size_x: REPLACE_WITH_CROP_WIDTH_M
+size_y: REPLACE_WITH_CROP_HEIGHT_M
+height_min: REPLACE_WITH_MIN_ELEVATION_M
+height_max: REPLACE_WITH_MAX_ELEVATION_M
+grid_delta: 0.05
+
+soils: [hanksville-hardpan]
+default_soil: hanksville-hardpan
+
+bulldozing: true
+active_domains: true
+active_domain_margin: 0.3
+
+source:
+    file: REPLACE_WITH_SOURCE_GEOTIFF
+    hash: REPLACE_WITH_SOURCE_HASH
+    crs: REPLACE_WITH_SOURCE_CRS
+    resolution_m: 0.05
+    vertical_scale: 1.0

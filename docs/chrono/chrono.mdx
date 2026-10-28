@@ -1,77 +1,281 @@
 ---
-title: Running Chrono
-description: How to run Project Chrono SCM terrain simulations.
+title: Running Simulations
+description: Running rover, wheel and terrain studies with the Chrono simulator, from a single run to a full parameter sweep.
 ---
 
-Chrono SCM (Soil Contact Model) simulations run inside the Dev Container, where Project Chrono is pre-built into the image.
+The Chrono simulator models the six-wheel rover on deformable and rigid terrain: rocker-bogie
+suspension, torque-driven wheels, motor and battery limits, and SCM soil. It runs either as an
+interactive viewer or headlessly for batch studies, and both paths drive the same physics.
 
-## Dev Container
+Everything runs inside the Dev Container, where Project Chrono is pre-built into the image.
 
-```bash title="Inside devcontainer"
-sim chrono run
+## The shape of a run
+
+A run is resolved from configuration before anything is simulated. The CLI merges the scenario,
+rover, wheel packages, actuators, battery, terrain and soils into one **run manifest**, writes it
+into a fresh results directory along with copies of every mesh it references, and hands that file to
+the simulator. The simulator reads the manifest and nothing else.
+
+That indirection is the point: a finished results directory contains a complete, re-runnable
+description of what was simulated, so editing a config later cannot change what an old result
+meant.
+
+```text
+chrono/configs/        authored YAML: rovers, wheels, actuators, soils, terrains, scenarios, studies
+       ↓               sim chrono run
+results/<stamp>-<study>/<run-id>/
+    manifest.yaml      fully resolved inputs, by value, with asset hashes
+    environment.json   Chrono commit, compiler, host, solver settings
+    telemetry.csv.zst  time series
+    events.jsonl       limits, cutoffs, wheel lift, termination
+    summary.json       scalar metrics and pass/fail checks
+    report.html        plots and comparison tables
 ```
 
-This builds the C++ simulation from `chrono/` (if not already built) and runs it. A Vulkan window opens showing a driven wheel rolling over a deformable soil patch.
+## Your first run
 
-<Callout type="info" title="Cleaning">
+```bash title="Inside devcontainer"
+sim chrono run smoke --wheel smooth-baseline
+```
 
-    To force a clean rebuild (could help during any unexpected error) run:
+That builds the simulator if needed, resolves the `smoke` scenario, opens the viewer, and prints
+a pass/fail verdict with the headline metrics when it finishes. Add `--headless` to skip the
+window.
 
-    ```bash title="Inside devcontainer"
-    sim chrono clean
-    ```
+To see what you can run against:
 
-    This deletes `chrono/build/`.
+```bash title="Inside devcontainer"
+sim chrono list
+```
 
+<Callout type="idea" title="Start headless">
+    A windowed run is for debugging a model you do not trust yet. Once it behaves, `--headless`
+    runs several times faster and is the only mode a study uses.
 </Callout>
 
-## Choosing a wheel
+## Scenarios
 
-By default the wheel is Chrono's own `lugged` tractor tire. Pick a different one by name:
+A scenario says what to simulate: which rover and terrain, the initial pose, the driver profile,
+how long to run, when to stop early, and which pass/fail checks to apply.
+
+| Scenario | Terrain | What it answers |
+| --- | --- | --- |
+| `smoke` | rigid flat | Does the whole pipeline work? Two seconds, used by CI. |
+| `drop-test` | rigid flat | Does the rover settle level, with load shared across six wheels? |
+| `articulation` | offset blocks | Does the rocker-bogie absorb a diagonal obstacle? |
+| `step-climb` | 0.30 m step | How large a step can it climb? |
+| `wheel-drop` | soft soil | Smoke test for a newly imported wheel. |
+| `flat-traverse` | soft soil | Baseline energy per metre and slip. |
+| `urc-hill` | 15° soft slope | Can it climb, and at what cost? |
+| `side-slope` | 15° side slope | Does it hold its line, or slide downhill? |
+| `rock-field` | seeded rocks | Can it cross rough ground? |
+| `drawbar-pull` | soft soil | Slip sweep producing a drawbar-pull curve. |
+
+Override pieces of one from the command line without editing it:
 
 ```bash title="Inside devcontainer"
-sim chrono run <wheel>
+sim chrono run urc-hill --wheel paddle-v4 --terrain scm-slope-15 --seed 7
+sim chrono run urc-hill --set driver.value=4.0 --set end_time=60
 ```
 
-To see what's available:
+`--set` takes dotted scenario keys. A key the scenario does not already have is an error rather
+than a silent addition, so a typo cannot produce a run that looks fine but changed nothing.
+
+## Wheels
+
+A wheel is a directory, not a loose mesh. It holds its manifest, visual mesh, contact mesh, the
+CAD file it came from with a content hash, and a preview image.
 
 ```bash title="Inside devcontainer"
-sim chrono wheels
+sim chrono wheel list
+sim chrono wheel inspect wheel-1
 ```
 
-`lugged` and `cylindrical` (a plain procedural cylinder, useful for quick collision testing) are
-always there. Any other name comes from a `*.obj` file dropped into `chrono/data/models/wheels/`
-- the filename (without the extension) becomes the wheel's name.
+### Importing one from CAD
 
-<Callout type="info" title="Per-wheel config">
+```bash title="Inside devcontainer"
+sim chrono wheel import exports/paddle-v4.stl \
+    --name paddle-v4 --units mm --roll-axis z --mass 3.2 \
+    --revision r4 --material "PETG, 40% infill"
+```
 
-    A custom mesh rarely matches this scene's assumptions out of the box - CAD tools often export
-    in centimeters or inches rather than meters, the mesh's rolling direction may not line up with
-    the axis this scene spins the wheel about, and a mass or inertia sized for the built-in
-    tractor tire can be wildly wrong for a much smaller wheel.
+`--units` and `--roll-axis` are required and never inferred. The importer then converts to metres,
+rotates the roll axis onto the rover convention, centres the mesh on its hub, checks the geometry,
+builds a decimated contact mesh that keeps the tread, renders a preview, and refuses to write
+anything if a check fails.
 
-    Fix any of that with a `<wheel>.toml` file next to `<wheel>.obj`:
-
-    ```toml title="chrono/data/models/wheels/wheel-1.toml"
-    scale = 0.0254      # mesh units -> meters
-    rotation_deg = 90   # corrective yaw in the horizontal plane
-    mass = 3.0          # kg
-    inertia = 0.05      # kg*m^2, applied equally to all three axes
-    radius = 0.258      # m - sets the wheel's start height and SCM active-domain box size
-    ```
-
-    Every field is optional and falls back to the generic default otherwise. See
-    `wheel_catalog.hpp` for the up-to-date field list.
-
+<Callout type="warning" title="A wrong scale still runs">
+    A wheel imported as metres when the CAD was millimetres comes out a thousand times too large.
+    It will load, render and produce a complete set of plausible-looking numbers. That is why the
+    importer rejects an implied radius outside 20 mm to 2 m, and why it compares the two radial
+    extents to confirm the roll axis really is the axis of symmetry.
 </Callout>
 
-You can also switch wheels without leaving the sim, from the **Wheel** dropdown in the TrickFire
-panel. Chrono has no way to swap a running body's mesh, so picking a new one and hitting **Apply**
-restarts the simulation with that wheel instead of hot-swapping it.
+Mass comes from `--mass` (measured, preferred) or `--density` with a closed mesh. The package
+records which, and a scenario can demand a minimum provenance — see
+[Provenance](#provenance-and-what-the-numbers-mean).
 
-## Camera
+STEP needs converting first; the importer says so rather than guessing. Keep the STEP beside the
+package so the provenance survives.
 
-The camera is a turntable locked to the world vertical axis, so the horizon never tilts and the view never rolls.
+### Generated reference wheels
+
+```bash title="Inside devcontainer"
+sim chrono wheel generate --name smooth-baseline --radius 0.105 --width 0.06 --mass 1.2
+sim chrono wheel generate --name grouser-ref --radius 0.105 --width 0.06 --mass 1.4 \
+    --grousers 12 --grouser-height 0.012
+```
+
+The smooth cylinder is the baseline every mesh wheel is compared against: a study that cannot
+tell a paddle wheel from a plain cylinder is measuring the pipeline, not the wheel.
+
+## The rover
+
+The rover config is generated from the chassis URDF, not hand-written:
+
+```bash title="Inside devcontainer"
+sim chrono rover import urc-rover
+```
+
+That reads `chrono/configs/rovers/urc-rover.import.yaml` — a hints file holding the judgement
+calls the URDF cannot express — renders the Xacro, collapses fixed joints, restores the suspension
+pivots, converts the meshes to OBJ, approximates the chassis collision volume with oriented
+boxes, and writes `chrono/configs/rovers/urc-rover.yaml` with the URDF's hash recorded in it.
+
+Edit the hints file and re-import. Editing the generated config directly means your change is
+lost the next time the chassis revision moves.
+
+<Callout type="warning" title="The suspension needs a differential">
+    A rocker-bogie has one degree of freedom that six wheel contacts do not constrain, and the
+    differential is what removes it. With `differential: type: none` and free pivots the chassis
+    has no defined rest attitude: it folds onto its rocker travel stops and sits at roughly 39° of
+    pitch on flat ground, with every wheel still loaded and most other checks still passing.
+
+    The hints file therefore assumes `kinematic` — an idealised equal-and-opposite coupling —
+    because a determinate model is a precondition for any result at all. Whether the hardware
+    actually has a differential is still unconfirmed, and it changes articulation and load-sharing
+    substantially. The `drop-test` scenario checks the settled pitch and rocker angles specifically
+    so this class of failure cannot go unnoticed again.
+</Callout>
+
+## Terrain
+
+Terrain follows a fidelity ladder. One model does not answer every question.
+
+| Tier | Configs | Use |
+| --- | --- | --- |
+| 0 | `rigid-flat` | Drivetrain, controls, energy accounting, regression baselines |
+| 1 | `rigid-step`, `rigid-diagonal-obstacle`, `rigid-washboard` | Articulation, clearance, suspension response |
+| 2 | `scm-flat-soft`, `scm-flat-lete`, `scm-slope-15`, `scm-side-slope-15` | Wheel ranking, slip, sinkage, drawbar pull, slopes |
+| 3 | `scm-mixed-crust`, `scm-rock-field` | Embedded rocks, crust, loose-to-firm transitions |
+
+A rock field is described by a seed and a distribution, and the CLI expands it into explicit
+obstacles in the manifest. Two wheels compared on "the same rock field" are therefore compared on
+identical rocks, and a layout can be read back out of an old result.
+
+```bash title="Inside devcontainer"
+sim chrono terrain rocks scm-rock-field --seed 1337
+```
+
+### Surveyed terrain
+
+```bash title="Inside devcontainer"
+sim chrono terrain heightmap survey/mdrs-hill.tif --name mdrs-hill \
+    --crop 512000 4250000 512200 4250150 --resolution 0.05
+```
+
+That crops, fills nodata gaps, resamples, removes the mean plane, and writes a 16-bit height map,
+a matching OBJ for rigid-terrain use, and a metadata sidecar recording the source CRS, transform,
+resolution, vertical scale, crop and content hash. It then prints the terrain config stanza to
+paste in, with the soil deliberately left as a placeholder.
+
+GeoTIFF needs the optional `rasterio` dependency. ESRI ASCII grids and XYZ point clouds need
+nothing extra, and GDAL converts a GeoTIFF to one:
+`gdal_translate -of AAIGrid input.tif output.asc`.
+
+## Studies and reports
+
+A study crosses scenarios, wheels, actuators, terrains, seeds and a parameter grid, runs every
+combination headlessly, and builds a comparison report.
+
+```bash title="Inside devcontainer"
+sim chrono sweep wheel-comparison --wheels paddle-v4,grouser-ref,smooth-baseline --jobs 8
+```
+
+<Steps>
+    <Step>
+        `--dry-run` first, to see the runs a study expands to before committing hours to it.
+    </Step>
+    <Step>
+        Run it. Progress, per-run exit codes and an ETA print as it goes. Each run gets its own
+        directory, manifest and telemetry.
+    </Step>
+    <Step>
+        A `report.html` lands in the study directory: a comparison table with confidence
+        intervals across seeds, one chart per objective, every failed check, and the traceable
+        inputs that produced it.
+    </Step>
+</Steps>
+
+Interrupted sweeps resume where they stopped, and a combination that fails to even set up leaves
+a `summary.json` explaining why rather than an empty directory:
+
+```bash title="Inside devcontainer"
+sim chrono sweep wheel-comparison --resume results/2026-10-28T012024Z-wheel-comparison
+```
+
+Rebuild a report from saved results at any time, or compare across studies in the terminal:
+
+```bash title="Inside devcontainer"
+sim chrono report results/2026-10-28T012024Z-wheel-comparison
+sim chrono compare results/2026-10-28T0120*-wheel-comparison
+```
+
+### Reproducing an old result
+
+```bash title="Inside devcontainer"
+sim chrono run results/2026-10-28T012024Z-smoke/run-000/manifest.yaml
+```
+
+Passing a manifest re-runs it with nothing re-resolved: the same meshes, the same soil numbers,
+the same seed. Only the output directory changes. This works after copying the results directory
+to another machine, because its assets travel with it.
+
+## Provenance and what the numbers mean
+
+Every mass property, soil profile, actuator and battery records where its numbers came from:
+`placeholder`, `estimated`, `cad`, `datasheet` or `measured`. A scenario can require a minimum:
+
+```yaml
+require_provenance: measured
+```
+
+A run whose inputs are weaker than that is refused. Configs that are still unmeasured use
+`REPLACE_WITH_*` markers, which both the validator and the simulator reject outright.
+
+```bash title="Inside devcontainer"
+sim chrono validate all
+```
+
+That reports every structural problem, then separately warns about configs holding unmeasured
+placeholders. Those two things are different and are kept apart on purpose.
+
+<Callout type="warning" title="Simulation is not validation">
+    The reference actuator and battery are invented, internally consistent parameter sets that
+    exist so the pipeline can be developed and tested. The soils are generic or published, not
+    measurements of the URC site. The rover's mass is CAD structural mass only, with no battery,
+    electronics, arm or payload.
+
+    Rankings from this model are internally consistent and comparable to each other. They are not
+    predictions about the rover. Every report states which of its inputs were unmeasured, and the
+    [development plan](./development-plan.mdx) sets out what has to be measured and in what order.
+</Callout>
+
+## The viewer
+
+The viewer attaches to a simulation and drives the same `Step()` the headless runner does, so the
+two cannot drift apart. Nothing in the panel changes the physics: the manifest is the only thing
+that decides what is simulated.
 
 | Input | Action |
 | --- | --- |
@@ -79,48 +283,104 @@ The camera is a turntable locked to the world vertical axis, so the horizon neve
 | Middle drag | Pan |
 | Scroll | Zoom |
 
-By default the camera follows the wheel. Turn that off, or jump back to the starting view, under **Camera** in the TrickFire panel.
-
-## The TrickFire panel
-
-The ImGui panel on the right controls the run and reports telemetry. It uses the ImGui build that already ships with Chrono's VSG module (via `vsgImGui`), so there is no extra dependency to install.
-
 <Accordions>
     <Accordion title="Run">
-        Pause, single-step while paused, and reset. Reset returns the wheel to its start pose, flattens the ruts and zeroes the clock.
-
-        The step size slider is the integration time step. Larger steps run faster but SCM contact forces get less accurate and the explicit SMC contact can go unstable. The render cap decouples drawing from the solver; 0 draws every step.
+        Pause, single-step while paused, and reset, alongside the run's identity, clock, distance
+        and real-time factor. Reset restores the initial state and writes a reset event into the
+        run log, so a hand-reset run is never mistaken for a clean one. The render cap decouples
+        drawing from the solver; 0 draws every step.
     </Accordion>
-    <Accordion title="Wheel">
-        The **Model** dropdown picks the wheel (see [Choosing a wheel](#choosing-a-wheel) above) - **Apply** restarts the sim with the selection. The speed slider commands the wheel motor live, in rad/s. Below it: pose, velocity, motor angle, measured speed, reaction torque, the net terrain contact force on the wheel, and sinkage under the wheel centre.
+    <Accordion title="Rover">
+        Position, roll and pitch, local grade, ground clearance, wheels in contact, stability
+        margin, path error and total model mass, plus a per-pivot table of angle, rate and
+        reaction torque.
     </Accordion>
-    <Accordion title="Terrain">
-        Switch the false-colour quantity (sinkage, pressure, yield pressure, shear) and the colormap at run time. The legend below the combos always reflects the current selection. Wireframe, bulldozing and active-domain boxes toggle here too.
+    <Accordion title="Drives">
+        One row per wheel: speed, applied torque, current, motor temperature, slip and sinkage.
+        Rows turn amber when a drive is current- or voltage-limited and red at thermal cutoff, so
+        a saturated drive is visible without reading every number.
     </Accordion>
-    <Accordion title="SCM solver">
-        Ray casts, ray hits, contact patches and eroded nodes for the last step, plus the per-stage timings SCM tracks internally. Useful for working out where a slow step is going.
+    <Accordion title="Energy">
+        Pack terminal and open-circuit voltage, current, power, cumulative Wh, state of charge,
+        peak current and any regenerated power the pack rejected.
+    </Accordion>
+    <Accordion title="Terrain and SCM solver">
+        Switch the false-colour quantity and colormap at run time, toggle wireframe and the active
+        domain boxes. The solver section reports ray casts, hits, contact patches, eroded nodes and
+        the per-stage SCM timings, which is where to look when a step is slow.
     </Accordion>
 </Accordions>
 
-Chrono's own **Simulation** window at the top left keeps model time, real-time factor, FPS and body counts, so the TrickFire panel does not repeat them.
+Chrono's own **Simulation** window keeps model time, real-time factor, FPS and body counts, so
+the TrickFire panel does not repeat them.
 
-## HiDPI displays
+### HiDPI displays
 
-Chrono renders its GUI at a fixed pixel size and does not look up the display scale, so on a HiDPI screen the panels come out very small. Scale the whole GUI with:
+Chrono renders its GUI at a fixed pixel size and does not look up the display scale, so on a
+HiDPI screen the panels come out very small:
 
 ```bash title="Inside devcontainer"
-TRICKFIRE_UI_SCALE=1.6 sim chrono run
+TRICKFIRE_UI_SCALE=1.6 sim chrono run smoke
 ```
 
-Set it to your display's scale factor. It affects the font, the logo and the panel metrics together.
+## Reproducibility
+
+The container pins an exact Chrono commit, and the patches it carries live in `docker/patches/`
+as real patch files that must apply with no fuzz. Each run records the Chrono commit, compiler,
+host, solver settings and a manifest fingerprint in `environment.json`.
+
+Two runs of the same manifest on the same machine agree to better than 1e-6 on every summary
+metric, which CI checks on every change. Bitwise equality is not promised: SCM's OpenMP reduction
+order is not fixed.
+
+<Callout type="info" title="Solver iterations are pinned deliberately">
+    The manifest sets `solver_iterations` (default 200) rather than taking Chrono's default. An
+    under-iterated VI solver does not enforce the rocker differential at all, and it fails
+    silently: the suspension drifts onto its travel stops and every load and attitude number
+    becomes wrong while the run still completes.
+</Callout>
+
+## Tests
+
+```bash title="Inside devcontainer"
+cd chrono/build && ctest --output-on-failure
+```
+
+Four suites: configuration validation, physics (free fall, pendulum period, static wheel load,
+slope forces, joint constraints, energy conservation), the powertrain equations, and metric and
+termination arithmetic. The physics suite builds bare Chrono systems with the same solver and
+collision settings the simulator pins, so a later disagreement on the rover can be attributed to
+the model rather than to the integrator.
 
 ## Troubleshooting
 
 <Accordions>
-    <Accordion title="Chrono window doesn't appear">
-        Chrono uses [Vulkan](https://en.wikipedia.org/wiki/Vulkan) for rendering. Make sure you followed all the steps for your platform [during setup](../setup/docker)
+    <Accordion title="The window doesn't appear">
+        Chrono uses [Vulkan](https://en.wikipedia.org/wiki/Vulkan) for rendering. Make sure you
+        followed the steps for your platform [during setup](../setup/docker.mdx).
     </Accordion>
-    <Accordion title="The wheel drives off the end of the terrain">
-        The patch is 6 m long and the wheel starts 1.5 m in, so it runs out after roughly 20 s at the default speed. Hit **Reset** in the TrickFire panel, or lower the wheel speed.
+    <Accordion title="A run is refused with a list of problems">
+        That is the manifest loader. It reports every problem it found rather than stopping at the
+        first, so one editing pass can fix them all. `REPLACE_WITH` in a message means the value
+        has not been measured yet, not that the config is malformed.
+    </Accordion>
+    <Accordion title="A check says 'not evaluated'">
+        The check names a summary metric the run never recorded, usually because the scenario
+        restricts `metric_groups`. An unevaluated check fails rather than passing: a gate that
+        cannot be evaluated has told you nothing.
+    </Accordion>
+    <Accordion title="An SCM run is very slow">
+        Expect a real-time factor well below 1 with six mesh wheels on soil. Check `active_domains`
+        is on, raise `grid_delta`, or drop to a rigid terrain if the question is not about soil.
+        The SCM solver section in the viewer shows which stage the time is going to.
+    </Accordion>
+    <Accordion title="The rover drives in a slow curve">
+        Usually a wheel axis that is nearly but not exactly cardinal, or a mirrored right-hand
+        side. The manifest loader rejects non-cardinal axes, and the rover importer normalises
+        axis signs so one command drives every wheel the same way.
+    </Accordion>
+    <Accordion title="Config values load as strings">
+        YAML 1.1 wants a signed exponent and a decimal point: `4.0e+7`, not `4e7`. The schema
+        catches it as "expected number, got string".
     </Accordion>
 </Accordions>

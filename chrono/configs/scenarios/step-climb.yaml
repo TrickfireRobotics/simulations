@@ -1,0 +1,33 @@
+# Phase 2 fixture: square step climb.
+#
+# A well-articulated rocker-bogie rover climbs roughly a wheel diameter. The step in
+# rigid-step is 0.30 m tall, which is above one diameter for the current wheels - so a
+# failure here is expected and informative rather than a bug.
+
+extends: smoke
+
+name: step-climb
+version: 1
+description: Phase 2 fixture - 0.30 m step climb, for clearance and articulation limits.
+
+terrain: rigid-step
+
+initial_position: [1.0, 0.0, 0.0]
+end_time: 20.0
+warmup_time: 0.5
+
+driver:
+    type: constant
+    value: 2.5
+    ramp_time: 1.0
+
+termination:
+    - { type: distance, threshold: 8.0, pass: true }
+    - { type: rollover, threshold: 55.0, pass: false }
+    - { type: immobility, threshold: 0.05, window_s: 4.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 3.0
+      description: the rover reached the step

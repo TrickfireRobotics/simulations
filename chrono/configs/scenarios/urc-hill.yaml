@@ -1,0 +1,55 @@
+# The hill climb. The headline scenario of a wheel comparison.
+#
+# URC's hill uses natural terrain at unspecified inclinations, and the official DEM is
+# not guaranteed, so this is a constant 15 degree grade on soft soil rather than a
+# reproduction of the real hill. It is a slope test, honestly labelled - swap `terrain`
+# for a surveyed height map when one exists.
+#
+# The termination rules are what make the result a number rather than a video: the run
+# either reaches the top, gets stuck, overheats, or tips, and the summary says which.
+
+name: urc-hill
+version: 1
+description: 15 degree soft-soil climb. A slope test, not a model of the real URC hill.
+
+rover: urc-rover
+terrain: scm-slope-15
+battery: reference-24v
+
+initial_position: [-6.0, 0.0, 0.0]
+drop_height: 0.03
+
+end_time: 40.0
+warmup_time: 2.0
+sample_rate_hz: 100
+step_size: 1.5e-3
+
+driver:
+    type: constant
+    value: 3.0
+    ramp_time: 2.0
+
+termination:
+    - { type: distance, threshold: 10.0, pass: true }
+    - { type: immobility, threshold: 0.15, window_s: 5.0, pass: false }
+    - { type: rollover, threshold: 45.0, pass: false }
+    - { type: motor_temperature, threshold: 120.0, pass: false }
+    - { type: battery_empty, threshold: 0.05, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 8.0
+      description: the climb was completed
+    - metric: wheel.mean_longitudinal_slip.mean
+      op: lt
+      value: 0.4
+      description: the wheels gripped rather than churning
+    - metric: motor.peak_temperature_c
+      op: lt
+      value: 100.0
+      description: the drives did not derate during the climb
+    - metric: stability.margin.mean
+      op: gt
+      value: 0.15
+      description: load stayed shared across the wheels

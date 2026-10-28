@@ -1,0 +1,60 @@
+# Phase 2 fixture: drop the rover and let it settle.
+#
+# Checks static load distribution and that the suspension reaches a sensible resting
+# pose. The commanded speed is zero, so the only thing acting is gravity and the
+# suspension - which makes the resting wheel loads directly comparable against a hand
+# calculation from the rover's mass and wheelbase.
+
+extends: smoke
+
+name: drop-test
+version: 1
+description: Phase 2 fixture - drop and settle, for static load and resting pose.
+
+terrain: rigid-flat
+drop_height: 0.10
+
+end_time: 4.0
+warmup_time: 2.5
+sample_rate_hz: 200
+
+driver:
+    type: stopped
+    value: 0.0
+
+termination:
+    - { type: rollover, threshold: 45.0, pass: false }
+
+checks:
+    - metric: stability.margin.mean
+      op: gt
+      value: 0.25
+      description: every wheel carries a share of the load once settled
+    - metric: mobility.distance_m
+      op: lt
+      value: 0.25
+      description: the rover settled rather than rolling away
+    - metric: suspension.chassis_roll_deg.max
+      op: lt
+      value: 5.0
+      description: it settled level
+    # These two exist because the model once failed exactly this way and nothing caught
+    # it: an under-iterated solver silently stopped enforcing the rocker differential,
+    # the suspension folded onto its travel stops, and the rover sat at 39 degrees of
+    # pitch on flat ground while every other check still passed.
+    - metric: suspension.chassis_pitch_deg.max
+      op: lt
+      value: 5.0
+      description: the chassis is not pitched up on flat ground
+    - metric: suspension.chassis_pitch_deg.min
+      op: gt
+      value: -5.0
+      description: the chassis is not pitched down on flat ground
+    - metric: suspension.rocker_left.angle_deg.max
+      op: lt
+      value: 30.0
+      description: the left rocker is not against its travel stop at rest
+    - metric: suspension.rocker_right.angle_deg.max
+      op: lt
+      value: 30.0
+      description: the right rocker is not against its travel stop at rest

@@ -1,0 +1,15 @@
+# Tier 0: rigid flat ground.
+#
+# For drivetrain, controls and energy accounting, and as the regression baseline. No
+# soil model at all, so a result here isolates everything that is not terramechanics.
+
+name: rigid-flat
+version: 1
+description: Tier 0 - rigid flat ground for drivetrain, controls and regression tests.
+type: rigid_flat
+
+size_x: 40.0
+size_y: 8.0
+
+rigid_friction: 0.9
+rigid_restitution: 0.0
