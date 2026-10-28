@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Scenario",
+  "type": "object",
+  "required": [
+    "name",
+    "rover",
+    "terrain",
+    "end_time",
+    "driver"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "rover": {
+      "type": "string"
+    },
+    "terrain": {
+      "type": "string"
+    },
+    "battery": {
+      "type": "string"
+    },
+    "initial_position": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "initial_yaw_deg": {
+      "type": "number"
+    },
+    "drop_height": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2
+    },
+    "end_time": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "warmup_time": {
+      "type": "number",
+      "minimum": 0
+    },
+    "sample_rate_hz": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "step_size": {
+      "type": "number",
+      "minimum": 1e-06,
+      "maximum": 0.1
+    },
+    "threads": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contact_method": {
+      "type": "string",
+      "enum": [
+        "smc",
+        "nsc"
+      ]
+    },
+    "up_axis": {
+      "type": "string",
+      "enum": [
+        "y",
+        "z"
+      ]
+    },
+    "gravity": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "driver": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "constant",
+            "ramp",
+            "slip_sweep",
+            "replay",
+            "stopped"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "description": "rad/s or Nm, per the actuator command mode"
+        },
+        "ramp_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "steering": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "skid-steer bias: +1 right, -1 left"
+        },
+        "sweep_values": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "sweep_hold_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "replay_file": {
+          "type": "string"
+        }
+      }
+    },
+    "termination": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "threshold"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "distance",
+              "rollover",
+              "immobility",
+              "sinkage",
+              "motor_temperature",
+              "battery_empty"
+            ]
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "window_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "pass": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "metric",
+          "op",
+          "value"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string",
+            "description": "a <group>.<name> key from summary.json"
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "lt",
+              "le",
+              "gt",
+              "ge"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metric_groups": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "mobility",
+          "wheel",
+          "suspension",
+          "motor",
+          "energy",
+          "stability",
+          "numerics"
+        ]
+      }
+    },
+    "require_provenance": {
+      "type": "string",
+      "enum": [
+        "placeholder",
+        "estimated",
+        "cad",
+        "datasheet",
+        "measured"
+      ],
+      "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+    },
+    "solver_iterations": {
+      "type": "integer",
+      "minimum": 10
+    }
+  }
+}
