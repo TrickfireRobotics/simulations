@@ -1,0 +1,26 @@
+# Tier 1: sinusoidal washboard, approximated by a row of half-cylinders.
+#
+# Excites the suspension at a frequency set by the rover's speed and the ridge spacing,
+# which is what the chassis roll/pitch-rate and wheel-lift metrics are for. A rigid
+# surface is used so the response is the suspension's and not the soil's.
+
+extends: rigid-flat
+
+name: rigid-washboard
+version: 1
+description: Tier 1 - washboard ridges at 0.5 m spacing for suspension response.
+
+size_x: 20.0
+size_y: 6.0
+
+# Generated rather than hand-written: see `sim chrono terrain washboard` for how this
+# list was produced, and regenerate it rather than editing the entries.
+obstacles:
+    - { type: cylinder, position: [2.0, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [2.5, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [3.0, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [3.5, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [4.0, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [4.5, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [5.0, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }
+    - { type: cylinder, position: [5.5, 0.0, 0.0], radius: 0.05, length: 6.0, rotation: [90, 0, 0], fixed: true }

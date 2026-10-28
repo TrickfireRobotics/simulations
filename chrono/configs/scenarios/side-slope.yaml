@@ -1,0 +1,30 @@
+# Lateral stability and slip on a 15 degree side slope.
+#
+# The metric that matters here is path error: a rover that slides downhill while driving
+# straight will miss a waypoint even though it never stopped.
+
+extends: urc-hill
+
+name: side-slope
+version: 1
+description: 15 degree side slope - lateral slip and tip margin.
+
+terrain: scm-side-slope-15
+
+initial_position: [-4.0, 0.0, 0.0]
+end_time: 30.0
+
+termination:
+    - { type: distance, threshold: 8.0, pass: true }
+    - { type: rollover, threshold: 40.0, pass: false }
+    - { type: immobility, threshold: 0.15, window_s: 5.0, pass: false }
+
+checks:
+    - metric: mobility.path_error_m.max
+      op: lt
+      value: 1.0
+      description: the rover held its line rather than sliding downhill
+    - metric: stability.margin.mean
+      op: gt
+      value: 0.1
+      description: the uphill wheels kept some load

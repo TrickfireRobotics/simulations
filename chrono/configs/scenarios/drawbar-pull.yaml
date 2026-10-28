@@ -1,0 +1,42 @@
+# Slip sweep for a drawbar-pull curve.
+#
+# Steps through commanded speeds, holding each long enough for slip and pull to settle.
+# The resulting pull-versus-slip curve is the standard way wheels are compared in
+# terramechanics, and it is what a single-wheel rig measures - so this is the scenario
+# that Phase 6's rig data gets compared against.
+#
+# Uses the ideal-speed actuator on purpose: the question here is the soil's response, not
+# the drivetrain's, and a saturating drive would truncate the high-slip end of the curve.
+
+name: drawbar-pull
+version: 1
+description: Slip sweep on soft soil, producing a drawbar-pull curve for wheel ranking.
+
+rover: urc-rover
+terrain: scm-flat-soft
+battery: reference-24v
+
+initial_position: [-5.0, 0.0, 0.0]
+drop_height: 0.03
+
+end_time: 36.0
+warmup_time: 3.0
+sample_rate_hz: 200
+step_size: 1.0e-3
+
+driver:
+    type: slip_sweep
+    value: 0.0
+    sweep_values: [1.0, 2.0, 3.0, 4.0, 6.0, 8.0]
+    sweep_hold_s: 5.5
+
+termination:
+    - { type: rollover, threshold: 45.0, pass: false }
+
+metric_groups: [mobility, wheel, motor, numerics]
+
+checks:
+    - metric: wheel.total_drawbar_pull_n.max
+      op: gt
+      value: 1.0
+      description: the sweep produced measurable pull

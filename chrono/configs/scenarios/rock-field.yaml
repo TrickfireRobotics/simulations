@@ -1,0 +1,35 @@
+# Traverse of a seeded rock field on soft soil.
+#
+# Run this across several seeds: one rock layout is an anecdote, and the sweep's
+# confidence interval across seeds is the actual result.
+
+extends: urc-hill
+
+name: rock-field
+version: 1
+description: Seeded rock-field traverse. Run across several seeds, not once.
+
+terrain: scm-rock-field
+
+initial_position: [-8.0, 0.0, 0.0]
+end_time: 45.0
+
+driver:
+    type: constant
+    value: 2.5
+    ramp_time: 2.0
+
+termination:
+    - { type: distance, threshold: 13.0, pass: true }
+    - { type: rollover, threshold: 45.0, pass: false }
+    - { type: immobility, threshold: 0.15, window_s: 6.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 10.0
+      description: the rover crossed the field
+    - metric: stability.wheel_lift_s.duration_s
+      op: lt
+      value: 8.0
+      description: wheels did not spend long off the ground

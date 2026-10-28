@@ -1,0 +1,21 @@
+# Tier 1: a single square step, for rocker-bogie articulation and clearance.
+#
+# The classic rocker-bogie check: a well-articulated six-wheel rover climbs a step of
+# about one wheel diameter. The step height here is deliberately a round number so the
+# result is comparable against a hand calculation.
+
+extends: rigid-flat
+
+name: rigid-step
+version: 1
+description: Tier 1 - one 0.15 m step for articulation and clearance checks.
+
+size_x: 20.0
+size_y: 6.0
+
+obstacles:
+    - type: box
+      position: [4.0, 0.0, -0.0]
+      dimensions: [6.0, 6.0, 0.30]
+      fixed: true
+      friction: 0.9
