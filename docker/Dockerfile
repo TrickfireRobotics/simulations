@@ -43,18 +43,6 @@ RUN userdel ubuntu 2>/dev/null || true && \
     usermod -aG video trickfire
 RUN echo "trickfire ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user
 
-# The Jetson/Tegra libdrm.so.2 is missing drmCloseBufferHandle, which
-# libdrm_nouveau.so.2 needs. Without it, swrast_dri.so fails to load and
-# Mesa GLX has no FB configs. This stub provides the missing symbol so Mesa
-# software rendering works inside the container.
-# Sketchy solution idk what to do with this...
-# TODO: Remove this when graphics are fixed
-RUN printf 'int drmCloseBufferHandle(int fd, unsigned int handle){ return 0; }\n' \
-    > /tmp/drm_stub.c && \
-    gcc -shared -fPIC -o /usr/local/lib/libdrm_stub.so /tmp/drm_stub.c && \
-    rm /tmp/drm_stub.c && \
-    ldconfig
-
 # ---------------------------------------------------------------------------- #
 #                                 VSG + CHRONO                                 #
 # ---------------------------------------------------------------------------- #
