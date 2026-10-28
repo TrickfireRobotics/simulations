@@ -1,0 +1,28 @@
+# How steep a slope can this drivebase climb?
+#
+# Sweeps the terrain's pitch instead of swapping terrain configs, so every grade in the
+# sweep shares one terrain definition and the only thing that changes is the number under
+# test. The answer is the steepest grade whose runs still pass across all seeds.
+
+name: slope-limit
+description: Grade sweep on soft soil - finds the climbable slope limit.
+
+scenario: urc-hill
+seeds: [1, 2]
+
+grid:
+    terrain.pitch_deg: [5, 10, 15, 20, 25, 30]
+
+objectives:
+    - metric: mobility.distance_m
+      direction: maximise
+      label: Distance climbed
+      unit: m
+    - metric: wheel.mean_longitudinal_slip.mean
+      direction: minimise
+      label: Mean slip
+      unit: ""
+    - metric: motor.peak_torque_nm
+      direction: minimise
+      label: Peak motor torque
+      unit: Nm
