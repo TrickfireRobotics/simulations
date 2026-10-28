@@ -21,7 +21,9 @@ RUN echo "------------------- BASE -------------------"
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
-    apt-get install --no-install-recommends -y locales curl gcc git libc6-dev sudo ca-certificates && \
+    apt-get install --no-install-recommends -y \
+    locales curl gcc git libc6-dev sudo ca-certificates \
+    zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search && \
     locale-gen en_US en_US.UTF-8 && \
     update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
@@ -37,7 +39,7 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
 
 # User
 RUN userdel ubuntu 2>/dev/null || true && \
-    useradd trickfire --uid 1000 --shell /bin/bash --create-home --no-log-init && \
+    useradd trickfire --uid 1000 --shell /usr/bin/zsh --create-home --no-log-init && \
     usermod -aG video trickfire
 RUN echo "trickfire ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user
 
@@ -267,6 +269,7 @@ COPY docker/xorg.nvidia.conf /etc/X11/xorg.nvidia.conf
 COPY docker/xorg.dummy.conf /etc/X11/xorg.dummy.conf
 COPY docker/xorg.vkms.conf /etc/X11/xorg.vkms.conf
 COPY docker/bashrc.sh /home/trickfire/.bashrc
+COPY docker/zshrc.zsh /home/trickfire/.zshrc
 
 EXPOSE ${NOVNC_PORT}
 EXPOSE ${VNC_PORT}

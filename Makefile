@@ -10,4 +10,4 @@ format:
 	shfmt -i 4 -s -w .devcontainer/ docker/
 
 attach:
-	docker exec -it simulations bash
+	docker exec -it simulations zsh
