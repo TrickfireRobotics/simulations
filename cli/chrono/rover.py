@@ -124,6 +124,7 @@ def import_rover(hints_path: Path, output: Path | None = None) -> Path:
     )
     info(f"wrote {_relative(destination)}")
 
+    _check_geometry(rover, meshes)
     _report_mass(rover)
     return destination
 
@@ -269,7 +270,25 @@ def _transform_to(model: urdf.Model, link: str, target: str) -> tuple[np.ndarray
     return rotation, translation
 
 
-def _combine_mass(model: urdf.Model, links: list[str], frame: str) -> dict:
+def _body_transform(
+    model: urdf.Model, link: str, body_link: str, align: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Transform from `link`'s own frame into the body's *chassis-aligned* frame.
+
+    The simulator builds every body axis-aligned with the chassis and places it at its
+    link origin, so geometry and inertia have to be expressed that way too. Expressing
+    them in the link's own frame instead is wrong whenever that frame is rotated - and
+    this export rotates all four suspension link frames 90 degrees about X, which lays
+    every rocker and bogie flat and turns its inertia tensor with it.
+
+    `align` is the body link's own rotation in the chassis frame, so composing it here
+    undoes exactly that.
+    """
+    rotation, translation = _transform_to(model, link, body_link)
+    return align @ rotation, align @ translation
+
+
+def _combine_mass(model: urdf.Model, links: list[str], frame: str, align: np.ndarray) -> dict:
     """Sum the mass properties of several links, expressed in one body's frame.
 
     The parallel-axis theorem is applied in full, including the off-diagonal terms, so a
@@ -283,7 +302,7 @@ def _combine_mass(model: urdf.Model, links: list[str], frame: str) -> dict:
         inertial = model.links[link].inertial
         if inertial.mass <= 0:
             continue
-        rotation, translation = _transform_to(model, link, frame)
+        rotation, translation = _body_transform(model, link, frame, align)
         com = translation + rotation @ np.array(inertial.com)
 
         ixx, iyy, izz, ixy, ixz, iyz = inertial.inertia
@@ -362,14 +381,14 @@ def _convert_meshes(model: urdf.Model, rover_name: str) -> dict[Path, str]:
 
 
 def _visual_entries(
-    model: urdf.Model, links: list[str], frame: str, meshes: dict[Path, str]
+    model: urdf.Model, links: list[str], frame: str, align: np.ndarray, meshes: dict[Path, str]
 ) -> list[dict]:
     entries = []
     for link in sorted(links):
         for geometry in model.links[link].visual:
             if geometry.kind != "mesh" or geometry.mesh is None:
                 continue
-            rotation, translation = _transform_to(model, link, frame)
+            rotation, translation = _body_transform(model, link, frame, align)
             position = translation + rotation @ np.array(geometry.position)
             combined = rotation @ _rotation(geometry.rpy)
 
@@ -398,7 +417,7 @@ def _to_rpy(rotation: np.ndarray) -> tuple[float, float, float]:
 
 
 def _collision_entries(
-    model: urdf.Model, links: list[str], frame: str, mode: str, padding: float
+    model: urdf.Model, links: list[str], frame: str, align: np.ndarray, mode: str, padding: float
 ) -> list[dict]:
     """Approximate a body's collision volume with primitives.
 
@@ -422,7 +441,7 @@ def _collision_entries(
             if geometry.scale != 1.0:
                 mesh.apply_scale(geometry.scale)
 
-            rotation, translation = _transform_to(model, link, frame)
+            rotation, translation = _body_transform(model, link, frame, align)
             local = rotation @ _rotation(geometry.rpy)
             offset = translation + rotation @ np.array(geometry.position)
 
@@ -465,15 +484,18 @@ def _build_config(
     collision_mode = hints.chassis_collision.get("mode", "obb_per_mesh")
     padding = float(hints.chassis_collision.get("padding", 0.0))
 
+    # The chassis body *is* the chassis frame, so no realignment is needed for it.
+    identity = np.eye(3)
+
     chassis_mass = _apply_override(
-        _combine_mass(model, tree.chassis_links, chassis_frame),
+        _combine_mass(model, tree.chassis_links, chassis_frame, identity),
         hints.mass_overrides.get("chassis"),
     )
 
     chassis_collision = hints.chassis_collision.get("shapes")
     if chassis_collision is None:
         chassis_collision = _collision_entries(
-            model, tree.chassis_links, chassis_frame, collision_mode, padding
+            model, tree.chassis_links, chassis_frame, identity, collision_mode, padding
         )
     if not chassis_collision:
         raise RoverImportError(
@@ -491,6 +513,10 @@ def _build_config(
         # pivot centre is the child's frame origin expressed in the chassis frame.
         axis_world = rotation @ np.array(joint.axis)
 
+        # The body is built chassis-aligned, so everything hanging off it is expressed
+        # that way too rather than in this link's own (here, rotated) frame.
+        align = rotation
+
         pivot = {
             "name": hint.get("name", entry["joint"]),
             "parent": "chassis"
@@ -499,10 +525,10 @@ def _build_config(
             "position": [round(float(v), 6) for v in translation],
             "axis": hint.get("axis") or _snap_axis(axis_world, entry["joint"]),
             "mass_properties": _apply_override(
-                _combine_mass(model, entry["links"], joint.child),
+                _combine_mass(model, entry["links"], joint.child, align),
                 hints.mass_overrides.get(entry["joint"]),
             ),
-            "visual": _visual_entries(model, entry["links"], joint.child, meshes),
+            "visual": _visual_entries(model, entry["links"], joint.child, align, meshes),
         }
 
         limits = hint.get("limits_deg")
@@ -559,7 +585,7 @@ def _build_config(
         "body_restitution": hints.body_restitution,
         "chassis": {
             "mass_properties": chassis_mass,
-            "visual": _visual_entries(model, tree.chassis_links, chassis_frame, meshes),
+            "visual": _visual_entries(model, tree.chassis_links, chassis_frame, identity, meshes),
             "collision": chassis_collision,
         },
         "pivots": pivots,
@@ -623,6 +649,57 @@ def _apply_override(properties: dict, override: dict | None) -> dict:
     merged.update(override)
     merged.setdefault("provenance", "measured")
     return merged
+
+
+def _check_geometry(rover: dict, meshes: dict[Path, str]) -> None:
+    """Warn when a suspension body's geometry does not reach the wheels it carries.
+
+    This exists because the frames got mixed up once and nothing noticed: the four
+    suspension link frames are rotated 90 degrees about X, the bodies are built
+    chassis-aligned, and expressing the meshes in the link frames laid every arm flat.
+    The rover still settled level, carried load on all six wheels and passed every
+    physics check - it just drew, and spun, a rover whose arms were not attached to
+    anything.
+
+    So the check is geometric: a wheel's hub has to fall inside the bounding box of the
+    body it hangs off, with a little margin. It is a warning rather than an error
+    because an unusual suspension could legitimately fail it, but anything tripping it
+    is worth looking at before trusting a result.
+    """
+    import trimesh
+
+    bodies = {p["name"]: p for p in rover.get("pivots", [])}
+
+    for station in rover.get("wheels", []):
+        parent = bodies.get(station["parent"])
+        if not parent or not parent.get("visual"):
+            continue
+
+        low = np.full(3, np.inf)
+        high = np.full(3, -np.inf)
+        for entry in parent["visual"]:
+            mesh = trimesh.load(CHRONO_DIR / entry["file"], force="mesh")
+            rotation = _rotation([math.radians(a) for a in entry.get("rotation", [0, 0, 0])])
+            vertices = (
+                (rotation @ np.asarray(mesh.vertices).T).T
+                + np.array(entry["position"])
+                + np.array(parent["position"])
+            )
+            low = np.minimum(low, vertices.min(axis=0))
+            high = np.maximum(high, vertices.max(axis=0))
+
+        hub = np.array(station["position"])
+        margin = 0.05
+        outside = (hub < low - margin) | (hub > high + margin)
+        if outside.any():
+            axes = ", ".join("xyz"[i] for i in range(3) if outside[i])
+            warn(
+                f"wheel '{station['id']}' sits outside the bounds of '{parent['name']}' "
+                f"along {axes}: hub at {np.round(hub, 3).tolist()}, body spans "
+                f"{np.round(low, 3).tolist()} to {np.round(high, 3).tolist()}. The arm "
+                "does not reach its own wheel, which usually means a frame or axis is "
+                "being dropped somewhere in the import."
+            )
 
 
 def _report_mass(rover: dict) -> None:

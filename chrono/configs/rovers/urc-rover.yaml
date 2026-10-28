@@ -13,7 +13,7 @@ source:
   urdf: gazebo/chassis_description/urdf/chassis.urdf
   urdf_hash: sha256:a3b258e44f99f5611d2bee4e349547f7
   rendered_urdf: data/rovers/urc-rover/rover.urdf
-  generated: '2026-10-28T01:27:21+00:00'
+  generated: '2026-10-28T21:05:06+00:00'
   xacro_args: {}
 body_friction: 0.8
 body_restitution: 0.0
@@ -42,14 +42,14 @@ pivots:
   axis: [0.0, 1.0, 0.0]
   mass_properties:
     mass: 3.2105
-    com: [0.126856, 0.075422, -0.019238]
-    inertia_xx: [0.019126, 0.121662, 0.139995]
-    inertia_xy: [-0.0389331, -9.673e-05, -6.3577e-05]
+    com: [0.126856, -0.019238, -0.075422]
+    inertia_xx: [0.019126, 0.139995, 0.121662]
+    inertia_xy: [-9.6587e-05, 0.0389331, 6.351e-05]
     provenance: cad
   visual:
   - file: data/rovers/urc-rover/meshes/top__mid__arm.obj
-    position: [0.0, 0.0, 0.232]
-    rotation: [90.0002, -0.0, 0.0]
+    position: [0.0, 0.232, -1.0e-06]
+    rotation: [0.0, -0.0, 0.0]
     scale: 1.0
     color: [0.647, 0.647, 0.647]
   limits_deg: [-40, 40]
@@ -59,14 +59,14 @@ pivots:
   axis: [0.0, 1.0, 0.0]
   mass_properties:
     mass: 2.2883
-    com: [-0.00108, 0.069791, -0.019333]
-    inertia_xx: [0.00365701, 0.0414024, 0.0444879]
-    inertia_xy: [0.000389844, 8.24e-07, -3.059e-05]
+    com: [-0.00108, -0.019333, -0.069791]
+    inertia_xx: [0.00365701, 0.0444879, 0.0414024]
+    inertia_xy: [8.22e-07, -0.000389844, 3.0578e-05]
     provenance: cad
   visual:
   - file: data/rovers/urc-rover/meshes/front_arm.obj
-    position: [0.203, -0.08437, 0.232]
-    rotation: [90.0002, -0.0, 0.0]
+    position: [0.203, 0.232, 0.084369]
+    rotation: [0.0, -0.0, 0.0]
     scale: 1.0
     color: [0.231, 0.38, 0.706]
   limits_deg: [-40, 40]
@@ -76,14 +76,14 @@ pivots:
   axis: [0.0, 1.0, 0.0]
   mass_properties:
     mass: 3.2105
-    com: [0.126856, -0.075422, -0.019238]
-    inertia_xx: [0.019126, 0.121662, 0.139995]
-    inertia_xy: [0.0389331, -9.673e-05, 6.3577e-05]
+    com: [0.126856, 0.019238, -0.075422]
+    inertia_xx: [0.019126, 0.139995, 0.121662]
+    inertia_xy: [9.6587e-05, 0.0389331, -6.351e-05]
     provenance: cad
   visual:
   - file: data/rovers/urc-rover/meshes/part_3.obj
-    position: [0.0, 0.0, 0.232]
-    rotation: [-90.0002, -0.0, 0.0]
+    position: [0.0, -0.232, -1.0e-06]
+    rotation: [-0.0, -0.0, 0.0]
     scale: 1.0
     color: [0.647, 0.647, 0.647]
   limits_deg: [-40, 40]
@@ -93,14 +93,14 @@ pivots:
   axis: [0.0, 1.0, 0.0]
   mass_properties:
     mass: 2.2883
-    com: [-0.00108, -0.069791, -0.019333]
-    inertia_xx: [0.00365701, 0.0414024, 0.0444879]
-    inertia_xy: [-0.000389844, 8.24e-07, 3.059e-05]
+    com: [-0.00108, 0.019333, -0.069791]
+    inertia_xx: [0.00365701, 0.0444879, 0.0414024]
+    inertia_xy: [-8.22e-07, -0.000389844, -3.0578e-05]
     provenance: cad
   visual:
   - file: data/rovers/urc-rover/meshes/part_4.obj
-    position: [0.203, 0.08437, 0.232]
-    rotation: [-90.0002, -0.0, 0.0]
+    position: [0.203, -0.232, 0.084369]
+    rotation: [-0.0, -0.0, 0.0]
     scale: 1.0
     color: [0.231, 0.38, 0.706]
   limits_deg: [-40, 40]
