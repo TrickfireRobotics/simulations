@@ -2,7 +2,7 @@
 
 #include "chrono_vsg/ChVisualSystemVSG.h"
 
-#include "orbit_camera.hpp"
+#include "gui/orbit_camera.hpp"
 
 namespace trickfire {
 

@@ -1,4 +1,4 @@
-#include "vis_system.hpp"
+#include "gui/vis_system.hpp"
 
 using namespace chrono;
 
