@@ -1,0 +1,40 @@
+# A generic 6S lithium pack, matched to configs/actuators/reference-24v.yaml.
+#
+# NOT THE ROVER'S PACK. Like the reference actuator, this exists so the energy and
+# voltage-sag accounting can be built and tested. Its provenance is "estimated", so a
+# scenario requiring measured inputs refuses it.
+#
+# The OCV curve is a typical 6S Li-ion shape: 25.2 V full, a long flat middle, and a
+# steep knee below 20%.
+
+name: reference-24v
+description: Generic 6S Li-ion pack - pipeline reference only, not the rover's.
+
+ocv_curve:
+    - [0.00, 19.8]
+    - [0.10, 21.6]
+    - [0.20, 22.5]
+    - [0.40, 23.3]
+    - [0.60, 23.9]
+    - [0.80, 24.6]
+    - [1.00, 25.2]
+
+capacity_ah: 20.0
+internal_resistance_ohm: 0.035
+wiring_resistance_ohm: 0.015
+current_limit_a: 120.0
+auxiliary_load_w: 40.0
+initial_soc: 1.0
+
+# Most rover drive controllers have nowhere to put regenerated energy and simply reject
+# it. Set accept_regen true only once the real controller is known to accept it, because
+# it changes the energy-per-metre figure on any descending traverse.
+accept_regen: false
+regen_current_limit_a: 0.0
+
+provenance:
+    quality: estimated
+    notes: >
+        Invented, internally consistent pack. The internal resistance matters most here:
+        it sets the voltage sag that limits torque when all six drives pull at once, and
+        it is the easiest thing on this list to measure for real.
