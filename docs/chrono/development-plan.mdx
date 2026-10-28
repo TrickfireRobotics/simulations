@@ -1,0 +1,434 @@
+---
+title: Chrono Development Plan
+description: Plan for turning the Chrono prototype into a validated rover, wheel, drivetrain, and terrain test system.
+---
+
+The goal is a repeatable engineering tool for comparing wheels, drive motors, suspension geometry, and complete drivebase designs on representative URC terrain. The simulation should be useful in two modes: an interactive viewer for debugging and a headless experiment runner for producing comparable data.
+
+## Recommendation
+
+Keep Project Chrono as the physics core and build the product around a **configuration-driven, headless experiment runner**. Treat the current GUI as a viewer for the same simulation, not as the source of truth. Use Chrono's multibody system for the rover, SCM for most deformable-soil studies, rigid terrain for suspension and obstacle regression tests, and a small number of higher-fidelity CRM or DEM studies to check whether SCM preserves wheel rankings.
+
+The recommended model pipeline is:
+
+```text
+wheel packages + rover URDF + actuator profiles + terrain profiles + scenario
+                                  |
+                                  v
+                         validated run manifest
+                                  |
+                   +--------------+--------------+
+                   |                             |
+             headless runner                GUI viewer
+                   |
+        raw telemetry + summary + report
+```
+
+This structure makes runs reproducible, enables batch sweeps, and prevents GUI state from silently changing test conditions.
+
+<Callout type="warning" title="Simulation is not validation">
+    A wheel ranking is only trustworthy after the terrain and actuator models are calibrated against physical tests. Uncalibrated SCM parameters can still produce convincing visuals and incorrect engineering conclusions.
+</Callout>
+
+## Starting baseline
+
+This section describes the single-wheel prototype that the work in
+[Implementation status](#implementation-status) replaced. It is kept because the gap table below
+is still the clearest statement of what had to change and why.
+
+The repository had a useful single-wheel prototype:
+
+- one driven mesh or cylindrical wheel on SCM deformable terrain
+- live torque, speed, force, sinkage, and solver telemetry
+- a VSG/ImGui viewer and basic wheel selection
+- optional per-wheel mass, inertia, radius, scale, and rotation settings
+- a Python `sim chrono` launcher
+
+The main gaps found in that model were:
+
+| Area | Current state | Required change |
+| --- | --- | --- |
+| Rover | Only one wheel is simulated | Load and simulate the full six-wheel rover |
+| Suspension | `left_rocker`, `right_rocker`, `left_upper_arm`, and `right_upper_arm` are fixed joints | Restore the two rocker pivots, two bogie pivots, joint limits, and left-right differential behavior |
+| Mass properties | Wheel links use `1e-09` kg placeholders | Use measured or CAD-derived mass, center of mass, and full inertia tensors |
+| Collision | Chassis uses detailed triangle meshes and wheels use generic cylinders | Create deliberate, simplified chassis collision geometry and wheel collision meshes that retain tread features |
+| Actuation | An ideal speed source drives the wheel | Use a torque-producing motor/controller model with current, voltage, speed, thermal, and battery limits |
+| Terrain | One flat, split-soil patch | Add versioned rigid, height-map SCM, mixed, and high-fidelity validation terrains |
+| Configuration | Defaults are compiled into C++; wheel TOML parsing is partial | Use schema-validated, versioned configuration files |
+| Results | Values are visible in the GUI | Save run metadata, time-series data, summary metrics, plots, and pass/fail checks |
+| Reproducibility | The container clones Chrono's moving `main` branch and patches it during image build | Pin an exact release or commit and track the patch as a real patch file or remove it after upgrading |
+
+## Target command-line workflow
+
+The CLI should make the common workflow short while retaining every input in a run manifest.
+
+```bash
+# import and validate a wheel exported from CAD
+sim chrono wheel import exports/wheel.step \
+    --name paddle-v4 --units mm --roll-axis z --mass 3.2kg
+
+# inspect available assets and validate the rover model
+sim chrono wheel list
+sim chrono validate rover configs/rovers/urc-rover.yaml
+
+# interactive debugging
+sim chrono run scenarios/urc-hill.yaml --wheel paddle-v4
+
+# reproducible headless run and a parameter sweep
+sim chrono run scenarios/urc-hill.yaml --wheel paddle-v4 --headless --seed 42
+sim chrono sweep studies/wheel-comparison.yaml --jobs 8
+
+# rebuild a report from saved results
+sim chrono report results/2026-10-26T183000Z-wheel-comparison
+```
+
+The existing `sim chrono run <wheel>` command can remain as a compatibility shortcut that resolves to a default scenario.
+
+## Repository structure
+
+```text
+chrono/
+  src/
+    app/                 CLI-facing runner and GUI application
+    config/              schema loading, validation, resolved manifests
+    rover/               rover assembly, rocker-bogie, wheel mounting
+    powertrain/          motor, controller, battery, thermal models
+    terrain/             rigid, SCM, mixed, and height-map builders
+    experiments/         scenarios, termination rules, metrics
+    reporting/           telemetry writers and run summaries
+  configs/
+    actuators/
+    batteries/
+    rovers/
+    soils/
+    terrains/
+    scenarios/
+    studies/
+  data/
+    wheels/<wheel-name>/
+      wheel.yaml
+      visual.obj
+      collision.obj
+      source.step
+    terrain/
+  schemas/
+  tests/
+results/                  ignored except for small reference results
+```
+
+Use YAML for authored configuration and publish a JSON Schema for validation and editor completion. Every completed run should save the fully resolved configuration, so changes to inherited defaults cannot alter an old result.
+
+## Model design
+
+### Rover and rocker-bogie
+
+Chrono's [URDF parser](https://api.projectchrono.org/classchrono_1_1parsers_1_1_ch_parser_u_r_d_f.html) can create bodies, joints, contact materials, mesh collision shapes, and actuated joints. Enable the Chrono Parsers module and use a cleaned URDF as the geometry and mass-property source. The current file contains Xacro properties, an include, and `package://` mesh paths, so the CLI must first render it to a plain, normalized URDF with resolvable asset paths. Keep that generated file out of the source-of-truth model. After import, add any coupling that URDF cannot express.
+
+For this rover:
+
+1. Correct the chassis URDF names, joint types, axes, origins, limits, mass properties, and collision shapes.
+2. Model each chassis-to-rocker and rocker-to-bogie connection as a passive revolute joint.
+3. Represent the mechanical differential explicitly if the physical rover has one. A simple kinematic constraint enforcing opposite rocker rotations is acceptable only if it matches the hardware. If there is no differential, model the real independent arrangement instead.
+4. Mount all six wheels through torque motors, not ideal speed constraints.
+5. Add optional steering joints only if the hardware has them. Skid steering can be driven through separate left/right wheel commands.
+
+Chrono's own [Curiosity model](https://github.com/projectchrono/chrono/tree/main/src/chrono_models/robot/curiosity) is the best implementation reference. It includes separate rocker and bogie bodies, a physical differential linkage, six wheel drives, SCM demos, and CSV output. The [Curiosity SCM demo](https://github.com/projectchrono/chrono/blob/main/src/demos/robot/curiosity/demo_ROBOT_Curiosity_SCM.cpp) also shows one active SCM domain per wheel and obstacle. The [Viper SCM demo](https://github.com/projectchrono/chrono/blob/main/src/demos/robot/viper/demo_ROBOT_Viper_SCM.cpp) is useful for its simpler motor and rover interfaces.
+
+### Wheel packages and import
+
+Each wheel should be a self-contained, immutable package instead of a loose OBJ/TOML pair. Its manifest should contain:
+
+- source file and content hash
+- units, coordinate frame, roll axis, hub origin, radius, width, and mounting transform
+- mass, center of mass, and full inertia tensor
+- visual mesh and terrain-contact mesh
+- material and manufacturing revision
+- provenance for measured or calculated values
+
+The importer should accept STEP when a CAD converter is available, plus STL and OBJ. It should:
+
+1. Convert to meters and the rover coordinate convention.
+2. Center the mesh on an explicit hub frame, never an inferred visual center without confirmation.
+3. Check for degenerate triangles, disconnected components, unexpected bounds, normals, and a missing hub axis.
+4. Calculate candidate mass properties from a closed mesh and density, while allowing measured values to override them.
+5. Generate a visual mesh and a collision mesh. The collision version should preserve grousers and tread features that affect SCM while removing detail that does not affect contact.
+6. Render a preview and run a short drop/spin smoke test before registering the package.
+
+Do not silently infer units or roll axes. A wheel that is ten times too large can still launch and produce meaningless data.
+
+### RMD-X8 actuator and electrical model
+
+"RMD-X8" is a family, not one parameter set. MyActuator currently lists different X8 variants, gear ratios, interfaces, and torque ratings. For example, the older RMD-X8-Pro is listed as X8-25 with a 1:9 reduction, while other X8 variants have different reductions and limits. Record the full label, hardware revision, interface, firmware, and reduction ratio before entering numbers. Use the manufacturer's [current X-series download page](https://www.myactuator.com/downloads-xseries) and the actual team's datasheet or dynamometer data as the source.
+
+The first useful model should be a torque actuator attached with `ChLinkMotorRotationTorque`, with these layers:
+
+- command path: velocity or torque request, rate limit, control-loop delay, and optional sampled update rate
+- controller: the same saturation and PI/PID behavior used on the rover
+- motor: torque constant, back-EMF constant, phase resistance, rotor inertia, gear ratio, gear efficiency, backlash, and speed limit
+- protection: continuous and peak current, peak-duration logic, bus-voltage limit, temperature derating, and cutoff behavior
+- electrical system: battery open-circuit voltage versus state of charge, internal resistance, current limit, wiring loss, auxiliary load, and regenerative-power policy
+- thermal system: at least a lumped motor/controller thermal resistance and capacitance model
+
+Chrono already supports applied-torque motors, and its [Curiosity DC motor control](https://github.com/projectchrono/chrono/blob/main/src/chrono_models/robot/curiosity/Curiosity.cpp) provides a basic linear stall-torque/no-load-speed example. That is a starting reference, not enough for power or thermal verification.
+
+Store measured curves when available instead of reducing everything to one stall-torque line:
+
+```yaml title="chrono/configs/actuators/rmd-x8-team.yaml"
+schema_version: 1
+identity:
+  manufacturer: MyActuator
+  model: REPLACE_WITH_FULL_PART_NUMBER
+  hardware_revision: REPLACE_WITH_REVISION
+  reduction_ratio: REPLACE_WITH_RATIO
+limits:
+  bus_voltage_v: REPLACE_WITH_MEASURED_VALUE
+  continuous_current_a: REPLACE_WITH_MEASURED_VALUE
+  peak_current_a: REPLACE_WITH_MEASURED_VALUE
+  peak_duration_s: REPLACE_WITH_MEASURED_VALUE
+motor:
+  torque_constant_nm_per_a: REPLACE_WITH_DATASHEET_OR_DYNO_VALUE
+  resistance_ohm: REPLACE_WITH_MEASURED_VALUE
+  rotor_inertia_kg_m2: REPLACE_WITH_DATASHEET_VALUE
+thermal:
+  ambient_c: 25
+  derate_start_c: REPLACE_WITH_CONTROLLER_SETTING
+  cutoff_c: REPLACE_WITH_CONTROLLER_SETTING
+provenance:
+  datasheet: REPLACE_WITH_FILE_OR_URL
+  measured_on: null
+```
+
+### Terrain fidelity ladder
+
+One terrain model should not be used for every question.
+
+| Tier | Model | Use |
+| --- | --- | --- |
+| 0 | Rigid flat ground | drivetrain, controls, energy accounting, and regression tests |
+| 1 | Rigid procedural obstacles | rocker-bogie articulation, clearance, rollover, step and rock traversal |
+| 2 | SCM flat or height-map terrain | wheel ranking, slip, sinkage, drawbar pull, slopes, and repeated passes |
+| 3 | Mixed rigid and SCM patches | embedded rocks, firm crust, and loose-soil transitions |
+| 4 | CRM or particle DEM | a small set of high-fidelity studies used to challenge and calibrate SCM |
+
+Chrono's [terrain documentation](https://api.projectchrono.org/vehicle_terrain.html) describes SCM as a comparatively lightweight deformable model suitable for rigid or FEA wheel collision geometry. It supports height-map initialization and location-dependent soil parameters. Chrono also ships [rigid, SCM, mixed-patch, tire-rig, and CRM demos](https://api.projectchrono.org/vehicle_terrain_crm_api_.html), which should be copied conceptually rather than reimplemented from memory.
+
+The baseline terrain library should include:
+
+- level hardpan and level loose soil
+- constant slopes at several grades, including side slopes
+- cross-axle articulation, sinusoidal washboard, trenches, and isolated steps
+- deterministic rock fields with recorded random seeds
+- loose-to-firm transitions and repeated-wheel tracks
+- a scaled course derived from surveyed URC terrain when data is available
+
+### URC and Utah data
+
+URC is held at the Mars Desert Research Station near Hanksville, Utah. The current URC 2027 Q&A says Delivery and Autonomy runs may exceed 1 km depending on route, the hill uses natural terrain with multiple unspecified inclinations, and a public DEM may be released, probably as GeoTIFF, but release and timing are not guaranteed. That means the simulator should not depend on receiving the official map. See the [URC requirements](https://urc.marssociety.org/home/requirements-guidelines) and [2027 Q&A](https://urc.marssociety.org/home/requirements-guidelines/qa).
+
+Build Utah terrain in two layers:
+
+- **Geometry:** ingest GeoTIFF/DEM, point clouds, or photogrammetry; crop, level, resample, remove vegetation artifacts, and export both a height map for SCM and a mesh for rigid terrain. Preserve the source CRS, transform, resolution, vertical scale, crop, and content hash in metadata.
+- **Soil:** create measured soil profiles for loose sand, sandy/clayey hardpan, gravel, and disturbed wheel tracks. Nearby Hanksville geology includes clay-rich mudstone and sandy clay units, but geology is not a substitute for test-site terramechanics measurements. The [USGS Hanksville-area material descriptions](https://pubs.usgs.gov/bul/1150/report.pdf) are useful context only.
+
+Calibrate SCM with physical tests. Plate-sinkage tests identify Bekker pressure-sinkage terms, shear tests identify cohesion, friction angle, and Janosi shear length, and repeated/dynamic loading helps tune elastic stiffness and damping. Then validate the combined profile with a single-wheel rig measuring wheel load, torque, speed, drawbar pull, slip, and sinkage. Chrono documents the meaning and units of these parameters in the [SCMTerrain API](https://api.projectchrono.org/10.0.0/classchrono_1_1vehicle_1_1_s_c_m_terrain.html).
+
+## Experiments and reporting
+
+Every scenario should define initial pose, terrain, driver input, termination rules, sampling rate, warm-up interval, random seed, and requested metrics. Runs should be non-interactive by default in CI and sweeps.
+
+Save this layout per run:
+
+```text
+results/<timestamp>-<study>/<run-id>/
+  manifest.yaml          fully resolved inputs and asset hashes
+  environment.json       git commit, Chrono commit, build flags, machine, solver
+  telemetry.csv.zst      time-series data
+  events.jsonl           limit, contact, cutoff, rollover, and termination events
+  summary.json           scalar results and pass/fail checks
+  report.html            plots and comparison tables
+  preview.png            optional final or worst-case frame
+```
+
+Start with CSV written by C++ and compress or convert it in the Python CLI. Adding the Arrow C++ stack only to write Parquet is unnecessary at this stage. A later Python reporting step can produce Parquet if study size requires it.
+
+Collect at least:
+
+| Group | Metrics |
+| --- | --- |
+| Mobility | distance, commanded and actual speed, completion time, path error, grade, rollover/immobility events |
+| Wheel | angular speed, longitudinal and lateral slip, sinkage, normal load, contact force/torque, drawbar pull |
+| Suspension | rocker/bogie angles and rates, joint reactions, articulation range, chassis roll/pitch, ground clearance |
+| Motor | requested/applied torque, output speed, mechanical power, current, voltage utilization, saturation time, temperature |
+| Energy | battery power, cumulative Wh, peak current, voltage sag, state of charge, regeneration rejected/accepted |
+| Stability | support polygon margin or tip indicator, wheel lift duration, peak roll/pitch rates |
+| Numerics | step size, real-time factor, solver iterations/failures, SCM ray casts/hits, contact count |
+
+Comparison reports should show confidence intervals across seeds and parameter uncertainty, not only one best-looking run. A wheel study should rank candidates by several objectives, such as climb completion, energy per meter, peak motor temperature, slip, sinkage, and stability, rather than collapsing everything into an unexplained score.
+
+## Implementation status
+
+The software spine of this plan is built. What follows records where each phase stands, so the
+plan stays a working document rather than a historical one.
+
+| Phase | State | What is left |
+| --- | --- | --- |
+| 0 — Reproducible prototype | **Done** | Chrono pinned to an exact commit, the `sed` replaced by a tracked patch that must apply with no fuzz, simulation split from visualisation and telemetry, resolved run manifests, seeded runs, CI smoke test and a same-machine determinism check. The cross-machine half of the exit gate needs a second host. |
+| 1 — Wheel asset pipeline | **Done** | `wheel import/generate/list/validate/inspect`, versioned packages with content hashes, unit and axis validation, mass-property handling, tread-preserving collision meshes, previews. The prototype wheel is migrated. |
+| 2 — Physically valid chassis | **Structurally done, data blocked** | Rover is generated from the URDF with fixed joints collapsed, pivots restored, axis signs normalised, collision approximated by primitives, and drop/articulation/step fixtures in place. Still needs: measured complete-rover mass and centre of mass, confirmation of whether the hardware has a differential, measured pivot travel limits, and a review of the generated collision boxes. |
+| 3 — Drivetrain and power | **Model done, numbers blocked** | Torque-driven wheels through `ChLinkMotorRotationTorque`, with command path, controller, motor, I²t and voltage protection, lumped thermal model and a shared battery with sag and regen policy. Unit-tested against hand calculations. Still needs the actual RMD-X8 part number and its measured parameters; `rmd-x8-team.yaml` is placeholders that the simulator refuses to run. |
+| 4 — Terrain and scenario library | **Mostly done** | Rigid, SCM flat, height-map, slope, side-slope, mixed-region and seeded rock-field builders; GeoTIFF, ASCII-grid and point-cloud ingestion with provenance sidecars; ten scenarios. Still needs real survey data and measured soils. |
+| 5 — Study orchestration and reports | **Done** | `run`, `sweep`, `--resume`, `report`, `compare`; all seven metric groups; summary metrics, pass/fail checks, events, self-contained HTML reports with confidence intervals across seeds. |
+| 6 — Calibrate and validate | **Not started** | This is physical work: a single-wheel rig, dynamometer runs, plate-sinkage and shear tests, field traverses. No amount of software substitutes for it. |
+| 7 — Package for team use | **Partly done** | Authoring guides and a user guide are written, example configs and reference wheels ship, CI runs the regression study. Still needs the pinned image cached for CI and named owners for model data, calibration and releases. |
+
+### What the model does not know yet
+
+Each of these is a `REPLACE_WITH_*` placeholder or a labelled assumption, and the simulator
+refuses to run anything that depends on one:
+
+- the RMD-X8 part number, reduction, controller gains, and measured motor constants
+- the battery's open-circuit curve and internal resistance
+- the Hanksville soil profiles, both loose sand and hardpan
+- the complete rover's measured mass and centre of mass
+- whether the rocker-bogie has a differential, and its linkage geometry if so
+- the rocker and bogie travel limits as built
+
+`reference-24v` (actuator and battery) and `scm-soft-soil` exist so the pipeline can be
+developed and regression-tested. They are invented or generic, labelled `estimated`, and every
+report states which of its inputs were unmeasured.
+
+<Callout type="warning" title="Two findings worth carrying forward">
+    Building this surfaced two problems that would have quietly corrupted results.
+
+    **A rocker-bogie with free pivots has no rest attitude.** Six wheel contacts leave one degree
+    of freedom unconstrained, and the differential is what removes it. With `differential: none`
+    the chassis folds onto its travel stops and settles at roughly 39° of pitch on flat ground
+    with all six wheels loaded. The model now assumes a kinematic differential, and the drop
+    fixture checks settled pitch and rocker angles so this cannot recur unnoticed.
+
+    **An under-iterated solver does not enforce that differential at all.** With Chrono's default
+    iteration count the constraint was silently ignored and the suspension drifted to its stops
+    anyway. `solver_iterations` is now pinned in the manifest and recorded per run.
+</Callout>
+
+## Development phases
+
+### Phase 0: Make the prototype reproducible
+
+- Pin the Chrono source revision and record it at run time.
+- Replace the inline `sed` source mutation with a tracked patch or upgrade to a version where it is unnecessary.
+- Split simulation, visualization, and telemetry loops so the same scene runs headless.
+- Add a resolved run manifest, deterministic seed handling, output directories, and one CI smoke test.
+
+**Exit gate:** the same short run produces matching summary metrics within documented numerical tolerances on two machines.
+
+### Phase 1: Build the wheel asset pipeline
+
+- Introduce wheel package directories and a versioned schema.
+- Implement `wheel import`, `wheel validate`, `wheel list`, and `wheel inspect`.
+- Add mesh checks, unit/axis validation, mass-property handling, collision-mesh generation, and previews.
+- Migrate the existing wheel.
+
+**Exit gate:** a new CAD wheel can be imported without editing C++, and a bad scale, axis, or mass fails validation before launch.
+
+### Phase 2: Make the chassis physically valid
+
+- Enable Chrono Parsers in the container build.
+- Clean the chassis URDF, add measured or CAD mass properties, and add deterministic Xacro-to-URDF preprocessing.
+- Replace expensive chassis collision meshes with validated primitives or convex approximations.
+- Restore rocker and bogie revolute joints and implement the real differential arrangement.
+- Add wheel mounting transforms and selection of any valid wheel package.
+
+**Exit gate:** drop, articulation, single-step, diagonal-obstacle, and static-load tests match hand calculations and physical measurements.
+
+### Phase 3: Add drivetrain and power
+
+- Implement torque-driven wheels and the first RMD-X8/controller configuration.
+- Add current, voltage, speed, peak-duration, thermal, and battery constraints.
+- Replay commands recorded from hardware where possible.
+- Verify sign conventions and power balance at every wheel.
+
+**Exit gate:** bench torque-speed-current tests and simulated results agree within a predeclared tolerance over the operating region.
+
+### Phase 4: Add the terrain and scenario library
+
+- Implement rigid, SCM height-map, mixed-patch, rock-field, slope, and obstacle builders.
+- Add GeoTIFF/point-cloud preprocessing in the Python CLI.
+- Add versioned soil profiles with provenance and uncertainty ranges.
+- Create URC-representative long traverse, hill, side-slope, rock, trench, and loose-soil scenarios.
+
+**Exit gate:** every terrain can be generated headlessly from source data, and no hand-edited intermediate file is required.
+
+### Phase 5: Add study orchestration and reports
+
+- Add run, sweep, resume, compare, and report commands.
+- Write all rover, wheel, motor, energy, stability, and solver channels.
+- Add summary metrics, limits, pass/fail assertions, plots, and run-to-run comparisons.
+- Make failed or interrupted runs retain useful diagnostics.
+
+**Exit gate:** one command compares several wheels across several terrains and produces a self-contained report with traceable inputs.
+
+### Phase 6: Calibrate and validate
+
+- Build or instrument a single-wheel test rig.
+- Measure the actual motor/controller, battery sag, wheel properties, and representative soils.
+- Fit soil parameters on one dataset and validate on separate tests.
+- Compare full-rover slope, obstacle, energy, and thermal results against field tests.
+- Run time-step, grid-resolution, collision-mesh, and parameter-sensitivity studies.
+
+**Exit gate:** publish the valid operating envelope and quantified error for each claimed metric. Results outside that envelope must be labeled exploratory.
+
+### Phase 7: Package for team use
+
+- Add short authoring guides for wheels, terrains, actuators, scenarios, and studies.
+- Ship example configurations and small reference results.
+- Cache the pinned container image and add CI regression studies.
+- Define ownership for model data, calibration, and simulator releases.
+
+**Exit gate:** a team member who did not build the simulator can import a wheel, run the standard study, and interpret the report from documentation alone.
+
+## Verification strategy
+
+Use four layers of verification:
+
+1. **Software tests:** configuration schema, unit conversions, mesh validation, deterministic seeds, motor equations, metric calculations, and output completeness.
+2. **Physics unit tests:** free fall, pendulum, inertia checks, constrained joints, static wheel loads, ideal slope force, power conservation, and thermal step response.
+3. **Subsystem validation:** single wheel on rigid ground and soil, motor dyno, battery load, rocker-bogie obstacle fixture, and chassis center-of-mass measurement.
+4. **System validation:** full rover on known slopes, rocks, trenches, and long traverses with synchronized hardware logs.
+
+For every benchmark, define the measured quantity, sensor uncertainty, allowed simulation error, and pass/fail threshold before running the comparison.
+
+## Scope boundaries
+
+Keep the first release focused on mobility engineering. Defer these unless a concrete test requires them:
+
+- cameras, LiDAR, autonomy, and ROS integration
+- flexible wheel FEA
+- large CRM or particle-DEM course simulation
+- photorealistic rendering
+- real-time hardware-in-the-loop control
+
+Chrono has a [ROS module](https://api.projectchrono.org/development/tutorial_table_of_content_chrono_ros.html) and sensor support, so those can be added later without making them dependencies of wheel and drivebase studies.
+
+## Decisions needed before Phase 2
+
+- exact RMD-X8 part number, hardware revision, gear ratio, and controller firmware
+- whether the physical rocker-bogie uses a mechanical differential and its actual linkage geometry
+- authoritative chassis CAD/URDF revision and measured complete-rover mass/center of mass
+- expected wheel input formats and whether STEP conversion can depend on a containerized CAD tool
+- which physical soil and single-wheel tests the team can perform
+- target hardware and acceptable wall-clock time for a standard study
+
+## Reference implementations and research
+
+- [Project Chrono repository](https://github.com/projectchrono/chrono), the upstream source and demos
+- [Chrono Curiosity model](https://github.com/projectchrono/chrono/tree/main/src/chrono_models/robot/curiosity), the closest full rocker-bogie implementation
+- [Chrono Viper model](https://github.com/projectchrono/chrono/tree/main/src/chrono_models/robot/viper), a useful rover and motor-control reference
+- [Chrono URDF demo](https://github.com/projectchrono/chrono/blob/main/src/demos/parsers/demo_PARSER_URDF.cpp), the import path proposed for the chassis
+- [Chrono SCM wheeled-vehicle demo](https://github.com/projectchrono/chrono/blob/main/src/demos/vehicle/terrain/demo_VEH_SCMTerrain_WheeledVehicle.cpp), a full vehicle on deformable terrain
+- [Chrono terrain models](https://api.projectchrono.org/vehicle_terrain.html), capabilities and limitations of rigid and deformable terrain
+- [NASA JPL Open Source Rover rocker-bogie](https://github.com/nasa-jpl/open-source-rover/tree/master/mechanical/rocker_bogie), a mechanical design reference rather than a terramechanics simulator
+- [DLR terramechanics program](https://www.dlr.de/en/rm/research/expertise/terramechanics), an example of using experiments, SCM, and DEM together
+- [Team Deimos URC Gazebo simulation](https://github.com/Team-Deimos-IIT-Mandi/Gazebo-Simulation), useful for URC workflow and ROS ideas but not a replacement for Chrono soil physics
+- [Rover-Sim rocker-bogie Gazebo model](https://github.com/chetanborse1999/Rover-Sim), a small URDF/Gazebo implementation to inspect for model organization
+- [URC 2027 requirements and Q&A](https://urc.marssociety.org/home/requirements-guidelines), the current competition source for course expectations
