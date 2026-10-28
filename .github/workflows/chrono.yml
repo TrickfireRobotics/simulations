@@ -1,0 +1,161 @@
+name: Chrono
+
+on:
+    push:
+        paths:
+            - "chrono/**"
+            - "cli/chrono/**"
+            - "cli/paths.py"
+            - "docker/vsg-chrono.Dockerfile"
+            - "docker/patches/**"
+            - ".github/workflows/chrono.yml"
+    pull_request:
+        paths:
+            - "chrono/**"
+            - "cli/chrono/**"
+            - "cli/paths.py"
+            - "docker/vsg-chrono.Dockerfile"
+            - "docker/patches/**"
+            - ".github/workflows/chrono.yml"
+    workflow_dispatch:
+
+# A push that supersedes an in-flight run should cancel it: a full Chrono build plus the
+# smoke study is not cheap enough to run twice for the same branch.
+concurrency:
+    group: chrono-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    # Everything that needs no Chrono build. Fast, and catches most config mistakes.
+    configs:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-python@v7
+              with:
+                  python-version: "3.12"
+
+            - name: Install the CLI
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install numpy pyyaml trimesh matplotlib jsonschema zstandard
+
+            - name: Validate every config against its schema
+              run: python -m cli.cli chrono validate all
+
+            - name: Validate every wheel package
+              run: python -m cli.cli chrono wheel validate
+
+            - name: List the asset library
+              run: python -m cli.cli chrono list
+
+            - name: Check the rover import is reproducible
+              # The committed rover config is generated. Re-importing must reproduce it
+              # byte for byte, or the config and the URDF have drifted apart.
+              run: |
+                  python -m cli.cli chrono rover import urc-rover \
+                      --out /tmp/urc-rover.regenerated.yaml
+                  # The header carries a generation timestamp, so compare the body only.
+                  sed '/^#/d' chrono/configs/rovers/urc-rover.yaml > /tmp/committed.yaml
+                  sed '/^#/d' /tmp/urc-rover.regenerated.yaml > /tmp/regenerated.yaml
+                  python - <<'PY'
+                  import sys, yaml
+                  a = yaml.safe_load(open('/tmp/committed.yaml'))
+                  b = yaml.safe_load(open('/tmp/regenerated.yaml'))
+                  # `generated` is a timestamp, so it is expected to differ.
+                  for d in (a, b):
+                      d.get('source', {}).pop('generated', None)
+                  if a != b:
+                      print('The committed rover config does not match a fresh import.')
+                      print('Run: sim chrono rover import urc-rover')
+                      sys.exit(1)
+                  print('rover config matches a fresh import')
+                  PY
+
+    # Phase 0's exit gate: the same short run has to produce matching summary metrics.
+    # Building Chrono from source in CI would take far too long, so this uses the pinned
+    # prebuilt image that docker/vsg-chrono.Dockerfile publishes.
+    smoke:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/trickfirerobotics/simulations-vsg-chrono:latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Record the pinned Chrono revision
+              run: |
+                  echo "Chrono commit: $(cat /home/trickfire/chrono-commit.txt 2>/dev/null || echo unknown)"
+                  echo "Dockerfile pin: $(grep -m1 CHRONO_COMMIT= docker/vsg-chrono.Dockerfile)"
+
+            - name: Install the CLI
+              run: |
+                  python3 -m pip install --break-system-packages --upgrade pip
+                  python3 -m pip install --break-system-packages \
+                      numpy pyyaml trimesh matplotlib jsonschema zstandard
+
+            - name: Build the simulator and its tests
+              run: |
+                  cmake -GNinja -B chrono/build -S chrono \
+                      -DCMAKE_BUILD_TYPE=Release \
+                      -DTRICKFIRE_BUILD_GUI=OFF \
+                      -DTRICKFIRE_BUILD_TESTS=ON
+                  cmake --build chrono/build
+
+            - name: Unit tests
+              working-directory: chrono/build
+              run: ctest --output-on-failure
+
+            - name: Smoke run
+              run: python3 -m cli.cli chrono run smoke --wheel smooth-baseline --headless
+
+            - name: Deformable-terrain run
+              run: python3 -m cli.cli chrono run wheel-drop --wheel wheel-1 --headless
+
+            - name: Determinism check
+              # Two runs of the same manifest with the same seed must agree. This is the
+              # weaker, same-machine half of Phase 0's exit gate; the cross-machine half
+              # is checked by hand against a second host.
+              run: |
+                  python3 -m cli.cli chrono run smoke --wheel smooth-baseline \
+                      --headless --out /tmp/determinism/a
+                  python3 -m cli.cli chrono run smoke --wheel smooth-baseline \
+                      --headless --out /tmp/determinism/b
+                  python3 - <<'PY'
+                  import json, sys
+                  a = json.load(open('/tmp/determinism/a/summary.json'))['metrics']
+                  b = json.load(open('/tmp/determinism/b/summary.json'))['metrics']
+
+                  # Wall-clock and real-time factor legitimately differ between runs.
+                  skip = ('real_time_factor', 'wall_clock')
+                  worst = ('', 0.0)
+                  for key in sorted(set(a) & set(b)):
+                      if any(s in key for s in skip):
+                          continue
+                      x, y = a[key], b[key]
+                      if x is None or y is None:
+                          continue
+                      scale = max(abs(x), abs(y), 1e-9)
+                      error = abs(x - y) / scale
+                      if error > worst[1]:
+                          worst = (key, error)
+
+                  print(f'worst relative disagreement: {worst[1]:.3e} on {worst[0] or "nothing"}')
+                  # A tolerance, not equality: OpenMP reduction order in SCM is not fixed,
+                  # so bitwise equality is not a promise worth making.
+                  if worst[1] > 1e-6:
+                      print('two runs of the same manifest disagreed by more than 1e-6')
+                      sys.exit(1)
+                  PY
+
+            - name: Smoke study and report
+              run: python3 -m cli.cli chrono sweep quick-wheel-check --jobs 2
+
+            - name: Upload results
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: chrono-results
+                  path: results/
+                  retention-days: 7
+                  if-no-files-found: warn
