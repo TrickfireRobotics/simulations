@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="chassis_sensors">
+
+    <!-- Kept out of chassis.urdf so `sim gazebo update chassis` doesn't wipe it -->
+
+    <!-- ============================================== -->
+    <!-- GPS: u-blox ZED-F9P RTK GNSS                   -->
+    <!-- ============================================== -->
+
+    <!-- matches `rate: 1.0` in the ublox_gps config the real rover loads -->
+    <xacro:property name="gps_update_rate" value="1.0"/>
+    <xacro:property name="gps_size_x" value="0.06"/>
+    <xacro:property name="gps_size_y" value="0.06"/>
+    <xacro:property name="gps_size_z" value="0.02"/>
+    <xacro:property name="gps_mass" value="0.05"/>
+
+    <!-- link name matches the ublox_gps driver's default frame_id -->
+    <link name="gps">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${gps_mass}"/>
+            <inertia
+                ixx="${gps_mass * (gps_size_y**2 + gps_size_z**2) / 12}" ixy="0" ixz="0"
+                iyy="${gps_mass * (gps_size_x**2 + gps_size_z**2) / 12}" iyz="0"
+                izz="${gps_mass * (gps_size_x**2 + gps_size_y**2) / 12}"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${gps_size_x} ${gps_size_y} ${gps_size_z}"/>
+            </geometry>
+            <material name="gps_material">
+                <color rgba="0.1 0.1 0.1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Centre of the chassis body, resting level on its top face. base_link sits
+         at the OnShape origin rather than the rover's centre, hence the y offset:
+         the body mesh spans x [-0.279, 0.279], y [0.069, 0.527], z [0.251, 0.399] -->
+    <joint name="gps_joint" type="fixed">
+        <parent link="ttb_0094_ttb_0095_2x1_grid_pattern_aluminum_extrusion"/>
+        <child link="gps"/>
+        <origin xyz="0 0.298 ${0.399 + gps_size_z / 2}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Noise-free ground truth; sim_common/ublox_gps.py adds receiver noise and
+         republishes it on the real driver's topics -->
+    <gazebo reference="gps">
+        <sensor name="ublox_zed_f9p" type="navsat">
+            <always_on>true</always_on>
+            <update_rate>${gps_update_rate}</update_rate>
+            <topic>/chassis/gps/navsat</topic>
+            <gz_frame_id>gps</gz_frame_id>
+        </sensor>
+    </gazebo>
+</robot>

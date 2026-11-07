@@ -90,8 +90,8 @@
     <link name="part_1">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1 -->
         <visual>
@@ -122,8 +122,8 @@
     <link name="part_1_2">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1_2 -->
         <visual>
@@ -162,8 +162,8 @@
     <link name="part_1_3">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1_3 -->
         <visual>
@@ -250,8 +250,8 @@
     <link name="part_1_4">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1_4 -->
         <visual>
@@ -282,8 +282,8 @@
     <link name="part_1_5">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1_5 -->
         <visual>
@@ -322,8 +322,8 @@
     <link name="part_1_6">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
-            <mass value="1e-09"/>
-            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.000916875" ixy="0" ixz="0" iyy="0.000916875" iyz="0" izz="0.00165375"/>
         </inertial>
         <!-- Part part_1_6 -->
         <visual>
@@ -366,30 +366,40 @@
         <axis xyz="0 0 1"/>
         <limit effort="10" velocity="10"/>
     </joint>
-    <!-- Wheel ground-contact friction (collision uses a cylinder primitive, not the STL mesh) -->
+    <!-- Wheel ground-contact friction (collision uses a cylinder primitive, not the STL mesh).
+         The CAD has no wheel mass, so the wheel links above use an estimated 0.3 kg: massless
+         wheels get almost no traction. Sideways friction (mu1, along fdir1 = the axle) is lower
+         than rolling friction (mu2) so the rover can skid-steer. Its wheelbase is longer than its
+         track, so with equal friction the wheels' sideways grip stops it turning. -->
     <gazebo reference="part_1">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
     <gazebo reference="part_1_2">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
     <gazebo reference="part_1_3">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
     <gazebo reference="part_1_4">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
     <gazebo reference="part_1_5">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
     <gazebo reference="part_1_6">
-        <mu1>1.0</mu1>
+        <mu1>0.3</mu1>
         <mu2>1.0</mu2>
+        <fdir1>0 0 1</fdir1>
     </gazebo>
 
     <xacro:include filename="$(find chassis_description)/urdf/chassis_control.urdf.xacro"/>

@@ -41,13 +41,15 @@ gazebo/
 
 ## `sim_common`
 
-This is a shared package containing cross-package repetitive code & also independent ROS nodes like the joint GUI. Its `setup.py` registers three console scripts:
+This is a shared package containing cross-package repetitive code & also independent ROS nodes like the joint GUI. Its `setup.py` registers five console scripts:
 
 | Command       | Source                      | Purpose                                                                                                                                                            |
 | ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `move_joints` | `sim_common/move_joints.py` | Publishes a single `JointTrajectory` and exits. See [Moving Joints](./moving-joints#move_joints-node-cli).                                                         |
 | `joint_gui`   | `sim_common/joint_gui.py`   | Tkinter joint slider GUI. See [Moving Joints](./moving-joints#joint-gui) for usage, or [Joint GUI internals](#joint-gui-internals) below for how it's implemented. |
-| `drivebase`   | `sim_common/drivebase.py`   | Sim equivalent of the real rover's drivebase node - converts joystick deflection messages into wheel velocity commands, mirroring `urc-2023/src/drivebase`.        |
+| `drivebase`   | `sim_common/drivebase.py`   | Sim equivalent of the real rover's drivebase node - converts joystick deflection messages into wheel velocity commands, mirroring `urc-2023/src/drivebase`. Also drives from `/cmd_vel` (e.g. Nav2), stopping if it goes quiet for 0.5 s. |
+| `ublox_gps`   | `sim_common/ublox_gps.py`   | Sim equivalent of the real rover's u-blox ZED-F9P driver (`ublox_gps`) - adds receiver noise to the gz NavSat reading and publishes it as `ublox_gps_node`. See [GPS](#gps). |
+| `zed_camera`  | `sim_common/zed_camera.py`  | Sim equivalent of the real rover's StereoLabs ZED 2i (`zed-ros2-wrapper` v5.x) - turns the gz camera, depth rays, IMU and ground-truth pose into the wrapper's `/zed/zed_node/*` topics. See [ZED 2i camera](#zed-2i-camera). |
 
 It also exports `sim_common/launch_utils.py`, a library (not a node) of helpers every `<robot>.launch.py` imports - `get_asset()` for resolving files in a package's share directory, plus node/launch-action builders for the Gazebo server, spawning, controllers, and the ROS-Gazebo bridge. See [launch_utils.py](#launch_utilspy) below for what each helper does.
 
@@ -56,6 +58,7 @@ It also exports `sim_common/launch_utils.py`, a library (not a node) of helpers 
 Holds the environment the robot spawns into:
 
 - `worlds/empty.world.sdf` - the default world, passed to `gz_sim.launch.py` as `-r <world>`
+- `worlds/rover.world.sdf` - the chassis' world: the sensor systems (rendering `Sensors`, `Imu`, `NavSat`) and the `<scene>` block they need, an MDRS geodetic origin, a 200x200 m ground plane, and a few obstacles 1.5-12 m ahead of the spawn point for the camera to see
 - `gui/gui.config` and `gz_gui.xml` - the Gazebo GUI layout (camera view, panels)
 
 Its `share/` install path is added to `GZ_SIM_RESOURCE_PATH` at launch time so Gazebo can find world assets - see the `SIM_WORLDS_SHARE` handling in `cli/gazebo/launch.py`.
@@ -250,6 +253,50 @@ bridge = Node(
 ```
 
 Bridges the `/clock` topic from Gazebo to ROS 2. This is essential for `use_sim_time: true` -- without it, ROS nodes won't have synchronized time with the simulation.
+
+#### GPS
+
+The chassis carries a simulated u-blox ZED-F9P (`chassis_description/urdf/chassis_sensors.urdf.xacro`): a `gps` link mounted level at the centre of the chassis with a gz `navsat` sensor. The world's `<spherical_coordinates>` (in `rover.world.sdf`) place the origin at MDRS (38.4064, -110.7919, 1370 m).
+
+The gz sensor is noise-free and bridged to `/chassis/gps/navsat` as ground truth. The `ublox_gps` node republishes it on the same topics the real `ublox_gps` driver uses:
+
+| Topic                          | Type                                       |
+| ------------------------------ | ------------------------------------------ |
+| `/ublox_gps_node/fix`          | `sensor_msgs/msg/NavSatFix`                |
+| `/ublox_gps_node/fix_velocity` | `geometry_msgs/msg/TwistWithCovarianceStamped` (ENU) |
+
+Both use `frame_id: gps` at 1 Hz. The `gps_fix_mode` launch argument picks the fix quality: `rtk_fixed` (default, ~1 cm, `STATUS_GBAS_FIX`) or `standalone` (~1.5 m horizontal / 2.5 m vertical with slowly wandering error, `STATUS_FIX`).
+
+#### ZED 2i camera
+
+The chassis also carries a simulated StereoLabs ZED 2i (`chassis_description/urdf/chassis_zed.urdf.xacro`), mounted upright under the front edge of the chassis frame. Its frame tree is ported from StereoLabs' `zed_macro.urdf.xacro` (`zed_camera_link` -> `zed_camera_center` -> `zed_left/right_camera_frame` -> `..._optical`, plus `zed_imu_link`), and the mount pose is set by the `zed_mount_xyz` / `zed_mount_rpy` / `zed_holder_gap` properties.
+
+As with the GPS, Gazebo produces noise-free ground truth on `/chassis/zed/*` and `/chassis/ground_truth/odometry`, and the `zed_camera` node republishes it the way `zed-ros2-wrapper` v5.x does with its defaults (namespace `zed`, node `zed_node`, HD720):
+
+| Topic (under `/zed/zed_node/`)                         | Type                                          | Notes                                                                                   |
+| ------------------------------------------------------ | --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `rgb/color/rect/image`, `.../camera_info`              | `sensor_msgs/msg/Image`, `CameraInfo`         | `bgra8`, 1280x720, `zed_left_camera_frame_optical`, rectified (`plumb_bob`, D = 0)      |
+| `depth/depth_registered`, `.../camera_info`            | `sensor_msgs/msg/Image`, `CameraInfo`         | `32FC1` metres, registered to the left camera. -inf = closer than 0.3 m, +inf = beyond 15 m or no return |
+| `point_cloud/cloud_registered`                         | `sensor_msgs/msg/PointCloud2`                 | 5 Hz, organised 640x360, `x y z rgb` float32, `zed_left_camera_frame` (x forward), NaN for invalid |
+| `imu/data`, `imu/data_raw`                             | `sensor_msgs/msg/Imu`                         | 100 Hz, `zed_imu_link`; `data_raw` has no orientation                                   |
+| `odom`, `pose`, `pose_with_covariance`, `path_odom`, `path_map` | `nav_msgs/msg/Odometry`, `PoseStamped`, ... | visual odometry from ground truth plus about 1% drift; `odom` -> `zed_camera_link`      |
+
+Images and depth publish at the `zed_frame_rate` launch argument (default 15 Hz; the real camera grabs at 60). Above 15 Hz the launch file thins the depth rays so their data rate stays constant, which keeps the sim real-time: 30 Hz reaches about 28 Hz on a laptop, with depth sampled at about 0.7x pixel pitch. Like the wrapper, each output is only computed while something subscribes to it.
+
+The point cloud follows the wrapper's `depth.point_cloud_freq` and `depth.point_cloud_res` through the `zed_point_cloud_freq` (default 5 Hz) and `zed_point_cloud_res` launch arguments. `REDUCED` (the default) keeps every second pixel for a 640x360 cloud of about 3.7 MB; `COMPACT` publishes the full 1280x720 (about 14.7 MB). The smaller cloud is what Nav2's costmaps need, and keeps the sim's ROS traffic light enough to bridge to another machine or container.
+
+How the real camera is approximated:
+
+- **Depth noise** follows the stereo model σ = z² · σ_d / (f · B) with σ_d = 0.15 px and B = 0.12 m (about 0.7% at 3 m and 3.5% at 15 m). It is drawn on a coarse grid and upsampled, so it comes in smooth patches like neural depth.
+- **Depth source**: depth comes from a `gpu_lidar` co-located with the left camera, resampled into a pinhole image, rather than from a gz depth camera. gz-rendering's depth camera pass crashes on macOS Metal.
+- **Intrinsics**: the default `zed_horizontal_fov` (1.76 rad, fx ≈ 530 px) is typical for a rectified 2i at HD720. To match a specific unit, set it to `2 * atan(640 / fx)` using `fx` from `[LEFT_CAM_HD]` in that camera's `/usr/local/zed/settings/SN<serial>.conf`.
+- **Not modelled**: stereo occlusion holes, depth failures on low-texture surfaces, auto-exposure, loop closure (so `map` = `odom`), the 2i's magnetometer, barometer and temperature topics, and the wrapper's `odom -> zed_camera_link` TF. The sim's robot TF stays authoritative, which matches running the wrapper with `publish_tf:=false`.
+
+<Callout type="warning" title="Rendering sensors on macOS">
+
+        On macOS, `gz sim` can't run the server and GUI in one process, so the chassis launch uses split mode there. The server renders its sensors offscreen through Metal. On Linux it uses combined mode, which gives the server a render context.
+
+</Callout>
 
 #### RViz
 

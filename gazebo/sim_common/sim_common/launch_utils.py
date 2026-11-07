@@ -63,13 +63,17 @@ def gz_supports_sim_command():
     return any(line.strip() == "sim" for line in commands)
 
 
-def process_robot_description(urdf_file, controller_config):
-    """Run xacro over `urdf_file`, wiring in the controller config and platform plugin extension"""
+def process_robot_description(urdf_file, controller_config, extra_mappings=None):
+    """
+    Run xacro over `urdf_file`, wiring in the controller config and platform plugin
+    extension, plus any `extra_mappings` for robot-specific xacro args
+    """
     return xacro.process_file(
         urdf_file,
         mappings={
             "controller_config": controller_config,
             "plugin_extension": ".dylib" if sys.platform == "darwin" else ".so",
+            **(extra_mappings or {}),
         },
     ).toxml()
 

@@ -63,4 +63,8 @@
             <update_rate>60</update_rate>
         </plugin>
     </gazebo>
+
+    <!-- SENSORS -->
+    <xacro:include filename="$(find chassis_description)/urdf/chassis_sensors.urdf.xacro"/>
+    <xacro:include filename="$(find chassis_description)/urdf/chassis_zed.urdf.xacro"/>
 </robot>

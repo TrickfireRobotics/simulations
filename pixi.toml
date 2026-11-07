@@ -13,6 +13,8 @@ ros-jazzy-gz-ros2-control = "*"
 ros-jazzy-ros2-controllers = "*"
 ros-jazzy-rmw-cyclonedds-cpp = "*"
 colcon-common-extensions = "*"
+ros-jazzy-rosbridge-suite = "*"
+cbor2 = "*"
 
 [activation]
 scripts = [".devcontainer/pixi.sh"]

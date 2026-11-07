@@ -17,6 +17,8 @@ setup(
             "move_joints = sim_common.move_joints:main",
             "joint_gui = sim_common.joint_gui:main",
             "drivebase = sim_common.drivebase:main",
+            "ublox_gps = sim_common.ublox_gps:main",
+            "zed_camera = sim_common.zed_camera:main",
         ],
     },
     install_requires=["setuptools"],
