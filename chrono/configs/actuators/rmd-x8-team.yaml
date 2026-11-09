@@ -1,0 +1,78 @@
+# The rover's actual drive actuator. NOT YET SPECIFIED.
+#
+# "RMD-X8" is a family, not a parameter set. MyActuator lists several X8 variants with
+# different reductions, interfaces and torque ratings - the older RMD-X8-Pro is listed
+# as X8-25 with a 1:9 reduction, while other X8 variants differ. So the full part number,
+# hardware revision and reduction ratio have to be read off the hardware, not guessed
+# from the family name.
+#
+# Every unmeasured value is a REPLACE_WITH placeholder, which both `sim chrono validate`
+# and the simulator refuse to run. Use configs/actuators/reference-24v.yaml to exercise
+# the pipeline in the meantime - it is explicitly generic and is not this hardware.
+#
+# Sources to use, in order of preference:
+#   1. the team's own dynamometer data for these specific units
+#   2. the datasheet for the exact part number, from
+#      https://www.myactuator.com/downloads-xseries
+#   3. nothing. Do not substitute a similar motor's numbers.
+
+schema_version: 1
+name: rmd-x8-team
+description: The rover's RMD-X8 drives - placeholder until the hardware is characterised.
+
+identity:
+    manufacturer: MyActuator
+    model: REPLACE_WITH_FULL_PART_NUMBER
+    hardware_revision: REPLACE_WITH_REVISION
+    firmware: REPLACE_WITH_FIRMWARE_VERSION
+    interface: REPLACE_WITH_INTERFACE
+    reduction_ratio: REPLACE_WITH_RATIO
+
+# Command path. These describe the rover's control software, not the actuator, so they
+# come from reading the firmware's configuration rather than from a datasheet.
+command:
+    mode: velocity
+    rate_limit: REPLACE_WITH_CONTROLLER_SLEW_LIMIT
+    delay_s: REPLACE_WITH_MEASURED_LOOP_DELAY
+    update_rate_hz: REPLACE_WITH_CONTROLLER_LOOP_RATE
+
+# The gains actually running on the rover. Guessed gains make the drivetrain's transient
+# behaviour fiction, which is most of what a slip or energy study measures.
+controller:
+    kp: REPLACE_WITH_CONTROLLER_SETTING
+    ki: REPLACE_WITH_CONTROLLER_SETTING
+    kd: REPLACE_WITH_CONTROLLER_SETTING
+    integrator_limit: REPLACE_WITH_CONTROLLER_SETTING
+    torque_limit_nm: REPLACE_WITH_CONTROLLER_SETTING
+
+motor:
+    torque_constant_nm_per_a: REPLACE_WITH_DATASHEET_OR_DYNO_VALUE
+    back_emf_v_per_rad_s: REPLACE_WITH_DATASHEET_OR_DYNO_VALUE
+    resistance_ohm: REPLACE_WITH_MEASURED_VALUE
+    rotor_inertia_kg_m2: REPLACE_WITH_DATASHEET_VALUE
+    gear_efficiency: REPLACE_WITH_MEASURED_VALUE
+    viscous_damping: REPLACE_WITH_DYNO_VALUE
+    coulomb_friction_nm: REPLACE_WITH_DYNO_VALUE
+
+limits:
+    bus_voltage_v: REPLACE_WITH_MEASURED_VALUE
+    continuous_current_a: REPLACE_WITH_MEASURED_VALUE
+    peak_current_a: REPLACE_WITH_MEASURED_VALUE
+    peak_duration_s: REPLACE_WITH_MEASURED_VALUE
+    output_speed_rad_s: REPLACE_WITH_DATASHEET_VALUE
+    cutoff: derate
+
+thermal:
+    ambient_c: 25
+    resistance_c_per_w: REPLACE_WITH_MEASURED_VALUE
+    capacitance_j_per_c: REPLACE_WITH_MEASURED_VALUE
+    derate_start_c: REPLACE_WITH_CONTROLLER_SETTING
+    cutoff_c: REPLACE_WITH_CONTROLLER_SETTING
+
+provenance:
+    quality: placeholder
+    datasheet: REPLACE_WITH_FILE_OR_URL
+    measured_on: null
+    notes: >
+        Phase 3's exit gate is bench torque-speed-current agreement within a predeclared
+        tolerance over the operating region. Record that tolerance here when it is set.

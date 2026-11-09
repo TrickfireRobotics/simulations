@@ -48,3 +48,11 @@ docker/.env.local
 
 # trickfire-docs
 dist/
+
+# sim chrono run output. Generated, often large, and reproducible from its own manifest,
+# so only the small committed reference results under results/reference/ are tracked.
+/results/*
+!/results/reference/
+
+# Generated from the chassis URDF by `sim chrono rover import`
+chrono/data/rovers/

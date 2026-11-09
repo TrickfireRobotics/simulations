@@ -1,0 +1,42 @@
+# Tier 2 baseline: level soft-soil traverse.
+#
+# The reference run for energy per metre and mean slip. Everything a wheel comparison
+# reports is relative to this, so it is deliberately simple: no slope, no obstacles,
+# constant commanded speed.
+
+name: flat-traverse
+version: 1
+description: Tier 2 baseline - level soft-soil traverse for energy per metre and slip.
+
+rover: urc-rover
+terrain: scm-flat-soft
+battery: reference-24v
+
+initial_position: [-4.0, 0.0, 0.0]
+drop_height: 0.03
+
+end_time: 25.0
+warmup_time: 2.0
+sample_rate_hz: 100
+step_size: 1.5e-3
+
+driver:
+    type: constant
+    value: 3.0
+    ramp_time: 2.0
+
+termination:
+    - { type: distance, threshold: 7.0, pass: true }
+    - { type: rollover, threshold: 45.0, pass: false }
+    - { type: immobility, threshold: 0.1, window_s: 4.0, pass: false }
+    - { type: motor_temperature, threshold: 120.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 5.0
+      description: the rover completed most of the patch
+    - metric: motor.peak_temperature_c
+      op: lt
+      value: 100.0
+      description: the drives stayed below their derating band

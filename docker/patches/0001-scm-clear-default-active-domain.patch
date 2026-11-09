@@ -1,0 +1,28 @@
+From: TrickFire Robotics <trickfire@uw.edu>
+Subject: [PATCH] SCMTerrain: drop the default active domain on first user domain
+
+SetupInitial() installs one active domain with a null body. AddActiveDomain()
+appended to that list without clearing it, so OnBindAssets() later iterated a
+domain whose body was null and dereferenced it.
+
+Clearing the list the first time a user domain is added keeps the default
+behaviour intact while making AddActiveDomain() safe to call.
+
+Reported upstream; remove this patch once a Chrono release contains the fix.
+---
+ src/chrono_vehicle/terrain/SCMTerrain.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/chrono_vehicle/terrain/SCMTerrain.cpp b/src/chrono_vehicle/terrain/SCMTerrain.cpp
+index fb6d6be..7386379 100644
+--- a/src/chrono_vehicle/terrain/SCMTerrain.cpp
++++ b/src/chrono_vehicle/terrain/SCMTerrain.cpp
+@@ -229,6 +229,8 @@ void SCMTerrain::AddActiveDomain(std::shared_ptr<ChBody> body, const ChVector3d&
+     ad.m_center = OOBB_center;
+     ad.m_hdims = OOBB_dims / 2;
+ 
++    if (!m_loader->m_user_domains)
++        m_loader->m_active_domains.clear();
+     m_loader->m_active_domains.push_back(ad);
+ 
+     // Enable user-provided active domains

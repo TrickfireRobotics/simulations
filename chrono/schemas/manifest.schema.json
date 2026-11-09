@@ -1,0 +1,604 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Resolved run manifest",
+  "description": "The only file the simulator reads. Written by `sim chrono run`/`sweep`.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run",
+    "simulation",
+    "wheels",
+    "actuators",
+    "battery",
+    "rover",
+    "terrain",
+    "scenario"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "run": {
+      "type": "object",
+      "required": [
+        "id",
+        "seed",
+        "output_dir"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "study": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "headless": {
+          "type": "boolean"
+        },
+        "output_dir": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "git_commit": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        }
+      }
+    },
+    "simulation": {
+      "type": "object",
+      "required": [
+        "step_size"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "step_size": {
+          "type": "number",
+          "minimum": 1e-06,
+          "maximum": 0.1
+        },
+        "threads": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contact_method": {
+          "type": "string",
+          "enum": [
+            "smc",
+            "nsc"
+          ]
+        },
+        "up_axis": {
+          "type": "string",
+          "enum": [
+            "y",
+            "z"
+          ]
+        },
+        "gravity": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "solver_iterations": {
+          "type": "integer",
+          "minimum": 10
+        }
+      }
+    },
+    "wheels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "radius",
+          "width",
+          "mass_properties",
+          "visual",
+          "collision",
+          "roll_axis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0.02,
+            "maximum": 2.0
+          },
+          "width": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 2.0
+          },
+          "roll_axis": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "a cardinal unit axis such as [0, 1, 0]"
+          },
+          "mass_properties": {
+            "type": "object",
+            "required": [
+              "mass",
+              "inertia_xx"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "mass": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "kg"
+              },
+              "com": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "centre of mass in the body's reference frame, m"
+              },
+              "inertia_xx": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+              },
+              "inertia_xy": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+              },
+              "provenance": {
+                "type": "string",
+                "enum": [
+                  "placeholder",
+                  "estimated",
+                  "cad",
+                  "datasheet",
+                  "measured"
+                ],
+                "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+              },
+              "inertia_provenance": {
+                "type": "string"
+              },
+              "density_kg_m3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "volume_m3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "visual": {
+            "type": "object",
+            "required": [
+              "file"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "position": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 4,
+                "description": "[roll, pitch, yaw] in degrees, or [w, x, y, z]"
+              },
+              "scale": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          },
+          "collision": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "box",
+                    "sphere",
+                    "cylinder",
+                    "mesh",
+                    "convex_hull"
+                  ]
+                },
+                "position": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "rotation": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 4
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "description": "box full extents, m"
+                },
+                "radius": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "length": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "file": {
+                  "type": "string"
+                },
+                "margin": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "collision envelope for mesh shapes, m"
+                }
+              }
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "actuators": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "battery": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "rover": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "terrain": {
+      "type": "object",
+      "required": [
+        "name",
+        "type",
+        "size_x",
+        "size_y"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "extends": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "rigid_flat",
+            "rigid_mesh",
+            "scm_flat",
+            "scm_heightmap",
+            "scm_mesh",
+            "mixed"
+          ],
+          "description": "tier 0-3 of the development plan's terrain fidelity ladder"
+        },
+        "size_x": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "size_y": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "grid_delta": {
+          "type": "number",
+          "minimum": 0.002,
+          "maximum": 0.5,
+          "description": "SCM grid spacing, m"
+        },
+        "heightmap_file": {
+          "type": "string"
+        },
+        "height_min": {
+          "type": "number"
+        },
+        "height_max": {
+          "type": "number"
+        },
+        "mesh_file": {
+          "type": "string"
+        },
+        "pitch_deg": {
+          "type": "number",
+          "minimum": -45,
+          "maximum": 45
+        },
+        "roll_deg": {
+          "type": "number",
+          "minimum": -45,
+          "maximum": 45
+        },
+        "soils": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "default_soil": {
+          "type": "string"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "x_min",
+              "x_max",
+              "y_min",
+              "y_max",
+              "soil"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "x_min": {
+                "type": "number"
+              },
+              "x_max": {
+                "type": "number"
+              },
+              "y_min": {
+                "type": "number"
+              },
+              "y_max": {
+                "type": "number"
+              },
+              "soil": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "bulldozing": {
+          "type": "boolean"
+        },
+        "bulldozing_params": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "bulldozing_erosion_iters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "active_domains": {
+          "type": "boolean"
+        },
+        "active_domain_margin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "rigid_friction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "rigid_restitution": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "obstacles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "position"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "box",
+                  "sphere",
+                  "cylinder",
+                  "mesh",
+                  "convex_hull"
+                ]
+              },
+              "position": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "in the terrain reference frame, m"
+              },
+              "rotation": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 4
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "radius": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "length": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "file": {
+                "type": "string"
+              },
+              "margin": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "fixed": {
+                "type": "boolean"
+              },
+              "mass": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "friction": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3
+              }
+            }
+          }
+        },
+        "rock_field": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "expanded into explicit obstacles by the CLI before the run"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "hash": {
+              "type": "string"
+            },
+            "crs": {
+              "type": "string"
+            },
+            "resolution_m": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "crop": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "vertical_scale": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

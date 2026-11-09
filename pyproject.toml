@@ -4,10 +4,27 @@ version = "1.0.0"
 description = "A simulation environment manager"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = ["onshape-to-robot", "pyfqmr", "pypresence", "requests", "trimesh"]
+dependencies = [
+    "onshape-to-robot",
+    "pyfqmr",
+    "pypresence",
+    "requests",
+    "trimesh",
+    # sim chrono: config loading, mesh maths, telemetry compression and reports
+    "numpy",
+    "pyyaml",
+    "matplotlib",
+    "zstandard",
+]
 
 [project.optional-dependencies]
 reduce = ["open3d"]
+# GeoTIFF ingestion for `sim chrono terrain heightmap`. Optional because ESRI ASCII grids
+# and XYZ point clouds need nothing extra, and GDAL can convert a GeoTIFF to one.
+geo = ["rasterio"]
+# Full JSON Schema validation. Without it the CLI falls back to its own validator, which
+# covers the subset the schemas use.
+schema = ["jsonschema"]
 
 [build-system]
 requires = ["setuptools"]

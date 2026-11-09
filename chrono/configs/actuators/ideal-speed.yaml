@@ -1,0 +1,47 @@
+# A near-ideal speed source, for isolating terrain and suspension behaviour.
+#
+# Not a model of any hardware: the limits are set high enough that the drive never
+# saturates, so a terrain or articulation result from this actuator is not contaminated
+# by the drivetrain. Use it when the question is "what does the soil do", and
+# reference-24v or the real actuator when the question involves power or thermals.
+
+extends: reference-24v
+
+schema_version: 1
+name: ideal-speed
+description: Unsaturating speed source - isolates terrain behaviour from the drivetrain.
+
+command:
+    mode: velocity
+    rate_limit: 0
+    delay_s: 0
+    update_rate_hz: 0
+
+controller:
+    kp: 400.0
+    ki: 800.0
+    kd: 0.0
+    integrator_limit: 10.0
+    torque_limit_nm: 400.0
+
+limits:
+    bus_voltage_v: 1000.0
+    continuous_current_a: 4000.0
+    peak_current_a: 4000.0
+    peak_duration_s: 0
+    output_speed_rad_s: 0
+    cutoff: derate
+
+thermal:
+    ambient_c: 25
+    resistance_c_per_w: 0
+    capacitance_j_per_c: 0
+    derate_start_c: 0
+    cutoff_c: 0
+
+provenance:
+    quality: estimated
+    notes: >
+        Deliberately unphysical. An ideal drive hides exactly the torque, current and
+        thermal limits that decide whether the rover can actually climb something, so
+        never report a mobility result from this actuator as a capability claim.

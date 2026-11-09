@@ -1,0 +1,14 @@
+# Tier 2: a 15 degree side slope, for lateral slip and stability margin.
+#
+# Side slopes are what actually tips a rover, and lateral slip on one is what pushes it
+# off a planned route - neither shows up in a straight climb.
+
+extends: scm-flat-soft
+
+name: scm-side-slope-15
+version: 1
+description: Tier 2 - 15 degree side slope for lateral slip and tip margin.
+
+size_x: 12.0
+size_y: 8.0
+roll_deg: 15.0

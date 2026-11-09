@@ -1,0 +1,10 @@
+# Tier 2: level LETE sand. The reference point a measured Utah profile is compared to.
+
+extends: scm-flat-soft
+
+name: scm-flat-lete
+version: 1
+description: Tier 2 - level LETE sand, the published reference soil.
+
+soils: [lete-sand]
+default_soil: lete-sand

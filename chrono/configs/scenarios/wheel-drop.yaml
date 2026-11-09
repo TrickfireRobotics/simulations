@@ -1,0 +1,31 @@
+# The smoke test a freshly imported wheel is put through.
+#
+# `sim chrono wheel import` prints this scenario as the next step: a short drop onto soft
+# soil, which exercises the wheel's contact mesh against SCM and will fail loudly if the
+# mesh is inside out, the wrong scale, or has degenerate triangles that the importer's
+# static checks did not catch.
+
+extends: drop-test
+
+name: wheel-drop
+version: 1
+description: Short drop onto soft soil - the smoke test for a newly imported wheel.
+
+terrain: scm-flat-soft
+
+end_time: 3.0
+warmup_time: 2.0
+
+checks:
+    - metric: stability.margin.mean
+      op: gt
+      value: 0.2
+      description: every wheel found the soil
+    - metric: wheel.mean_sinkage_m.max
+      op: lt
+      value: 0.2
+      description: the wheels sat on the soil rather than sinking through it
+    - metric: mobility.distance_m
+      op: lt
+      value: 0.3
+      description: the rover settled rather than sliding

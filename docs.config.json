@@ -4,12 +4,21 @@
     "description": "Multi-sim environment: Gazebo Harmonic (ROS 2 Jazzy) for robot subsystems, and Project Chrono for terrain/wheel physics",
     "icon": "MonitorCloud",
     "sidebar": [
-        { "label": "Getting Started", "slug": "index" },
+        {
+            "label": "Getting Started",
+            "slug": "index"
+        },
         {
             "label": "Setup",
             "items": [
-                { "label": "Docker", "slug": "setup/docker" },
-                { "label": "Native (pixi)", "slug": "setup/pixi" }
+                {
+                    "label": "Docker",
+                    "slug": "setup/docker"
+                },
+                {
+                    "label": "Native (pixi)",
+                    "slug": "setup/pixi"
+                }
             ]
         },
         {
@@ -19,19 +28,44 @@
                     "label": "Running Gazebo",
                     "slug": "gazebo/gazebo"
                 },
-                { "label": "Moving Joints", "slug": "gazebo/moving-joints" },
+                {
+                    "label": "Moving Joints",
+                    "slug": "gazebo/moving-joints"
+                },
                 {
                     "label": "Adding a New Robot",
                     "slug": "gazebo/adding-robots"
                 },
-                { "label": "Architecture", "slug": "gazebo/architecture" },
-                { "label": "Drone (ArduPilot SITL)", "slug": "gazebo/drone" }
+                {
+                    "label": "Architecture",
+                    "slug": "gazebo/architecture"
+                },
+                {
+                    "label": "Drone (ArduPilot SITL)",
+                    "slug": "gazebo/drone"
+                }
             ]
         },
         {
             "label": "Chrono",
-            "items": [{ "label": "Running Simulations", "slug": "chrono/chrono" }]
+            "items": [
+                {
+                    "label": "Running Simulations",
+                    "slug": "chrono/chrono"
+                },
+                {
+                    "label": "Authoring Configs",
+                    "slug": "chrono/authoring"
+                },
+                {
+                    "label": "Development Plan",
+                    "slug": "chrono/development-plan"
+                }
+            ]
         },
-        { "label": "Dev Notes", "slug": "dev-notes" }
+        {
+            "label": "Dev Notes",
+            "slug": "dev-notes"
+        }
     ]
 }

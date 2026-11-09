@@ -1,0 +1,77 @@
+# A generic 24 V geared brushless drive, for exercising the pipeline.
+#
+# THIS IS NOT THE ROVER'S HARDWARE. It is a plausible, self-consistent parameter set for
+# a mid-size geared BLDC so that the terrain, suspension and reporting work can be built
+# and regression-tested before the real actuator is characterised. Its provenance is
+# "estimated", so any scenario with `require_provenance: cad` or stronger refuses it.
+#
+# Numbers are chosen to be internally consistent rather than copied from a product:
+#   - 0.09 Nm/A at 0.35 ohm on a 24 V bus
+#   - 1:9 reduction, 90% efficient
+#   - 18 A continuous, 40 A peak for 3 s
+# which gives roughly 14 Nm continuous and 32 Nm peak at the output.
+
+schema_version: 1
+name: reference-24v
+description: Generic 24 V geared BLDC drive - pipeline reference only, not the rover's.
+
+identity:
+    manufacturer: generic
+    model: reference-24v-9to1
+    hardware_revision: "n/a"
+    firmware: "n/a"
+    interface: "n/a"
+    reduction_ratio: 9.0
+
+command:
+    mode: velocity
+    rate_limit: 8.0
+    delay_s: 0.004
+    update_rate_hz: 500
+
+# Gains sized for the rover this reference is used with: roughly 25 kg on 0.105 m
+# wheels, which needs well under 1 Nm per wheel to roll on rigid ground. The earlier,
+# much stiffer gains drove every wheel straight into its current limit at t = 0, which
+# made the energy figure a measurement of the limiter rather than of the rover.
+#
+# The torque limit is the drive's continuous rating (0.09 Nm/A x 18 A x 9 x 0.9 = 13.1
+# Nm), leaving the peak-current allowance to cover transients.
+controller:
+    kp: 3.0
+    ki: 6.0
+    kd: 0.0
+    integrator_limit: 1.5
+    torque_limit_nm: 14.0
+
+motor:
+    torque_constant_nm_per_a: 0.09
+    back_emf_v_per_rad_s: 0.09
+    resistance_ohm: 0.35
+    rotor_inertia_kg_m2: 4.0e-5
+    gear_efficiency: 0.9
+    viscous_damping: 2.0e-5
+    coulomb_friction_nm: 0.01
+
+limits:
+    bus_voltage_v: 24.0
+    continuous_current_a: 18.0
+    peak_current_a: 40.0
+    peak_duration_s: 3.0
+    output_speed_rad_s: 14.0
+    cutoff: derate
+
+thermal:
+    ambient_c: 25
+    resistance_c_per_w: 1.6
+    capacitance_j_per_c: 90.0
+    derate_start_c: 80.0
+    cutoff_c: 110.0
+
+provenance:
+    quality: estimated
+    datasheet: null
+    measured_on: null
+    notes: >
+        Invented, internally consistent parameters. Present so the simulator and the
+        reporting pipeline can be developed and tested. Results from this actuator
+        describe a motor that does not exist.

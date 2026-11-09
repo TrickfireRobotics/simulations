@@ -1,0 +1,14 @@
+# Tier 2: a constant 15 degree climb on soft soil.
+#
+# The slope is applied by tilting the whole patch, so the only difference from the flat
+# case is this frame and the rover's start pose. That keeps a slope sweep honest: every
+# grade in the sweep shares one terrain definition.
+
+extends: scm-flat-soft
+
+name: scm-slope-15
+version: 1
+description: Tier 2 - 15 degree uphill on soft soil.
+
+size_x: 16.0
+pitch_deg: 15.0

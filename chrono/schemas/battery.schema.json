@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Battery pack",
+  "type": "object",
+  "required": [
+    "name",
+    "ocv_curve",
+    "capacity_ah",
+    "internal_resistance_ohm",
+    "current_limit_a"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ocv_curve": {
+      "type": "array",
+      "minItems": 1,
+      "description": "[state_of_charge, volts] pairs; one pair means a constant source",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "capacity_ah": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "internal_resistance_ohm": {
+      "type": "number",
+      "minimum": 0
+    },
+    "wiring_resistance_ohm": {
+      "type": "number",
+      "minimum": 0
+    },
+    "current_limit_a": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "auxiliary_load_w": {
+      "type": "number",
+      "minimum": 0
+    },
+    "initial_soc": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "accept_regen": {
+      "type": "boolean"
+    },
+    "regen_current_limit_a": {
+      "type": "number",
+      "minimum": 0
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "quality": {
+          "type": "string",
+          "enum": [
+            "placeholder",
+            "estimated",
+            "cad",
+            "datasheet",
+            "measured"
+          ],
+          "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+        }
+      }
+    }
+  }
+}

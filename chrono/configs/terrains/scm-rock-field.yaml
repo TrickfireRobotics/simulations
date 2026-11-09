@@ -1,0 +1,36 @@
+# Tier 3: deterministic rock field on soft soil.
+#
+# The rocks are generated from a recorded seed and expanded into explicit obstacles in
+# the run manifest, so a result can be reproduced exactly and two wheels can be compared
+# on the identical rock layout rather than on two different random ones.
+#
+# Regenerate with: sim chrono terrain rocks scm-rock-field --seed 1337
+
+name: scm-rock-field
+version: 1
+description: Tier 3 - deterministic rock field on soft soil, seeded and reproducible.
+type: scm_flat
+
+size_x: 20.0
+size_y: 6.0
+grid_delta: 0.035
+
+soils: [scm-soft-soil]
+default_soil: scm-soft-soil
+
+bulldozing: true
+active_domains: true
+active_domain_margin: 0.3
+
+rock_field:
+    seed: 1337
+    count: 40
+    x_range: [-7.0, 7.0]
+    y_range: [-2.2, 2.2]
+    radius_range: [0.04, 0.16]
+    # Buried fraction: a rock sitting on the surface rolls away, a partly buried one is
+    # an obstacle. The real site has both.
+    embed_fraction: 0.4
+    friction: 0.95
+    loose_fraction: 0.25
+    loose_density_kg_m3: 2600

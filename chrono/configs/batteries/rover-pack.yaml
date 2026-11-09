@@ -1,0 +1,30 @@
+# The rover's actual pack. NOT YET MEASURED.
+#
+# The OCV curve and internal resistance are what decide whether six drives pulling peak
+# current together sag the bus enough to lose torque, which is the usual reason a rover
+# that should climb a slope does not. Measure them: a loaded-discharge test with a
+# current clamp and a voltmeter is enough.
+
+name: rover-pack
+description: The rover's drive battery - placeholder until the pack is characterised.
+
+ocv_curve:
+    - [0.0, REPLACE_WITH_MEASURED_VALUE]
+    - [0.5, REPLACE_WITH_MEASURED_VALUE]
+    - [1.0, REPLACE_WITH_MEASURED_VALUE]
+
+capacity_ah: REPLACE_WITH_MEASURED_VALUE
+internal_resistance_ohm: REPLACE_WITH_MEASURED_VALUE
+wiring_resistance_ohm: REPLACE_WITH_MEASURED_VALUE
+current_limit_a: REPLACE_WITH_BMS_SETTING
+auxiliary_load_w: REPLACE_WITH_MEASURED_VALUE
+initial_soc: 1.0
+
+accept_regen: false
+regen_current_limit_a: 0.0
+
+provenance:
+    quality: placeholder
+    notes: >
+        Measure OCV at several states of charge with the pack rested, then internal
+        resistance from the voltage step under a known load step.

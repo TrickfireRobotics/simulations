@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parameter study",
+  "description": "A sweep: one scenario crossed with a grid of variations.",
+  "type": "object",
+  "required": [
+    "name",
+    "scenario"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "wheels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actuators": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "terrains": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "seeds": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 1,
+      "description": "repeats per combination; several seeds give the report a CI"
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array"
+      },
+      "description": "dotted scenario keys crossed with each other"
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "metric",
+          "direction"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "minimise",
+              "maximise"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

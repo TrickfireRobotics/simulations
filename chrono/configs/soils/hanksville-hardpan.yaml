@@ -1,0 +1,21 @@
+# Placeholder profile for the firm hardpan at the URC site. See hanksville-loose-sand
+# for what has to be measured and how.
+
+name: hanksville-hardpan
+description: >
+    Sandy/clayey hardpan near MDRS, Hanksville, Utah. NOT YET MEASURED.
+
+bekker_kphi: REPLACE_WITH_PLATE_SINKAGE_FIT
+bekker_kc: REPLACE_WITH_PLATE_SINKAGE_FIT
+bekker_n: REPLACE_WITH_PLATE_SINKAGE_FIT
+mohr_cohesion: REPLACE_WITH_SHEAR_TEST_FIT
+mohr_friction_deg: REPLACE_WITH_SHEAR_TEST_FIT
+janosi_shear: REPLACE_WITH_SHEAR_TEST_FIT
+elastic_k: REPLACE_WITH_REPEATED_LOADING_FIT
+damping_r: REPLACE_WITH_REPEATED_LOADING_FIT
+
+provenance:
+    quality: placeholder
+    source: null
+    measured_on: null
+    test: null

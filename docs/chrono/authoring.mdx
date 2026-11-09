@@ -1,0 +1,398 @@
+---
+title: Authoring Configs
+description: Reference for writing the YAML that defines wheels, rovers, actuators, soils, terrains, scenarios and studies.
+---
+
+Everything the Chrono simulator does is decided by YAML under `chrono/configs/`, validated
+against the JSON Schemas in `chrono/schemas/`. This page is the field reference. For how to
+*run* what you author, see [Running Simulations](./chrono.mdx).
+
+Validate as you go — it reports every problem at once rather than the first:
+
+```bash title="Inside devcontainer"
+sim chrono validate all
+sim chrono validate scenario urc-hill
+```
+
+## Conventions that apply everywhere
+
+Getting these wrong is the most common cause of a config that validates but misbehaves.
+
+| Convention | Rule |
+| --- | --- |
+| Units | SI throughout: metres, kilograms, seconds, newtons, radians internally. Keys ending `_deg` take degrees, `_mm` never appears. |
+| Frames | Z up. Rover X is forward, Y is left. Wheel spin axes are the rover's Y. |
+| Axes | Must be exact cardinal unit vectors such as `[0, 1, 0]`. A nearly-cardinal axis is rejected. |
+| Rotations | `[roll, pitch, yaw]` in degrees, or `[w, x, y, z]` for a quaternion. |
+| Inertia | `inertia_xx` is `[Ixx, Iyy, Izz]`, `inertia_xy` is `[Ixy, Ixz, Iyz]`, both about the centre of mass. |
+| Paths | Relative to `chrono/`, or absolute. |
+| Scientific notation | `4.0e+7`, never `4e7`. |
+
+<Callout type="warning" title="YAML 1.1 and exponents">
+    PyYAML's float rule requires both a decimal point and a signed exponent. `0.2e6` and `5301e3`
+    load as **strings**, not numbers, and the schema then reports "expected number, got string".
+    Write `2.0e+5` and `5.301e+6`.
+</Callout>
+
+## Inheritance
+
+Any config can extend another of the same kind:
+
+```yaml title="chrono/configs/terrains/scm-slope-15.yaml"
+extends: scm-flat-soft
+
+name: scm-slope-15
+pitch_deg: 15.0
+```
+
+Maps merge recursively; **lists replace**. Lists replacing is deliberate: appending would make
+"the hill scenario but with only a distance termination" impossible to express, and a
+half-inherited list of termination rules is exactly the surprise this pipeline exists to prevent.
+
+Inheritance is resolved by the CLI and the result is written into the run manifest by value. The
+simulator never sees an `extends:`, so changing a base config later cannot alter what an old
+result meant.
+
+## Provenance
+
+Every config carrying physical numbers records where they came from. This is the mechanism that
+keeps unmeasured inputs from quietly becoming engineering conclusions.
+
+| Value | Meaning |
+| --- | --- |
+| `measured` | Measured on the actual hardware |
+| `datasheet` | From the manufacturer's datasheet for the exact part |
+| `cad` | Computed from CAD geometry and an assumed density |
+| `estimated` | A defensible guess, or an analytic approximation |
+| `placeholder` | Nobody knows yet |
+
+A scenario can demand a minimum with `require_provenance`, and a run with weaker inputs is
+refused. Unmeasured fields use `REPLACE_WITH_*` markers, which both the validator and the
+simulator reject — so a placeholder config is impossible to run by accident, which is the point.
+
+## Scenarios
+
+```yaml title="chrono/configs/scenarios/urc-hill.yaml"
+name: urc-hill
+version: 1
+rover: urc-rover
+terrain: scm-slope-15
+battery: reference-24v
+
+initial_position: [-6.0, 0.0, 0.0]
+drop_height: 0.03
+
+end_time: 40.0
+warmup_time: 2.0
+sample_rate_hz: 100
+step_size: 1.5e-3
+
+driver:
+    type: constant
+    value: 3.0
+    ramp_time: 2.0
+
+termination:
+    - { type: distance, threshold: 10.0, pass: true }
+    - { type: immobility, threshold: 0.15, window_s: 5.0, pass: false }
+    - { type: rollover, threshold: 45.0, pass: false }
+
+checks:
+    - metric: mobility.distance_m
+      op: gt
+      value: 8.0
+      description: the climb was completed
+```
+
+`initial_position` only sets the horizontal placement; the height comes from the terrain, so the
+same scenario works on a flat patch and on a height map. `warmup_time` is excluded from the
+summary metrics but still recorded in the telemetry, so the drop transient does not set the
+peak-current or peak-torque figures a wheel comparison is ranked on.
+
+### Drivers
+
+| Type | Behaviour |
+| --- | --- |
+| `constant` | Ramps to `value` over `ramp_time`, then holds |
+| `ramp` | Linear to `value` over `ramp_time` |
+| `slip_sweep` | Steps through `sweep_values`, holding each for `sweep_hold_s` |
+| `replay` | Commands from a CSV of recorded hardware logs |
+| `stopped` | Zero command, for drop and settling fixtures |
+
+`steering` applies a skid-steer bias from -1 to +1, keeping the mean command unchanged so a turn
+does not also change the commanded speed.
+
+### Termination rules
+
+Checked in order, so a scenario can put its success condition first and have it win a tie with a
+failure condition firing on the same step.
+
+| Type | Threshold means | `pass` usually |
+| --- | --- | --- |
+| `distance` | Metres travelled | `true` |
+| `rollover` | Degrees of roll or pitch | `false` |
+| `immobility` | Metres of progress within `window_s` | `false` |
+| `sinkage` | Metres of worst wheel sinkage | `false` |
+| `motor_temperature` | Degrees C on the hottest drive | `false` |
+| `battery_empty` | State of charge | `false` |
+
+Every run also stops at `end_time`, and stops immediately if the solver diverges, keeping the
+telemetry written so far usable.
+
+### Checks
+
+A check is an assertion on a `<group>.<name>` key from `summary.json`, with `op` one of `lt`,
+`le`, `gt` or `ge`. Channel keys gain a suffix: `.min`, `.max`, `.mean`, `.final`, and
+`.duration_s` for time spent above a threshold.
+
+<Callout type="info" title="An unevaluated check fails">
+    A check naming a metric the run never recorded is reported as "not evaluated" and **fails**.
+    A gate that silently passes because it could not be evaluated has told you nothing, which is
+    worse than no gate at all.
+</Callout>
+
+Restrict what is recorded with `metric_groups`, which also shrinks the telemetry:
+
+```yaml
+metric_groups: [mobility, wheel, motor, numerics]
+```
+
+Available groups: `mobility`, `wheel`, `suspension`, `motor`, `energy`, `stability`, `numerics`.
+Omit the key for all of them.
+
+## Soils
+
+```yaml title="chrono/configs/soils/lete-sand.yaml"
+name: lete-sand
+bekker_kphi: 5.301e+6
+bekker_kc: 1.02e+5
+bekker_n: 0.793
+mohr_cohesion: 1.3e+3
+mohr_friction_deg: 31.1
+janosi_shear: 1.2e-2
+elastic_k: 4.0e+8
+damping_r: 3.0e+4
+
+provenance:
+    quality: datasheet
+    source: Published LETE sand parameters, via Chrono's SCM demos
+    test: plate sinkage and shear annulus
+```
+
+| Field | Identified by |
+| --- | --- |
+| `bekker_kphi`, `bekker_kc`, `bekker_n` | Plate-sinkage tests |
+| `mohr_cohesion`, `mohr_friction_deg`, `janosi_shear` | Shear (annulus or box) tests |
+| `elastic_k`, `damping_r` | Repeated and dynamic loading |
+
+Fit on one dataset and validate on a separate one. The `hanksville-*` profiles are the shape of
+the measurements the plan's Phase 6 calls for, with every value still a placeholder.
+
+## Terrains
+
+```yaml title="chrono/configs/terrains/scm-flat-soft.yaml"
+name: scm-flat-soft
+version: 1
+type: scm_flat
+
+size_x: 12.0
+size_y: 4.0
+grid_delta: 0.03
+
+soils: [scm-soft-soil]
+default_soil: scm-soft-soil
+
+bulldozing: true
+active_domains: true
+active_domain_margin: 0.25
+```
+
+`type` picks the tier: `rigid_flat`, `rigid_mesh`, `scm_flat`, `scm_heightmap`, `scm_mesh` or
+`mixed`. Slope goes in `pitch_deg` and `roll_deg`, which tilt the whole patch — so a slope sweep
+shares one terrain definition and only the number under test changes.
+
+`grid_delta` is the SCM grid spacing and dominates the run cost. It must be fine enough to
+resolve the tread; `grid-resolution` is the study that finds where the answer stops moving.
+
+<Callout type="idea" title="Keep active domains on">
+    SCM only ray casts inside the boxes that follow each wheel. Turning them off casts over the
+    whole patch, which on a long traverse is enormously slower for no benefit.
+</Callout>
+
+### Soil regions and rock fields
+
+Regions are rectangles in the terrain's own ground-plane coordinates, tested in order, with the
+first match winning:
+
+```yaml
+regions:
+    - { x_min: -3.0, x_max: 3.0, y_min: -2.0, y_max: 2.0, soil: hanksville-loose-sand }
+```
+
+A rock field is a seed plus a distribution, which the CLI expands into explicit obstacles in the
+manifest. Two wheels compared on "the same rock field" therefore get identical rocks:
+
+```yaml
+rock_field:
+    seed: 1337
+    count: 40
+    x_range: [-7.0, 7.0]
+    y_range: [-2.2, 2.2]
+    radius_range: [0.04, 0.16]
+    embed_fraction: 0.4
+    loose_fraction: 0.25
+```
+
+## Actuators
+
+The layers are stacked in the order a command travels through them: command path, controller,
+motor, protection, thermal.
+
+```yaml title="chrono/configs/actuators/reference-24v.yaml"
+identity:
+    model: reference-24v-9to1
+    hardware_revision: "n/a"
+    reduction_ratio: 9.0
+
+command: { mode: velocity, rate_limit: 8.0, delay_s: 0.004, update_rate_hz: 500 }
+controller: { kp: 3.0, ki: 6.0, kd: 0.0, integrator_limit: 1.5, torque_limit_nm: 14.0 }
+
+motor:
+    torque_constant_nm_per_a: 0.09
+    resistance_ohm: 0.35
+    rotor_inertia_kg_m2: 4.0e-5
+    gear_efficiency: 0.9
+
+limits:
+    bus_voltage_v: 24.0
+    continuous_current_a: 18.0
+    peak_current_a: 40.0
+    peak_duration_s: 3.0
+    cutoff: derate
+
+thermal: { ambient_c: 25, resistance_c_per_w: 1.6, capacitance_j_per_c: 90.0,
+           derate_start_c: 80.0, cutoff_c: 110.0 }
+```
+
+Notes on the ones that are easy to get wrong:
+
+- `reduction_ratio` lives under `identity` because it is a property of the part, not a tuning
+  knob. Rotor inertia is folded into the wheel as `N² · J`, which is exact for a rigid gearbox.
+- `back_emf_v_per_rad_s` defaults to the torque constant. In SI they are the same number for an
+  ideal machine, so that default is correct rather than a guess.
+- `peak_duration_s` is an I²t allowance. It drains while the drive is *asked* for more than its
+  continuous rating and refills while it is not.
+- `cutoff` is `derate` (linear to zero), `fold_back` (limps on at a quarter of continuous) or
+  `disable` (full output then nothing).
+- Thermal `resistance_c_per_w` and `capacitance_j_per_c` must both be given or both omitted. Half
+  a thermal model integrates to either a frozen or an infinite temperature.
+
+<Callout type="warning" title="Controller gains are not free parameters">
+    These are the gains running on the rover, read off the firmware. Guessed gains make the
+    drivetrain's transient behaviour fiction, and the transient is most of what a slip or energy
+    study measures. Gains far too stiff for the rover drive every wheel into its current limit at
+    t = 0, which turns the energy figure into a measurement of the limiter.
+</Callout>
+
+Use `ideal-speed` when the question is about soil rather than the drivetrain: its limits are high
+enough that it never saturates, so a terrain result is not contaminated. Never report a mobility
+number from it as a capability claim.
+
+## Batteries
+
+```yaml title="chrono/configs/batteries/reference-24v.yaml"
+name: reference-24v
+ocv_curve:
+    - [0.00, 19.8]
+    - [0.50, 23.3]
+    - [1.00, 25.2]
+capacity_ah: 20.0
+internal_resistance_ohm: 0.035
+wiring_resistance_ohm: 0.015
+current_limit_a: 120.0
+auxiliary_load_w: 40.0
+accept_regen: false
+```
+
+`internal_resistance_ohm` matters most: it sets the voltage sag that limits torque when all six
+drives pull at once, and it is the easiest thing here to measure for real. `accept_regen` should
+stay false until the real controller is known to accept regenerated power, because it changes the
+energy-per-metre figure on any descending traverse.
+
+## Rovers
+
+Rover configs are **generated** by `sim chrono rover import` from the chassis URDF plus a hints
+file. Edit the hints, not the output.
+
+```yaml title="chrono/configs/rovers/urc-rover.import.yaml"
+name: urc-rover
+urdf: gazebo/chassis_description/urdf/chassis.urdf
+
+pivots:
+    left_upper_arm: { name: rocker_left, limits_deg: [-40, 40] }
+    left_rocker: { name: bogie_left, limits_deg: [-40, 40] }
+
+wheel_stations:
+    fl_wheel: { id: fl }
+    fr_wheel: { id: fr, mirror: true }
+
+differential:
+    type: kinematic
+
+chassis_collision:
+    mode: obb_per_mesh
+
+mass_overrides: {}
+```
+
+The hints exist because the URDF cannot express any of this:
+
+- Which exported `fixed` joints are really suspension pivots, and what their travel limits are.
+  All four are `fixed` in the export, which is why the prototype had a rigid rover.
+- Which link is which wheel station, and its `id` — the trailing `l`/`r` is what the skid-steer
+  driver uses to decide a wheel's side, so it is not cosmetic.
+- Whether the rockers are coupled. See the differential warning in
+  [Running Simulations](./chrono.mdx#the-rover): with free pivots the chassis has no defined rest
+  attitude.
+- How to approximate the chassis collision volume. `obb_per_mesh` fits one oriented box per
+  visual mesh, which is deliberately crude and meant to be reviewed. Replace it with an explicit
+  `shapes:` list once you have looked at it. Triangle-mesh chassis collision is rejected outright:
+  it is slow and it behaves badly against SCM.
+- Measured masses, as `mass_overrides` keyed by body. The URDF carries CAD structural mass only.
+
+<Callout type="warning" title="The model is lighter than the rover">
+    The imported model is about 16.5 kg plus wheels, because the URDF has no battery, electronics,
+    arm or payload. Until the complete rover is weighed and the numbers land in `mass_overrides`,
+    every load, traction and energy result is optimistic.
+</Callout>
+
+## Studies
+
+```yaml title="chrono/configs/studies/wheel-comparison.yaml"
+name: wheel-comparison
+scenario: [flat-traverse, urc-hill, side-slope, rock-field]
+wheels: []
+seeds: [1, 2, 3]
+
+objectives:
+    - { metric: mobility.distance_m, direction: maximise, label: Distance completed, unit: m }
+    - { metric: energy.wh_per_m, direction: minimise, label: Energy per metre, unit: Wh/m }
+    - { metric: motor.peak_temperature_c, direction: minimise, label: Peak motor temperature, unit: C }
+```
+
+Scenarios, wheels, actuators, terrains, seeds and `grid` are crossed. `grid` takes dotted
+scenario keys, which is how to sweep a parameter without writing one scenario per value:
+
+```yaml
+grid:
+    terrain.pitch_deg: [5, 10, 15, 20, 25, 30]
+```
+
+`objectives` decide what the report ranks on and in which direction. Several of them, not one
+collapsed score: the trade is the interesting part, and a paddle wheel that climbs anything while
+cooking the motors is a different answer from a smooth wheel that is efficient and gets stuck.
+
+Several `seeds` are what turn runs into a result with an error bar. Runs of the same manifest are
+currently deterministic to within 1e-6, so seeds only vary what a scenario actually randomises —
+a rock field, for instance. The report shows a confidence interval across whatever spread exists,
+so a difference smaller than the intervals is visibly not a difference.

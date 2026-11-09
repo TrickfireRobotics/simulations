@@ -1,0 +1,102 @@
+# Import hints for the URC rover chassis.
+#
+# `sim chrono rover import urc-rover` reads this plus the URDF and writes
+# configs/rovers/urc-rover.yaml. Everything the URDF already knows (link frames, mass
+# properties, meshes) comes from the URDF; everything it cannot express lives here.
+#
+# The export names the joints misleadingly: `left_upper_arm` is the chassis-to-rocker
+# pivot and `left_rocker` is the rocker-to-bogie pivot. Rather than renaming them in the
+# URDF, which would break the Gazebo packages, the `name:` field below gives each pivot
+# the name it actually describes.
+
+name: urc-rover
+urdf: gazebo/chassis_description/urdf/chassis.urdf
+
+# Suspension pivots. All four are exported as `fixed`, which is why the prototype had a
+# rigid rover; listing them here is what restores them.
+#
+# The travel limits are the ones already in the URDF (+/- 40 deg). They are a plausible
+# rocker-bogie range, not a measured one - confirm them against the hardware's physical
+# stops before trusting any articulation or rollover result.
+pivots:
+    left_upper_arm:
+        name: rocker_left
+        limits_deg: [-40, 40]
+    right_upper_arm:
+        name: rocker_right
+        limits_deg: [-40, 40]
+    left_rocker:
+        name: bogie_left
+        limits_deg: [-40, 40]
+    right_rocker:
+        name: bogie_right
+        limits_deg: [-40, 40]
+
+# Wheel stations. The id's trailing l/r is what the skid-steer driver uses to decide
+# which side a wheel is on, so it is not cosmetic.
+#
+# `mirror` turns the wheel package round on the right-hand side, which matters for any
+# handed tread.
+#
+# The wheel package and actuator named here are only defaults, so that `sim chrono run`
+# works with no extra flags. `--wheel` and `--actuator` replace them on every station at
+# once, which is what makes a wheel comparison one command.
+wheel_stations:
+    fl_wheel: { id: fl, wheel_package: smooth-baseline, actuator: reference-24v }
+    ml_wheel: { id: ml, wheel_package: smooth-baseline, actuator: reference-24v }
+    bl_wheel: { id: bl, wheel_package: smooth-baseline, actuator: reference-24v }
+    fr_wheel: { id: fr, wheel_package: smooth-baseline, actuator: reference-24v, mirror: true }
+    mr_wheel: { id: mr, wheel_package: smooth-baseline, actuator: reference-24v, mirror: true }
+    br_wheel: { id: br, wheel_package: smooth-baseline, actuator: reference-24v, mirror: true }
+
+# Whether the two rockers are mechanically coupled.
+#
+# UNCONFIRMED against the hardware. This is one of the development plan's open decisions
+# and it is not cosmetic: a rocker-bogie suspension has one degree of freedom that the
+# six wheel contacts do not constrain, and the differential is what removes it.
+#
+# With `type: none` and free pivots the chassis has no defined rest attitude at all. That
+# is not a hypothetical - running the drop fixture that way settles the chassis at about
+# 39 degrees of pitch, hard against the rocker travel limits, on flat ground with all six
+# wheels loaded. Every load, traction and stability number from such a run is meaningless.
+#
+# So `kinematic` is used here: an idealised differential holding the two rockers equal and
+# opposite, which is the standard rocker-bogie assumption and makes the model determinate.
+# A determinate model is a precondition for any result, so this is the least-wrong choice
+# available before the hardware is checked - but it IS a choice, and it is recorded in
+# every run manifest as such.
+#
+# When the hardware is confirmed:
+#   - it has a differential  -> keep `kinematic`, or switch to `linkage` and fill in the
+#     bar and link geometry to capture the mechanism's own inertia and compliance
+#   - it has no differential -> the real rover must constrain that DOF some other way
+#     (a chassis rigidly tied to one rocker, or a spring between them). Model whichever
+#     it actually is, with `spring_stiffness`/`spring_damping` on the pivots above if
+#     there is a spring. Do not simply set `none` and leave the pivots free.
+differential:
+    type: kinematic
+    notes: >
+        UNCONFIRMED. Idealised equal-and-opposite rocker coupling, assumed so the model
+        has a determinate rest attitude. Confirm against the hardware before using any
+        articulation, load-sharing or rollover result.
+
+# Chassis collision volume.
+#
+# `obb_per_mesh` fits one oriented box per visual mesh. That is deliberately crude and
+# meant to be reviewed: boxes that overlap or that bound a thin diagonal member badly
+# should be replaced by an explicit `shapes:` list here.
+chassis_collision:
+    mode: obb_per_mesh
+    padding: 0.0
+
+# Measured mass properties, overriding the CAD values per body.
+#
+# The URDF carries only the structural parts CAD knew about: no battery, electronics,
+# arm or payload. Until the complete rover is weighed, add entries here as they are
+# measured. Each override is marked `measured` provenance, so a scenario with
+# `require_provenance: measured` will only run once the bodies it needs are covered.
+mass_overrides: {}
+
+battery: reference-24v
+body_friction: 0.8
+body_restitution: 0.0

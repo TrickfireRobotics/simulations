@@ -1,0 +1,26 @@
+# Tier 2: level deformable soil.
+#
+# The default wheel-ranking terrain, and the one CI smoke tests on. The soil is generic,
+# so this ranks wheels on a fictional soil - useful for checking that the pipeline
+# discriminates between wheels at all, not for choosing one.
+
+name: scm-flat-soft
+version: 1
+description: Tier 2 - level soft soil, the baseline wheel-comparison patch.
+type: scm_flat
+
+size_x: 12.0
+size_y: 4.0
+grid_delta: 0.03
+
+soils: [scm-soft-soil]
+default_soil: scm-soft-soil
+
+bulldozing: true
+bulldozing_params: [55, 1, 5]
+bulldozing_erosion_iters: 6
+
+active_domains: true
+active_domain_margin: 0.25
+
+rigid_friction: 0.9

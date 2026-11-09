@@ -1,0 +1,714 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rover model",
+  "description": "Generated from the chassis URDF by `sim chrono rover import`, then edited.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "chassis",
+    "wheels"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "extends": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "battery": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "urdf": {
+          "type": "string"
+        },
+        "urdf_hash": {
+          "type": "string"
+        },
+        "generated": {
+          "type": "string"
+        },
+        "xacro_args": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "body_friction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "body_restitution": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "chassis": {
+      "type": "object",
+      "required": [
+        "mass_properties",
+        "collision"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "mass_properties": {
+          "type": "object",
+          "required": [
+            "mass",
+            "inertia_xx"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "mass": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "kg"
+            },
+            "com": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "centre of mass in the body's reference frame, m"
+            },
+            "inertia_xx": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+            },
+            "inertia_xy": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+            },
+            "provenance": {
+              "type": "string",
+              "enum": [
+                "placeholder",
+                "estimated",
+                "cad",
+                "datasheet",
+                "measured"
+              ],
+              "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+            },
+            "inertia_provenance": {
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "volume_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "visual": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "file"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "position": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 4,
+                "description": "[roll, pitch, yaw] in degrees, or [w, x, y, z]"
+              },
+              "scale": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          }
+        },
+        "collision": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "box",
+                  "sphere",
+                  "cylinder",
+                  "mesh",
+                  "convex_hull"
+                ]
+              },
+              "position": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 4
+              },
+              "dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "box full extents, m"
+              },
+              "radius": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "length": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "file": {
+                "type": "string"
+              },
+              "margin": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "collision envelope for mesh shapes, m"
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "pivots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "parent",
+          "position",
+          "axis",
+          "mass_properties"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent": {
+            "type": "string",
+            "minLength": 1,
+            "description": "'chassis' or a pivot declared earlier in the list"
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "pivot centre in the chassis reference frame, m"
+          },
+          "axis": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "a cardinal unit axis such as [0, 1, 0]"
+          },
+          "limits_deg": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "[lower, upper] mechanical travel stops"
+          },
+          "spring_stiffness": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Nm/rad, 0 for a free pivot"
+          },
+          "spring_damping": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Nm/(rad/s)"
+          },
+          "rest_angle_deg": {
+            "type": "number"
+          },
+          "mass_properties": {
+            "type": "object",
+            "required": [
+              "mass",
+              "inertia_xx"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "mass": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "kg"
+              },
+              "com": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "centre of mass in the body's reference frame, m"
+              },
+              "inertia_xx": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+              },
+              "inertia_xy": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+              },
+              "provenance": {
+                "type": "string",
+                "enum": [
+                  "placeholder",
+                  "estimated",
+                  "cad",
+                  "datasheet",
+                  "measured"
+                ],
+                "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+              },
+              "inertia_provenance": {
+                "type": "string"
+              },
+              "density_kg_m3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "volume_m3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "visual": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "file"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "rotation": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 4,
+                  "description": "[roll, pitch, yaw] in degrees, or [w, x, y, z]"
+                },
+                "scale": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "color": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              }
+            }
+          },
+          "collision": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "box",
+                    "sphere",
+                    "cylinder",
+                    "mesh",
+                    "convex_hull"
+                  ]
+                },
+                "position": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "rotation": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 4
+                },
+                "dimensions": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "description": "box full extents, m"
+                },
+                "radius": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "length": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "file": {
+                  "type": "string"
+                },
+                "margin": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "collision envelope for mesh shapes, m"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "differential": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "kinematic",
+            "linkage"
+          ]
+        },
+        "bar_position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "left_link_position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "right_link_position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "bar_mass_properties": {
+          "type": "object",
+          "required": [
+            "mass",
+            "inertia_xx"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "mass": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "kg"
+            },
+            "com": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "centre of mass in the body's reference frame, m"
+            },
+            "inertia_xx": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+            },
+            "inertia_xy": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+            },
+            "provenance": {
+              "type": "string",
+              "enum": [
+                "placeholder",
+                "estimated",
+                "cad",
+                "datasheet",
+                "measured"
+              ],
+              "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+            },
+            "inertia_provenance": {
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "volume_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "link_mass_properties": {
+          "type": "object",
+          "required": [
+            "mass",
+            "inertia_xx"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "mass": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "kg"
+            },
+            "com": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "centre of mass in the body's reference frame, m"
+            },
+            "inertia_xx": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixx, Iyy, Izz about the centre of mass, kg m^2"
+            },
+            "inertia_xy": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "description": "Ixy, Ixz, Iyz about the centre of mass, kg m^2"
+            },
+            "provenance": {
+              "type": "string",
+              "enum": [
+                "placeholder",
+                "estimated",
+                "cad",
+                "datasheet",
+                "measured"
+              ],
+              "description": "How the numbers were obtained. Scenarios can demand a minimum strength."
+            },
+            "inertia_provenance": {
+              "type": "string"
+            },
+            "density_kg_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "volume_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "wheels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "parent",
+          "position",
+          "axis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z]+[lr]$",
+            "description": "fl, ml, bl, fr, mr, br - the trailing l/r sets the skid-steer side"
+          },
+          "parent": {
+            "type": "string",
+            "minLength": 1
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "hub centre in the chassis reference frame, m"
+          },
+          "axis": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "a cardinal unit axis such as [0, 1, 0]"
+          },
+          "wheel_package": {
+            "type": "string"
+          },
+          "actuator": {
+            "type": "string"
+          },
+          "mount_roll_deg": {
+            "type": "number"
+          },
+          "mirror": {
+            "type": "boolean"
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

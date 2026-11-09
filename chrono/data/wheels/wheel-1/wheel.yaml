@@ -1,0 +1,42 @@
+schema_version: 1
+name: wheel-1
+revision: r1-migrated
+source:
+  file: source.obj
+  original_path: /home/trickfire/simulations/chrono/data/models/wheels/wheel-1.obj
+  content_hash: sha256:9a31783c23f0e3236d2abb9c546cdfeac8ab61fe96318ca4dd4cfa7afa7e4f3b
+  units: in
+  roll_axis: z
+  hub_origin: [0.0, 0.0, 0.104839]
+  hub_origin_source: bounding box centre
+geometry:
+  radius: 0.258064
+  width: 0.209677
+  roll_axis: [0, 1, 0]
+mass_properties:
+  mass: 3.0
+  provenance: estimated
+  com: [0.0, 0.0, 0.0]
+  inertia_xx: [0.060938882, 0.099895542, 0.060938882]
+  inertia_xy: [0.0, 0.0, 0.0]
+  inertia_provenance: solid-cylinder estimate
+visual: {file: visual.obj}
+collision:
+- {type: mesh, file: collision.obj, margin: 0.005}
+material: unspecified (3D print?)
+notes: Migrated from the prototype wheel-1.obj + .toml pair.
+checks:
+  triangles: 2864
+  vertices: 3174
+  components: 219
+  watertight: false
+  radius_m: 0.258064
+  width_m: 0.209677
+  bounds_m:
+  - [-0.258064, -0.104839, -0.258064]
+  - [0.258064, 0.104839, 0.258064]
+  radial_symmetry: 1.0
+  bulk_density_kg_m3: 68.4
+  visual_triangles: 2864
+  collision_triangles: 2864
+  decimated: false

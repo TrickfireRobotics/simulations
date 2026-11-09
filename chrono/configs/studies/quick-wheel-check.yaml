@@ -1,0 +1,12 @@
+name: quick-wheel-check
+description: Two wheels on rigid ground across two seeds. Fast enough for CI.
+
+scenario: smoke
+wheels: [smooth-baseline, grouser-ref]
+actuators: [reference-24v]
+seeds: [1, 2]
+
+objectives:
+    - { metric: mobility.distance_m, direction: maximise, label: Distance, unit: m }
+    - { metric: energy.wh_per_m, direction: minimise, label: Energy per metre, unit: Wh/m }
+    - { metric: wheel.mean_longitudinal_slip.mean, direction: minimise, label: Mean slip, unit: "" }

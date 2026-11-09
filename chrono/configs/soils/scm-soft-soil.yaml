@@ -1,0 +1,24 @@
+name: scm-soft-soil
+description: >
+    Generic soft soil. Chrono's own SCM demo parameters, used as a sanity baseline and
+    for CI smoke tests. Not a measurement of anything at the URC site.
+
+bekker_kphi: 0.2e+6
+bekker_kc: 0
+bekker_n: 1.1
+mohr_cohesion: 0
+mohr_friction_deg: 30
+janosi_shear: 0.01
+elastic_k: 4.0e+7
+damping_r: 3.0e+4
+
+provenance:
+    quality: estimated
+    source: >
+        Project Chrono demo_VEH_SCMTerrain_* default parameter set. Chosen by Chrono's
+        authors to look and behave plausibly, not fitted to a soil.
+    measured_on: null
+    test: none
+    notes: >
+        Use for regression tests and for checking that a model runs. Any wheel ranking
+        taken from this soil is a ranking on a fictional soil.

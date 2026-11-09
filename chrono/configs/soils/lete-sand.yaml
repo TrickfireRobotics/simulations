@@ -1,0 +1,25 @@
+name: lete-sand
+description: >
+    LETE sand, the standard published terramechanics reference soil. The closest thing
+    to a validated SCM parameter set that is available without doing the measurements.
+
+bekker_kphi: 5301.0e+3
+bekker_kc: 102.0e+3
+bekker_n: 0.793
+mohr_cohesion: 1.3e+3
+mohr_friction_deg: 31.1
+janosi_shear: 1.2e-2
+elastic_k: 4.0e+8
+damping_r: 3.0e+4
+
+provenance:
+    quality: datasheet
+    source: >
+        Published LETE sand Bekker/Janosi parameters, as carried in Project Chrono's
+        SCM terrain demos. Originally from the terramechanics literature.
+    measured_on: null
+    test: plate sinkage and shear annulus, by the original authors
+    notes: >
+        A real soil, measured properly - but not the URC site's soil. Use it as the
+        reference point a measured Utah profile is compared against, not as a stand-in
+        for one.
