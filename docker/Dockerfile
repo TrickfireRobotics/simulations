@@ -86,8 +86,8 @@ RUN rosdep fix-permissions && \
 COPY docker/xorg.nvidia.conf /etc/X11/xorg.nvidia.conf
 COPY docker/xorg.dummy.conf /etc/X11/xorg.dummy.conf
 COPY docker/xorg.vkms.conf /etc/X11/xorg.vkms.conf
-COPY docker/bashrc.sh /home/trickfire/.bashrc
-COPY docker/zshrc.zsh /home/trickfire/.zshrc
+
+RUN ln -s /home/trickfire/simulations/shell/zshrc.zsh /home/trickfire/.zshrc
 
 EXPOSE ${NOVNC_PORT}
 EXPOSE ${VNC_PORT}

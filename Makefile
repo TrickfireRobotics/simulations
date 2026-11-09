@@ -10,4 +10,4 @@ format:
 	shfmt -i 4 -s -w .devcontainer/ docker/
 
 attach:
-	docker exec -it simulations zsh
+	docker exec -it -e TERM=xterm-256color -e COLORTERM=truecolor simulations zsh
