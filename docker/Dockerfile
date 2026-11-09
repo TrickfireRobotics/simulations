@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install --no-install-recommends -y \
     locales curl gcc git libc6-dev sudo ca-certificates \
-    zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search && \
+    zsh zsh-autosuggestions zsh-syntax-highlighting && \
     locale-gen en_US en_US.UTF-8 && \
     update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 

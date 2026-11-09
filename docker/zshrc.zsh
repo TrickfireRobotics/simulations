@@ -90,9 +90,8 @@ source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-source /usr/share/zsh-history-substring-search/zsh-history-substring-search.zsh
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+bindkey '^[[A' history-beginning-search-backward
+bindkey '^[[B' history-beginning-search-forward
 
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
