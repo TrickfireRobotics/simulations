@@ -113,12 +113,17 @@ def gazebo_launch_actions(
     return [gz_server, TimerAction(period=gui_delay, actions=[gz_gui])]
 
 
-def spawn_robot_node(robot_name, robot_desc):
-    """Node that spawns `robot_desc` into the running gz sim world as `robot_name`"""
+def spawn_robot_node(robot_name, robot_desc, z=0.1):
+    """
+    Node that spawns `robot_desc` into the running gz sim world as `robot_name`.
+    `z` is the spawn height above the world origin - bump it for worlds whose
+    ground isn't a flat plane at z=0 (e.g. a heightmap terrain), so the robot
+    drops onto the surface instead of spawning underneath it.
+    """
     return Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=["-name", robot_name, "-string", robot_desc, "-x", "0", "-y", "0", "-z", "0.1"],
+        arguments=["-name", robot_name, "-string", robot_desc, "-x", "0", "-y", "0", "-z", str(z)],
         output="screen",
     )
 

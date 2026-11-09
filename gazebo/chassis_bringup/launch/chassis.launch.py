@@ -29,14 +29,17 @@ def generate_launch_description():
     """ROS launch method, must have this name"""
 
     controller_config = get_asset("chassis_bringup", "config", "chassis.controller.yaml")
-    world_file = get_asset("sim_worlds", "worlds", "empty.world.sdf")
+    world_file = get_asset("sim_worlds", "worlds", "mars.world.sdf")
     rviz_config = get_asset("chassis_bringup", "config", "chassis.rviz")
     urdf_file = get_asset("chassis_description", "urdf", "chassis.urdf")
-    gz_gui_config = get_asset("sim_worlds", "gui", "gui.config")
+    gz_gui_config = get_asset("sim_worlds", "gui", "mars_gui.config")
 
     robot_desc = process_robot_description(urdf_file, controller_config)
 
-    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc)
+    # the marsyard terrain is ~1.6m tall at the origin (vs. the 0.1m default meant
+    # for a flat ground plane) - spawn above it so the chassis drops onto the
+    # surface instead of into it
+    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc, z=1.9)
     joint_state_broadcaster = joint_state_broadcaster_spawner()
     forward_velocity_controller = controller_spawner_node(
         "forward_velocity_controller", controller_config
