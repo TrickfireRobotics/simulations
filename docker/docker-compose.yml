@@ -16,11 +16,6 @@ services:
 
         runtime: "${SIM_GPU_RUNTIME:-}"
 
-        # Lets QGroundControl (running in-container) read the Flysky i6X receiver.
-        # /dev/input/eventN is host-owned root:input mode 660 - trickfire needs to be
-        # in a group with the same numeric GID as the host's "input" group to read it.
-        # INPUT_GID is auto-detected by .devcontainer/host-env.sh; the fallback only
-        # matters if docker/.env wasn't regenerated (host-env.sh's usual Ubuntu GID).
         group_add:
             - "${INPUT_GID:-994}"
 

@@ -1,4 +1,4 @@
-# Prebuilt VulkanSceneGraph + Chrono base image.
+# Prebuilt VulkanSceneGraph + Chrono base image
 
 FROM ubuntu:24.04
 
@@ -98,9 +98,6 @@ RUN git clone -c advice.detachedHead=false --depth 1 --branch v0.7.0 \
 #                                    CHRONO                                    #
 # ---------------------------------------------------------------------------- #
 
-3# Pinned so the image is reproducible: a run's environment.json records this SHA and
-# `sim chrono run` refuses to compare results across different ones. Bump deliberately,
-# re-check docker/patches/ against the new tree, and rebuild the image.
 ARG CHRONO_COMMIT=dbdc98932c496f10d37bae3f914cf148c19e9a49
 
 RUN git clone --filter=blob:none --no-checkout \
@@ -109,8 +106,6 @@ RUN git clone --filter=blob:none --no-checkout \
     git -C /home/trickfire/chrono submodule update --init --recursive --depth 1 && \
     git -C /home/trickfire/chrono rev-parse HEAD > /home/trickfire/chrono-commit.txt
 
-# Patches carried against the pinned tree. Each must apply with no fuzz, so a Chrono bump
-# that makes one obsolete fails the image build instead of silently dropping the fix.
 COPY docker/patches/ /tmp/chrono-patches/
 RUN for patch in /tmp/chrono-patches/*.patch; do \
     echo "applying $(basename "${patch}")" && \
