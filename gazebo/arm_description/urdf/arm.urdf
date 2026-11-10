@@ -2108,7 +2108,7 @@
         <parent link="forearm"/>
         <child link="joint"/>
         <axis xyz="0 0 1"/>
-        <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+        <limit effort="10" velocity="10" lower="-0.334" upper="3.142"/>
     </joint>
     <!-- Joint from bicep_actuator to forearm -->
     <joint name="elbow_1" type="revolute">
@@ -2116,7 +2116,7 @@
         <parent link="bicep_actuator"/>
         <child link="forearm"/>
         <axis xyz="0 0 1"/>
-        <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+        <limit effort="10" velocity="10" lower="-3.142" upper="1.17"/>
     </joint>
     <!-- Joint from shoulder_assembly to bicep_actuator -->
     <joint name="shoulder_1" type="revolute">
@@ -2124,7 +2124,7 @@
         <parent link="shoulder_assembly"/>
         <child link="bicep_actuator"/>
         <axis xyz="0 0 1"/>
-        <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+        <limit effort="10" velocity="10" lower="-1.571" upper="0.936"/>
     </joint>
     <!-- Joint from arm_base_link to shoulder_assembly -->
     <joint name="base_link_to_shoulder_assembly" type="fixed">
