@@ -3,10 +3,14 @@
 
     <xacro:arg name="controller_config" default=""/>
     <xacro:arg name="plugin_extension" default=".so"/>
+    <!-- standalone: true when the chassis is its own robot and needs its own
+         gz_ros2_control plugin instance; set false by assemblies (e.g. the
+         rover) that load one combined plugin for the whole robot instead -->
+    <xacro:arg name="standalone" default="true"/>
     <xacro:property name="plugin_extension" value="$(arg plugin_extension)"/>
 
     <!-- ros2_control hardware interface -->
-    <ros2_control name="GazeboSimSystem" type="system">
+    <ros2_control name="ChassisGazeboSimSystem" type="system">
         <hardware>
             <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
@@ -54,13 +58,15 @@
         </joint>
     </ros2_control>
 
-    <gazebo>
-        <!-- JOINT CONTROLLER -->
-        <plugin filename="libgz_ros2_control-system${plugin_extension}" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-            <robot_param>robot_description</robot_param>
-            <robot_param_node>robot_state_publisher</robot_param_node>
-            <parameters>$(arg controller_config)</parameters>
-            <update_rate>60</update_rate>
-        </plugin>
-    </gazebo>
+    <xacro:if value="$(arg standalone)">
+        <gazebo>
+            <!-- JOINT CONTROLLER -->
+            <plugin filename="libgz_ros2_control-system${plugin_extension}" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                <robot_param>robot_description</robot_param>
+                <robot_param_node>robot_state_publisher</robot_param_node>
+                <parameters>$(arg controller_config)</parameters>
+                <update_rate>60</update_rate>
+            </plugin>
+        </gazebo>
+    </xacro:if>
 </robot>

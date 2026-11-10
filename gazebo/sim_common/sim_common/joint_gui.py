@@ -69,15 +69,18 @@ class JointPublisher(Node):
         Continuously updates current_positions on every message.
         """
         if not self.joint_names and msg.name:
-            self.joint_names = list(msg.name)
-            origin_angles = list(msg.position)
-            self.get_logger().info(f"Discovered joints: {self.joint_names}")
-            self._joints_ready.set()
-            # find origin angle and then update accordingly
-            i = 0
-            for joint in self.joint_names:
-                self.possible_joints[joint]["origin"] = origin_angles[i]
-                i = i + 1
+            # /joint_states may carry joints this GUI doesn't control (e.g. a
+            # rover's continuous wheel joints alongside the arm's revolute
+            # ones) - only track the ones we actually parsed sliders for.
+            discovered = [name for name in msg.name if name in self.possible_joints]
+            if discovered:
+                self.joint_names = discovered
+                self.get_logger().info(f"Discovered joints: {self.joint_names}")
+                self._joints_ready.set()
+                # find origin angle and then update accordingly
+                for name, position in zip(msg.name, msg.position):
+                    if name in self.possible_joints:
+                        self.possible_joints[name]["origin"] = position
 
         # Always track latest positions
         for name, position in zip(msg.name, msg.position):

@@ -5,19 +5,24 @@
     <!-- XACRO -->
     <xacro:property name="mesh_path" value="package://arm_description/meshes"/>
     <xacro:arg name="controller_config" default=""/>
+    <!-- standalone: true when the arm is its own robot (free-floating at a world
+         origin, for isolated arm testing); set false by assemblies (e.g. the
+         rover) that fix arm_base_link to a mount point on another body instead -->
+    <xacro:arg name="standalone" default="true"/>
 
-    <!-- Link base_link -->
-    
-    <!-- World base link -->
-    <link name="world"/>
+    <!-- Link arm_base_link -->
+    <xacro:if value="$(arg standalone)">
+        <!-- World base link -->
+        <link name="world"/>
 
-    <joint name="world_to_base_link" type="fixed">
-        <parent link="world"/>
-        <child link="base_link"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-    </joint>
+        <joint name="world_to_arm_base_link" type="fixed">
+            <parent link="world"/>
+            <child link="arm_base_link"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </joint>
+    </xacro:if>
 
-<link name="base_link">
+    <link name="arm_base_link">
         <inertial>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <mass value="1e-09"/>
@@ -28,8 +33,13 @@
     <link name="shoulder_assembly">
         <inertial>
             <origin xyz="-0.00194485 -0.00356848 0.00424449" rpy="0 0 0"/>
-            <mass value="2.78799"/>
-            <inertia ixx="0.00871875" ixy="2.23289e-05" ixz="0.000456034" iyy="0.00608936" iyz="0.000140572" izz="0.00963454"/>
+            <!-- TEMP: zeroed out (was 2.78799) - arm can't hold its own weight
+                 yet (see gz_ros2_control's position_proportional_gain tuning
+                 in arm_control.urdf.xacro/rover.urdf.xacro), so making the arm
+                 weightless as a stopgap instead of fighting gravity. Restore
+                 the real mass once that's sorted. -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
         <!-- Part part_1 -->
         <visual>
@@ -1012,8 +1022,9 @@
     <link name="bicep_actuator">
         <inertial>
             <origin xyz="0.105905 -0.14384 -0.0256953" rpy="0 0 0"/>
-            <mass value="0.622108"/>
-            <inertia ixx="0.0101667" ixy="0.00691418" ixz="6.16367e-05" iyy="0.00514599" iyz="-7.9173e-05" izz="0.0150427"/>
+            <!-- TEMP: zeroed out (was 0.622108) - see shoulder_assembly -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
         <!-- Part 0_4m_shaft -->
         <visual>
@@ -1164,8 +1175,9 @@
     <link name="forearm">
         <inertial>
             <origin xyz="-0.243757 -0.11109 -0.00749791" rpy="0 0 0"/>
-            <mass value="1.24353"/>
-            <inertia ixx="0.0066925" ixy="-0.00694663" ixz="1.9259e-07" iyy="0.0198271" iyz="8.3478e-08" izz="0.0196824"/>
+            <!-- TEMP: zeroed out (was 1.24353) - see shoulder_assembly -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
         <!-- Part part_1_44 -->
         <visual>
@@ -1380,8 +1392,9 @@
     <link name="joint">
         <inertial>
             <origin xyz="-0.0105034 -0.00789668 -0.034" rpy="0 0 0"/>
-            <mass value="0.118383"/>
-            <inertia ixx="4.64039e-05" ixy="1.60572e-06" ixz="-1e-12" iyy="4.54753e-05" iyz="-2.6e-11" izz="1.78397e-05"/>
+            <!-- TEMP: zeroed out (was 0.118383) - see shoulder_assembly -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
         <!-- Part deleteface2 -->
         <visual>
@@ -1516,8 +1529,9 @@
     <link name="gripper_assembly">
         <inertial>
             <origin xyz="0.000296759 0.00121245 0.106598" rpy="0 0 0"/>
-            <mass value="0.942224"/>
-            <inertia ixx="0.00222801" ixy="-9.90607e-05" ixz="1.5364e-05" iyy="0.00252767" iyz="3.68726e-05" izz="0.000777998"/>
+            <!-- TEMP: zeroed out (was 0.942224) - see shoulder_assembly -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
         <!-- Part part_1_58 -->
         <visual>
@@ -2112,10 +2126,10 @@
         <axis xyz="0 0 1"/>
         <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
     </joint>
-    <!-- Joint from base_link to shoulder_assembly -->
+    <!-- Joint from arm_base_link to shoulder_assembly -->
     <joint name="base_link_to_shoulder_assembly" type="fixed">
         <origin xyz="0 0 0" rpy="0 -0 0"/>
-        <parent link="base_link"/>
+        <parent link="arm_base_link"/>
         <child link="shoulder_assembly"/>
         <axis xyz="0 0 1"/>
         <limit effort="10" velocity="10"/>
@@ -2124,46 +2138,15 @@
     <link name="elbow_linkage">
         <inertial>
             <origin xyz="-0 -0.337396 0.237384" rpy="0 0 0"/>
-            <mass value="0.0164299"/>
-            <inertia ixx="1.0171e-05" ixy="0" ixz="-0" iyy="5.3974e-06" iyz="4.51025e-06" izz="9.14392e-06"/>
+            <!-- TEMP: zeroed out (was 0.0164299) - see shoulder_assembly -->
+            <mass value="1e-09"/>
+            <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
         </inertial>
-        <!-- Part actuator_linkage -->
-        <visual>
-            <origin xyz="-0.013 -0.307545 0.210247" rpy="-0 -0.963478 1.5708"/>
-            <geometry>
-                <mesh filename="${mesh_path}/actuator_linkage.stl"/>
-            </geometry>
-            <material name="actuator_linkage_material">
-                <color rgba="0.713725 0.760784 0.8 1"/>
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="-0.013 -0.307545 0.210247" rpy="-0 -0.963478 1.5708"/>
-            <geometry>
-                <mesh filename="${mesh_path}/actuator_linkage.stl"/>
-            </geometry>
-        </collision>
-        <!-- Part actuator_linkage_2 -->
-        <visual>
-            <origin xyz="0.01 -0.307545 0.210247" rpy="-0 -0.963478 1.5708"/>
-            <geometry>
-                <mesh filename="${mesh_path}/actuator_linkage.stl"/>
-            </geometry>
-            <material name="actuator_linkage_2_material">
-                <color rgba="0.713725 0.760784 0.8 1"/>
-            </material>
-        </visual>
-        <collision>
-            <origin xyz="0.01 -0.307545 0.210247" rpy="-0 -0.963478 1.5708"/>
-            <geometry>
-                <mesh filename="${mesh_path}/actuator_linkage.stl"/>
-            </geometry>
-        </collision>
     </link>
-    <!-- Joint from base_link to elbow_linkage -->
+    <!-- Joint from arm_base_link to elbow_linkage -->
     <joint name="base_link_to_elbow_linkage" type="fixed">
         <origin xyz="0 0 0" rpy="0 -0 0"/>
-        <parent link="base_link"/>
+        <parent link="arm_base_link"/>
         <child link="elbow_linkage"/>
         <axis xyz="0 0 1"/>
         <limit effort="10" velocity="10"/>
