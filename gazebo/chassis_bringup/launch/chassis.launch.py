@@ -8,6 +8,7 @@ import sys
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -134,6 +135,29 @@ def generate_launch_description():
     )
 
     # ----------------------------------------------
+    # Optional props
+    # ----------------------------------------------
+
+    # TTT faces +X in its own frame; yaw 180 deg turns it to face the rover.
+    # Its mesh resolves from sim_worlds/models via GZ_SIM_RESOURCE_PATH
+    spawn_ttt = Node(
+        package="ros_gz_sim",
+        executable="create",
+        arguments=[
+            "-name",
+            "TTT",
+            "-file",
+            get_asset("sim_worlds", "models", "TTT", "model.sdf"),
+            "-x",
+            "6.5",
+            "-Y",
+            str(math.pi),
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("ttt")),
+    )
+
+    # ----------------------------------------------
     # Rosbridge
     # ----------------------------------------------
 
@@ -176,6 +200,11 @@ def generate_launch_description():
                 description="Simulated ZED point cloud resolution: COMPACT (full) or REDUCED "
                 "(half), like the wrapper's depth.point_cloud_res.",
             ),
+            DeclareLaunchArgument(
+                "ttt",
+                default_value="false",
+                description="Spawn the TTT model 6.5 m ahead of the rover.",
+            ),
             # the ZED is a rendering sensor, which needs the server's render context.
             # macOS gz can't run server+GUI in one process (gz-sim#44), but there the
             # split-mode server renders offscreen on its own
@@ -183,6 +212,8 @@ def generate_launch_description():
                 world_file, gz_gui_config, combined_gui=sys.platform != "darwin"
             ),
             OpaqueFunction(function=robot_actions, args=[controller_config]),
+            # same head start as the robot spawn, so the world is up first
+            TimerAction(period=5.0, actions=[spawn_ttt]),
             clock_bridge_node(),
             rviz_node(rviz_config),
             drivebase_bridge,
