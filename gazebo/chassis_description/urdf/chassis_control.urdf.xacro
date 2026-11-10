@@ -69,4 +69,7 @@
             </plugin>
         </gazebo>
     </xacro:if>
+
+    <!-- SENSORS -->
+    <xacro:include filename="$(find chassis_description)/urdf/chassis_zed.urdf.xacro"/>
 </robot>

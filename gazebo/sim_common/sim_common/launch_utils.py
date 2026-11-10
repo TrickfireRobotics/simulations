@@ -1,5 +1,6 @@
 """Shared launch utilities for simulation packages"""
 
+import math
 import os
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ from pathlib import Path
 import xacro
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import (
+    DeclareLaunchArgument,
     ExecuteProcess,
     IncludeLaunchDescription,
     RegisterEventHandler,
@@ -19,6 +21,20 @@ from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+
+# highest ZED frame rate (Hz) at which depth rays are simulated at full resolution
+ZED_FULL_RES_RATE = 15.0
+
+# gz topic -> ROS type mappings for the chassis' simulated ZED (ground truth - the
+# zed_camera node turns these into what the real wrapper publishes)
+ZED_BRIDGES = [
+    "/chassis/zed/image@sensor_msgs/msg/Image[gz.msgs.Image",
+    "/chassis/zed/depth_rays/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked",
+    "/chassis/zed/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo",
+    "/chassis/zed/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
+    "/chassis/ground_truth/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry",
+]
 
 
 def log(msg):
@@ -63,13 +79,17 @@ def gz_supports_sim_command():
     return any(line.strip() == "sim" for line in commands)
 
 
-def process_robot_description(urdf_file, controller_config):
-    """Run xacro over `urdf_file`, wiring in the controller config and platform plugin extension"""
+def process_robot_description(urdf_file, controller_config, extra_mappings=None):
+    """
+    Run xacro over `urdf_file`, wiring in the controller config and platform plugin
+    extension, plus any `extra_mappings` for robot-specific xacro args
+    """
     return xacro.process_file(
         urdf_file,
         mappings={
             "controller_config": controller_config,
             "plugin_extension": ".dylib" if sys.platform == "darwin" else ".so",
+            **(extra_mappings or {}),
         },
     ).toxml()
 
@@ -146,6 +166,76 @@ def clock_bridge_node():
         arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
         output="screen",
     )
+
+
+def zed_launch_arguments():
+    """Launch arguments for the simulated ZED 2i, named after the wrapper's parameters"""
+    return [
+        DeclareLaunchArgument(
+            "zed_frame_rate",
+            default_value="15",
+            description="Simulated ZED image/depth rate in Hz (the real camera grabs at 60).",
+        ),
+        DeclareLaunchArgument(
+            "zed_point_cloud_freq",
+            default_value="5",
+            description="Simulated ZED point cloud rate in Hz (wrapper depth.point_cloud_freq).",
+        ),
+        DeclareLaunchArgument(
+            "zed_point_cloud_res",
+            default_value="REDUCED",
+            description="Simulated ZED point cloud resolution: COMPACT (full) or REDUCED "
+            "(half), like the wrapper's depth.point_cloud_res.",
+        ),
+    ]
+
+
+def zed_xacro_mappings(context):
+    """
+    xacro args for chassis_zed.urdf.xacro, to pass to `process_robot_description`.
+    Needs the launch `context` (so call it from an OpaqueFunction) because the
+    camera's render rate comes from the `zed_frame_rate` launch argument.
+    """
+    zed_frame_rate = float(LaunchConfiguration("zed_frame_rate").perform(context))
+    return {
+        "zed_frame_rate": str(zed_frame_rate),
+        # zed_camera.py keeps up with full-resolution depth rays up to 15 Hz;
+        # above that, thin the rays so their total data rate stays the same
+        "zed_depth_ray_scale": str(min(1.0, math.sqrt(ZED_FULL_RES_RATE / zed_frame_rate))),
+    }
+
+
+def zed_nodes():
+    """
+    The simulated StereoLabs ZED 2i: a bridge for its gz ground truth, and the
+    zed_camera node that republishes it on /zed/zed_node/* like zed-ros2-wrapper
+    """
+    sensor_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="zed_bridge",
+        arguments=ZED_BRIDGES,
+        output="screen",
+    )
+    zed_camera = Node(
+        package="sim_common",
+        executable="zed_camera",
+        namespace="zed",
+        output="screen",
+        parameters=[
+            {
+                "pub_frame_rate": ParameterValue(
+                    LaunchConfiguration("zed_frame_rate"), value_type=float
+                ),
+                "point_cloud_freq": ParameterValue(
+                    LaunchConfiguration("zed_point_cloud_freq"), value_type=float
+                ),
+                "point_cloud_res": LaunchConfiguration("zed_point_cloud_res"),
+                "use_sim_time": True,
+            },
+        ],
+    )
+    return [sensor_bridge, zed_camera]
 
 
 def rviz_node(rviz_config, rviz_launch_arg="rviz"):

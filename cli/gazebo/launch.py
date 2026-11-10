@@ -246,7 +246,7 @@ def _check_display() -> None:
 def _configure_virtualgl_rendering(env: dict[str, str]) -> list[str]:
     """Route GL rendering through VirtualGL when displaying on a remote X server"""
     display = os.environ.get("DISPLAY", "")
-    if display.startswith(":"):
+    if in_pixi() or display.startswith(":"):
         return []
 
     if not shutil.which("vglrun"):
@@ -337,11 +337,8 @@ def _setup_pixi_env() -> None:
         if engine_plugins not in paths:
             os.environ["GZ_RENDERING_PLUGIN_PATH"] = ":".join([engine_plugins] + paths)
 
-        ogre2_media = f"{conda_prefix}/share/gz/gz-rendering8/ogre2/media"
-        existing = os.environ.get("GZ_RENDERING_RESOURCE_PATH", "")
-        paths = [p for p in existing.split(":") if p]
-        if ogre2_media not in paths:
-            os.environ["GZ_RENDERING_RESOURCE_PATH"] = ":".join([ogre2_media] + paths)
+        # Single path, not a list: gz-rendering appends ogre2/media itself
+        os.environ["GZ_RENDERING_RESOURCE_PATH"] = f"{conda_prefix}/share/gz/gz-rendering8"
 
     if os.environ.get("QT_QPA_PLATFORM") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"

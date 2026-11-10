@@ -1,0 +1,201 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="chassis_zed">
+
+    <!-- Kept out of chassis.urdf so `sim gazebo update chassis` doesn't wipe it -->
+
+    <!-- ============================================== -->
+    <!-- CAMERA: StereoLabs ZED 2i                      -->
+    <!-- ============================================== -->
+
+    <!-- Image/depth render rate; the real wrapper grabs at 60 Hz -->
+    <xacro:arg name="zed_frame_rate" default="15"/>
+    <!-- Depth rays per pixel along each image axis. 1 resamples at pixel pitch; every
+         ray costs zed_camera.py 32 bytes per frame, so the launch file scales this
+         down as zed_frame_rate rises above 15 Hz to keep the node real-time -->
+    <xacro:arg name="zed_depth_ray_scale" default="1.0"/>
+
+    <!-- Frame tree and dimensions ported from stereolabs/zed-ros2-description
+         urdf/zed_macro.urdf.xacro (Apache-2.0), model zed2i. Frame names match
+         zed-ros2-wrapper v5.x with the default camera_name `zed` -->
+    <xacro:property name="zed_baseline" value="0.12"/>
+    <xacro:property name="zed_height" value="0.03"/>
+    <xacro:property name="zed_optical_offset_x" value="-0.005"/>
+
+    <!-- Matches the HD720 rectified image the wrapper publishes by default. fx is
+         about 530 px on a typical 2i; for an exact match use (w/2)/tan(hfov/2) = fx
+         from [LEFT_CAM_HD] in the unit's /usr/local/zed/settings/SN<serial>.conf -->
+    <xacro:property name="zed_image_width" value="1280"/>
+    <xacro:property name="zed_image_height" value="720"/>
+    <xacro:property name="zed_horizontal_fov" value="1.76"/>
+
+    <!-- IMU noise: approximate consumer MEMS figures at 100 Hz -->
+    <xacro:property name="zed_imu_rate" value="100"/>
+    <xacro:property name="zed_gyro_stddev" value="0.0017"/>
+    <xacro:property name="zed_gyro_bias_stddev" value="0.0005"/>
+    <xacro:property name="zed_accel_stddev" value="0.0083"/>
+    <xacro:property name="zed_accel_bias_stddev" value="0.02"/>
+
+    <!-- Mounting: on the CAD model's own camera body, the `camera` link in
+         chassis.urdf, which supplies the visual and mass. That link's origin is the
+         centre of the body's underside, standing in for the real camera's mounting
+         screw hole. The rover's front is base_link -y, so the yaw turns the ZED's +x
+         (its viewing direction) to face it -->
+    <xacro:property name="zed_mount_xyz" value="0 0 0"/>
+    <xacro:property name="zed_mount_rpy" value="0 0 ${-pi / 2}"/>
+
+    <!-- Mounting point: the threaded screw hole in the bottom of the camera -->
+    <link name="zed_camera_link"/>
+
+    <joint name="zed_camera_joint" type="fixed">
+        <parent link="camera"/>
+        <child link="zed_camera_link"/>
+        <origin xyz="${zed_mount_xyz}" rpy="${zed_mount_rpy}"/>
+    </joint>
+
+    <link name="zed_camera_center"/>
+
+    <joint name="zed_camera_center_joint" type="fixed">
+        <parent link="zed_camera_link"/>
+        <child link="zed_camera_center"/>
+        <origin xyz="0 0 ${zed_height / 2}" rpy="0 0 0"/>
+    </joint>
+
+    <xacro:macro name="zed_eye" params="side y">
+        <link name="zed_${side}_camera_frame"/>
+
+        <joint name="zed_${side}_camera_joint" type="fixed">
+            <parent link="zed_camera_center"/>
+            <child link="zed_${side}_camera_frame"/>
+            <origin xyz="${zed_optical_offset_x} ${y} 0" rpy="0 0 0"/>
+        </joint>
+
+        <link name="zed_${side}_camera_frame_optical"/>
+
+        <joint name="zed_${side}_camera_optical_joint" type="fixed">
+            <parent link="zed_${side}_camera_frame"/>
+            <child link="zed_${side}_camera_frame_optical"/>
+            <origin xyz="0 0 0" rpy="${-pi / 2} 0 ${-pi / 2}"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:zed_eye side="left" y="${zed_baseline / 2}"/>
+    <xacro:zed_eye side="right" y="${-zed_baseline / 2}"/>
+
+    <!-- The wrapper places this from the factory calibration; centre is close enough -->
+    <link name="zed_imu_link"/>
+
+    <joint name="zed_imu_joint" type="fixed">
+        <parent link="zed_camera_center"/>
+        <child link="zed_imu_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- Noise-free ground truth; sim_common/zed_camera.py adds ZED-like errors and
+         republishes it on the real wrapper's /zed/zed_node/* topics.
+
+         Depth comes from a gpu_lidar rather than a depth/rgbd camera: gz-rendering's
+         depth camera pass crashes on macOS Metal. The lidar sits on the same frame
+         as the RGB camera and its angular grid spans the camera frustum (at about
+         pixel pitch by default), so zed_camera.py resamples it into a registered pinhole
+         depth image. gz sensors look down +x, so both sit on the non-optical frame -->
+    <xacro:property name="zed_vertical_fov"
+        value="${2 * atan(tan(zed_horizontal_fov / 2) * zed_image_height / zed_image_width)}"/>
+
+    <gazebo reference="zed_left_camera_frame">
+        <sensor name="zed_left_camera" type="camera">
+            <always_on>true</always_on>
+            <update_rate>$(arg zed_frame_rate)</update_rate>
+            <!-- camera_info lands on the sibling /chassis/zed/camera_info -->
+            <topic>/chassis/zed/image</topic>
+            <gz_frame_id>zed_left_camera_frame_optical</gz_frame_id>
+            <camera name="zed_left">
+                <horizontal_fov>${zed_horizontal_fov}</horizontal_fov>
+                <image>
+                    <width>${zed_image_width}</width>
+                    <height>${zed_image_height}</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.1</near>
+                    <far>40</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+        </sensor>
+
+        <sensor name="zed_depth_rays" type="gpu_lidar">
+            <always_on>true</always_on>
+            <update_rate>$(arg zed_frame_rate)</update_rate>
+            <!-- organised cloud on /chassis/zed/depth_rays/points: row 0 = lowest
+                 elevation, column 0 = most negative azimuth (image right) -->
+            <topic>/chassis/zed/depth_rays</topic>
+            <gz_frame_id>zed_left_camera_frame</gz_frame_id>
+            <lidar>
+                <scan>
+                    <horizontal>
+                        <samples>${int(round(zed_image_width * $(arg zed_depth_ray_scale)))}</samples>
+                        <min_angle>${-zed_horizontal_fov / 2}</min_angle>
+                        <max_angle>${zed_horizontal_fov / 2}</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>${int(round(zed_image_height * $(arg zed_depth_ray_scale)))}</samples>
+                        <min_angle>${-zed_vertical_fov / 2}</min_angle>
+                        <max_angle>${zed_vertical_fov / 2}</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>40</max>
+                </range>
+            </lidar>
+        </sensor>
+    </gazebo>
+
+    <xacro:macro name="zed_imu_noise" params="stddev bias_stddev">
+        <noise type="gaussian">
+            <mean>0</mean>
+            <stddev>${stddev}</stddev>
+            <bias_mean>0</bias_mean>
+            <bias_stddev>${bias_stddev}</bias_stddev>
+        </noise>
+    </xacro:macro>
+
+    <gazebo reference="zed_imu_link">
+        <sensor name="zed_imu" type="imu">
+            <always_on>true</always_on>
+            <update_rate>${zed_imu_rate}</update_rate>
+            <topic>/chassis/zed/imu</topic>
+            <gz_frame_id>zed_imu_link</gz_frame_id>
+            <imu>
+                <orientation_reference_frame>
+                    <localization>ENU</localization>
+                </orientation_reference_frame>
+                <angular_velocity>
+                    <x><xacro:zed_imu_noise stddev="${zed_gyro_stddev}" bias_stddev="${zed_gyro_bias_stddev}"/></x>
+                    <y><xacro:zed_imu_noise stddev="${zed_gyro_stddev}" bias_stddev="${zed_gyro_bias_stddev}"/></y>
+                    <z><xacro:zed_imu_noise stddev="${zed_gyro_stddev}" bias_stddev="${zed_gyro_bias_stddev}"/></z>
+                </angular_velocity>
+                <linear_acceleration>
+                    <x><xacro:zed_imu_noise stddev="${zed_accel_stddev}" bias_stddev="${zed_accel_bias_stddev}"/></x>
+                    <y><xacro:zed_imu_noise stddev="${zed_accel_stddev}" bias_stddev="${zed_accel_bias_stddev}"/></y>
+                    <z><xacro:zed_imu_noise stddev="${zed_accel_stddev}" bias_stddev="${zed_accel_bias_stddev}"/></z>
+                </linear_acceleration>
+            </imu>
+        </sensor>
+    </gazebo>
+
+    <!-- Ground-truth chassis pose for the sim's visual odometry -->
+    <gazebo>
+        <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+            <odom_frame>world</odom_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+            <odom_topic>/chassis/ground_truth/odometry</odom_topic>
+            <odom_publish_frequency>50</odom_publish_frequency>
+            <dimensions>3</dimensions>
+        </plugin>
+    </gazebo>
+</robot>

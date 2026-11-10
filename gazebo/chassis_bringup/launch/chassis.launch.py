@@ -3,9 +3,10 @@ Launch script for the Gazebo chassis simulation
 """
 
 import os
+import sys
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, TimerAction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -20,21 +21,23 @@ from sim_common.launch_utils import (
     robot_state_publisher_node,
     rviz_node,
     spawn_robot_node,
+    zed_launch_arguments,
+    zed_nodes,
+    zed_xacro_mappings,
 )
 
 ROBOT_NAME = "chassis"
 
 
-def generate_launch_description():
-    """ROS launch method, must have this name"""
-
-    controller_config = get_asset("chassis_bringup", "config", "chassis.controller.yaml")
-    world_file = get_asset("sim_worlds", "worlds", "mars.world.sdf")
-    rviz_config = get_asset("chassis_bringup", "config", "chassis.rviz")
+def robot_actions(context, controller_config):
+    """
+    Spawn, state publisher and controllers - deferred until launch args resolve
+    because xacro needs `zed_frame_rate` to set the camera's render rate
+    """
     urdf_file = get_asset("chassis_description", "urdf", "chassis.urdf")
-    gz_gui_config = get_asset("sim_worlds", "gui", "mars_gui.config")
-
-    robot_desc = process_robot_description(urdf_file, controller_config)
+    robot_desc = process_robot_description(
+        urdf_file, controller_config, zed_xacro_mappings(context)
+    )
 
     # the marsyard terrain is ~0.4m tall at the origin (vs. the 0.1m default meant
     # for a flat ground plane) - spawn above it so the chassis drops onto the
@@ -48,6 +51,23 @@ def generate_launch_description():
     forward_velocity_controller = controller_spawner_node(
         "forward_velocity_controller", controller_config
     )
+
+    return [
+        TimerAction(period=5.0, actions=[spawn_robot]),
+        robot_state_publisher_node(robot_desc),
+        *chain_controller_spawners(
+            spawn_robot, joint_state_broadcaster, forward_velocity_controller
+        ),
+    ]
+
+
+def generate_launch_description():
+    """ROS launch method, must have this name"""
+
+    controller_config = get_asset("chassis_bringup", "config", "chassis.controller.yaml")
+    world_file = get_asset("sim_worlds", "worlds", "mars.world.sdf")
+    rviz_config = get_asset("chassis_bringup", "config", "chassis.rviz")
+    gz_gui_config = get_asset("sim_worlds", "gui", "mars_gui.config")
 
     # ----------------------------------------------
     # Drivebase bridge
@@ -74,9 +94,6 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            *gazebo_launch_actions(world_file, gz_gui_config),
-            TimerAction(period=5.0, actions=[spawn_robot]),
-            robot_state_publisher_node(robot_desc),
             DeclareLaunchArgument("rviz", default_value="true", description="Open RViz."),
             DeclareLaunchArgument("gui", default_value="true", description="Open Gazebo GUI."),
             DeclareLaunchArgument(
@@ -84,12 +101,18 @@ def generate_launch_description():
                 default_value=os.environ.get("ROSBRIDGE_PORT", "9090"),
                 description="Port for the rosbridge WebSocket server.",
             ),
-            *chain_controller_spawners(
-                spawn_robot, joint_state_broadcaster, forward_velocity_controller
+            *zed_launch_arguments(),
+            # the ZED is a rendering sensor, which needs the server's render context.
+            # macOS gz can't run server+GUI in one process (gz-sim#44), but there the
+            # split-mode server renders offscreen on its own
+            *gazebo_launch_actions(
+                world_file, gz_gui_config, combined_gui=sys.platform != "darwin"
             ),
+            OpaqueFunction(function=robot_actions, args=[controller_config]),
             clock_bridge_node(),
             rviz_node(rviz_config),
             drivebase_bridge,
+            *zed_nodes(),
             rosbridge,
         ]
     )
