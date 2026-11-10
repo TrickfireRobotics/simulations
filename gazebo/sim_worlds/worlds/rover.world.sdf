@@ -92,20 +92,6 @@
         </model>
 
         <!-- OBSTACLES -->
-        <model name="box_near">
-            <static>true</static>
-            <pose>1.5 0.3 0.2 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.4 0.4 0.4</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.4 0.4 0.4</size></box></geometry>
-                    <material>
-                        <ambient>0.8 0.2 0.2 1</ambient>
-                        <diffuse>0.8 0.2 0.2 1</diffuse>
-                    </material>
-                </visual>
-            </link>
-        </model>
         <model name="cylinder_3m">
             <static>true</static>
             <pose>3.0 -1.0 0.5 0 0 0</pose>
@@ -162,5 +148,16 @@
                 </visual>
             </link>
         </model>
+
+        <!-- PEOPLE -->
+        <!-- Resolved from sim_worlds/models via GZ_SIM_RESOURCE_PATH -->
+        <!-- Directly ahead of the rover's spawn point (+X); the mesh faces -Y, so
+             yaw -90 deg turns the person to face the rover -->
+        <include>
+            <name>person_walking</name>
+            <static>true</static>
+            <pose>3.0 0.0 0.0 0 0 -1.5708</pose>
+            <uri>model://person_walking</uri>
+        </include>
     </world>
 </sdf>

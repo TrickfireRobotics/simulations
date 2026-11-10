@@ -426,7 +426,7 @@ source install/setup.bash
 
 SIM_WORLDS_SHARE=\"$PWD/install/sim_worlds/share/sim_worlds\"
 if [ -d \"$SIM_WORLDS_SHARE/worlds\" ]; then
-    export GZ_SIM_RESOURCE_PATH=\"${{GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}}$SIM_WORLDS_SHARE\"
+    export GZ_SIM_RESOURCE_PATH=\"${{GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}}$SIM_WORLDS_SHARE:$SIM_WORLDS_SHARE/models\"
     echo \"[INFO] GZ_SIM_RESOURCE_PATH set to: $GZ_SIM_RESOURCE_PATH\"
 else
     echo \"[WARN] sim_worlds share directory not found - world files may not load\"

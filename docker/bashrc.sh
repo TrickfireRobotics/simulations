@@ -61,7 +61,7 @@ tf_source_env() {
 
         local _sim_worlds_share="$TF_GAZEBO_DIR/install/sim_worlds/share/sim_worlds"
         if [ -d "$_sim_worlds_share/worlds" ]; then
-            export GZ_SIM_RESOURCE_PATH="${GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}$_sim_worlds_share"
+            export GZ_SIM_RESOURCE_PATH="${GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}$_sim_worlds_share:$_sim_worlds_share/models"
         fi
     fi
 }

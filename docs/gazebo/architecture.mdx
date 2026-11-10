@@ -27,7 +27,7 @@ gazebo/
 | --------------------- | -------------- | --------------------------------------------------- |
 | `<robot>_description` | `ament_cmake`  | `urdf/`, `meshes/`                                  |
 | `<robot>_bringup`     | `ament_cmake`  | `launch/`, `config/` (controller YAML, RViz config) |
-| `sim_worlds`          | `ament_cmake`  | `worlds/` (SDF files), `gui/` (Gazebo GUI config)   |
+| `sim_worlds`          | `ament_cmake`  | `worlds/` (SDF files), `models/` (SDF models), `gui/` (Gazebo GUI config) |
 | `sim_common`          | `ament_python` | Shared launch helpers and standalone ROS 2 nodes    |
 
 <Callout type="idea">
@@ -58,7 +58,9 @@ It also exports `sim_common/launch_utils.py`, a library (not a node) of helpers 
 Holds the environment the robot spawns into:
 
 - `worlds/empty.world.sdf` - the default world, passed to `gz_sim.launch.py` as `-r <world>`
-- `worlds/rover.world.sdf` - the chassis' world: the sensor systems (rendering `Sensors`, `Imu`, `NavSat`) and the `<scene>` block they need, an MDRS geodetic origin, a 200x200 m ground plane, and a few obstacles 1.5-12 m ahead of the spawn point for the camera to see
+- `worlds/rover.world.sdf` - the chassis' world: the sensor systems (rendering `Sensors`, `Imu`, `NavSat`) and the `<scene>` block they need, an MDRS geodetic origin, a 200x200 m ground plane, and a few obstacles 3-12 m ahead of the spawn point for the camera to see
+- `models/person_walking/` - a static walking-person model from [Gazebo Fuel](https://fuel.gazebosim.org/1.0/Abdurrahman/models/Walking%20person), included by `rover.world.sdf` as `model://person_walking`
+- `models/hammer/` - a static hammer model from [Gazebo Fuel](https://fuel.gazebosim.org/1.0/OpenRobotics/models/Hammer), available to worlds as `model://hammer` (not placed in any world yet)
 - `gui/gui.config` and `gz_gui.xml` - the Gazebo GUI layout (camera view, panels)
 
 Its `share/` install path is added to `GZ_SIM_RESOURCE_PATH` at launch time so Gazebo can find world assets - see the `SIM_WORLDS_SHARE` handling in `cli/gazebo/launch.py`.
