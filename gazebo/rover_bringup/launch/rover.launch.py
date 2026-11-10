@@ -6,8 +6,9 @@ import os
 import sys
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler, TimerAction
 from launch.conditions import IfCondition
+from launch.event_handlers import OnProcessExit
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -50,26 +51,31 @@ def robot_actions(context, controller_config, urdf_file):
         "joint_trajectory_controller", controller_config
     )
 
-    return [
-        TimerAction(period=5.0, actions=[spawn_robot]),
-        robot_state_publisher_node(robot_desc),
-        *chain_controller_spawners(
-            spawn_robot,
-            joint_state_broadcaster,
-            forward_velocity_controller,
-            joint_trajectory_controller,
-        ),
-    ]
-
-
-def generate_launch_description():
-    """ROS launch method, must have this name"""
-
-    controller_config = get_asset("rover_bringup", "config", "rover.controller.yaml")
-    world_file = get_asset("sim_worlds", "worlds", "mars.world.sdf")
-    rviz_config = get_asset("rover_bringup", "config", "rover.rviz")
-    urdf_file = get_asset("rover_description", "urdf", "rover.urdf.xacro")
-    gz_gui_config = get_asset("sim_worlds", "gui", "mars_gui.config")
+    # start after `create` confirms the rover exists, avoiding a race with model and terrain loading
+    follow_rover_camera = ExecuteProcess(
+        cmd=[
+            "gz",
+            "topic",
+            "-t",
+            "/gui/track",
+            "-m",
+            "gz.msgs.CameraTrack",
+            "-p",
+            (
+                'track_mode: FOLLOW follow_target: {name: "rover"} '
+                "follow_offset: {x: -4, y: 0, z: 1.7} "
+                "follow_pgain: 0.02 track_pgain: 0.02"
+            ),
+        ],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration("gui")),
+    )
+    follow_camera_after_spawn = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=spawn_robot,
+            on_exit=[TimerAction(period=3.0, actions=[follow_rover_camera])],
+        )
+    )
 
     # ----------------------------------------------
     # Drivebase bridge
@@ -121,12 +127,13 @@ def generate_launch_description():
                 default_value=os.environ.get("ROSBRIDGE_PORT", "9090"),
                 description="Port for the rosbridge WebSocket server.",
             ),
-            *zed_launch_arguments(),
-            # see chassis.launch.py: the ZED needs the server's render context
-            *gazebo_launch_actions(
-                world_file, gz_gui_config, combined_gui=sys.platform != "darwin"
+            *chain_controller_spawners(
+                spawn_robot,
+                joint_state_broadcaster,
+                forward_velocity_controller,
+                joint_trajectory_controller,
             ),
-            OpaqueFunction(function=robot_actions, args=[controller_config, urdf_file]),
+            follow_camera_after_spawn,
             clock_bridge_node(),
             rviz_node(rviz_config),
             drivebase_bridge,
