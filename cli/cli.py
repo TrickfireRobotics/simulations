@@ -1,6 +1,7 @@
 """Main CLI entry point for the sim command"""
 
 import argparse
+import re
 import shutil
 import sys
 import threading
@@ -11,6 +12,7 @@ from .output import die, info
 from .paths import GAZEBO_WORKSPACE_DIR
 
 _GAZEBO_SUBCOMMANDS = frozenset({"clean", "create", "update"})
+_LAUNCH_ARG_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*:=.*")
 
 
 def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
@@ -136,7 +138,16 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         action="store_true",
         help="Don't launch QGroundControl in-container (drone only) - use your own local one",
     )
+    p.add_argument(
+        "launch_args",
+        nargs="*",
+        metavar="name:=value",
+        help="ROS launch arguments passed through to the robot's launch file (e.g. ttt:=true)",
+    )
     args = p.parse_args(remaining)
+    for launch_arg in args.launch_args:
+        if not _LAUNCH_ARG_RE.fullmatch(launch_arg):
+            p.error(f"expected a name:=value launch argument, got '{launch_arg}'")
 
     from .gazebo.launch import build_and_launch, in_pixi
 
@@ -146,7 +157,11 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         daemon=True,
     ).start()
     build_and_launch(
-        robot, build_only=args.build_only, no_build=args.no_build, local_qgc=args.local_qgc
+        robot,
+        build_only=args.build_only,
+        no_build=args.no_build,
+        local_qgc=args.local_qgc,
+        launch_args=args.launch_args,
     )
 
 

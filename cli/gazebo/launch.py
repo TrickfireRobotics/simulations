@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import shlex
 import shutil
 import signal
 import socket
@@ -350,6 +351,7 @@ def build_and_launch(
     build_only: bool = False,
     no_build: bool = False,
     local_qgc: bool = False,
+    launch_args: list[str] | None = None,
 ) -> None:
     """Build the ROS 2 workspace and launch a robot simulation."""
     if build_only and no_build:
@@ -417,9 +419,12 @@ def build_and_launch(
         return
 
     info("Sourcing ROS2 environment and launching simulation...")
-    launch_args = "gui:=true"
+    ros_launch_args = ["gui:=true"]
     if robot_type == "ardupilot" and local_qgc:
-        launch_args += " qgc:=false"
+        ros_launch_args.append("qgc:=false")
+    # user-supplied name:=value pairs go last so they override the defaults above
+    ros_launch_args += launch_args or []
+    quoted_launch_args = " ".join(shlex.quote(arg) for arg in ros_launch_args)
     launch_script = f"""
 set -e
 source install/setup.bash
@@ -433,7 +438,7 @@ else
     echo \"       Expected: $SIM_WORLDS_SHARE/worlds\"
 fi
 
-exec {" ".join(render_prefix)} ros2 launch \"{bringup_pkg}\" \"{launch_file_name}\" {launch_args}
+exec {" ".join(render_prefix)} ros2 launch \"{bringup_pkg}\" \"{launch_file_name}\" {quoted_launch_args}
 """.strip()
 
     try:
