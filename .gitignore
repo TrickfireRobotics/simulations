@@ -56,3 +56,6 @@ dist/
 
 # Generated from the chassis URDF by `sim chrono rover import`
 chrono/data/rovers/
+
+# debug onshape zip exports
+zips/

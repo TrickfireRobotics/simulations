@@ -36,10 +36,10 @@ def generate_launch_description():
 
     robot_desc = process_robot_description(urdf_file, controller_config)
 
-    # the marsyard terrain is ~1.6m tall at the origin (vs. the 0.1m default meant
+    # the marsyard terrain is ~0.4m tall at the origin (vs. the 0.1m default meant
     # for a flat ground plane) - spawn above it so the chassis drops onto the
     # surface instead of into it
-    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc, z=1.9)
+    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc, z=0.7)
     joint_state_broadcaster = joint_state_broadcaster_spawner()
     forward_velocity_controller = controller_spawner_node(
         "forward_velocity_controller", controller_config

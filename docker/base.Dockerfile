@@ -98,6 +98,22 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN rosdep init || true
 
 # ---------------------------------------------------------------------------- #
+#                               URDF VISUALIZATION                             #
+# ---------------------------------------------------------------------------- #
+
+ARG URDF_VIZ_VERSION=0.46.1
+ARG RUST_VERSION=1.83.0
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    cmake libglu1-mesa-dev xorg-dev unzip
+RUN --mount=type=cache,target=/root/.cargo/registry,sharing=locked \
+    --mount=type=cache,target=/root/.cargo/git,sharing=locked \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain "${RUST_VERSION}" && \
+    /root/.cargo/bin/cargo install --locked --root /opt/urdf-viz urdf-viz --version "${URDF_VIZ_VERSION}" && \
+    ln -s /opt/urdf-viz/bin/urdf-viz /usr/local/bin/urdf-viz
+
+# ---------------------------------------------------------------------------- #
 #                                 VNC / DISPLAY                                #
 # ---------------------------------------------------------------------------- #
 

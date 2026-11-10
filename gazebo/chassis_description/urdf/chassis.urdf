@@ -366,30 +366,36 @@
         <axis xyz="0 0 1"/>
         <limit effort="10" velocity="10"/>
     </joint>
-    <!-- Wheel ground-contact friction (collision uses a cylinder primitive, not the STL mesh) -->
+    <!--
+      Wheel ground-contact friction (collision uses a cylinder primitive, not the STL mesh).
+      mu=1.0 let the rover skid/slide instead of gripping during skid-steer turns - a bare
+      cylinder has much less effective contact-patch grip than a real tire/track, so it
+      needs a higher-than-real-world mu to compensate. Raised to 3.0 to match the terrain's
+      surface friction (sim_worlds/models/marsyard2022_terrain/model.sdf).
+    -->
     <gazebo reference="part_1">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
     <gazebo reference="part_1_2">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
     <gazebo reference="part_1_3">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
     <gazebo reference="part_1_4">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
     <gazebo reference="part_1_5">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
     <gazebo reference="part_1_6">
-        <mu1>1.0</mu1>
-        <mu2>1.0</mu2>
+        <mu1>3.0</mu1>
+        <mu2>3.0</mu2>
     </gazebo>
 
     <xacro:include filename="$(find chassis_description)/urdf/chassis_control.urdf.xacro"/>

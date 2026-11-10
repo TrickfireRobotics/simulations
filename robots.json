@@ -12,5 +12,10 @@
     {
         "name": "drone",
         "type": "ardupilot"
+    },
+    {
+        "name": "rover",
+        "url": "https://trickfire.onshape.com/documents/2af42e9bce0b35ea46d6ddc2/w/6894dcb528bd19bdfcc3ecc1/e/277d831c15c5fdc3939b8440",
+        "world_base_link": false
     }
 ]
