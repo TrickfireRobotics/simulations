@@ -8,12 +8,27 @@ from std_msgs.msg import Float32, Float64MultiArray
 
 # matches urc-2023/src/drivebase/drivebase/drivebase.py so a given joystick
 # deflection produces the same wheel speed on the sim as on the real rover
-SPEED = 6.28 * 1.5  # rad/s
+# TEMP: negated and halved for Viator - its wheel joint axes come out of Onshape's
+# export pointing the opposite way the old chassis's did, so the unmodified sign
+# drove backwards; and full urc-2023 speed was too fast/twitchy for this chassis
+# in sim. Re-tune once real wheel speed/axis convention is confirmed.
+SPEED = -(6.28 * 1.5) * 0.5  # rad/s
 
 # order must match the joints list in chassis_bringup/config/chassis.controller.yaml
-WHEEL_ORDER = ["fl_wheel", "ml_wheel", "bl_wheel", "fr_wheel", "mr_wheel", "br_wheel"]
-LEFT_WHEELS = ("fl_wheel", "ml_wheel", "bl_wheel")
-RIGHT_WHEELS = ("fr_wheel", "mr_wheel", "br_wheel")
+WHEEL_ORDER = [
+    "wheel_front_left_to_motor",
+    "wheel_mid_left_to_motor",
+    "wheel_back_left_to_motor",
+    "wheel_front_right_to_motor",
+    "wheel_mid_right_to_motor",
+    "wheel_back_right_to_motor",
+]
+LEFT_WHEELS = ("wheel_front_left_to_motor", "wheel_mid_left_to_motor", "wheel_back_left_to_motor")
+RIGHT_WHEELS = (
+    "wheel_front_right_to_motor",
+    "wheel_mid_right_to_motor",
+    "wheel_back_right_to_motor",
+)
 
 
 class Drivebase(Node):

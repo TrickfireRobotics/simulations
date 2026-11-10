@@ -39,7 +39,11 @@ def generate_launch_description():
     # the marsyard terrain is ~0.4m tall at the origin (vs. the 0.1m default meant
     # for a flat ground plane) - spawn above it so the chassis drops onto the
     # surface instead of into it
-    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc, z=0.7)
+    # TEMP DEBUG: raised from 0.7 - Viator's wheel-bottom is ~0.40m below base_link,
+    # which at z=0.7 only cleared the ~0.4m terrain by about 0.1m. Testing whether
+    # spawning higher (so the chassis free-falls onto the terrain instead of
+    # possibly starting embedded in it) stops the rover from launching off-screen.
+    spawn_robot = spawn_robot_node(ROBOT_NAME, robot_desc, z=1.5)
     joint_state_broadcaster = joint_state_broadcaster_spawner()
     forward_velocity_controller = controller_spawner_node(
         "forward_velocity_controller", controller_config

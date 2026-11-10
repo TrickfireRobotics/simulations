@@ -67,61 +67,161 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        ak10_9v2_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ak10_9v2_0_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ak10_9v2_0_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ak10_9v2_0_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ak10_9v2_0_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ak10_9v2_0_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        front_arm:
+        battery:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1:
+        batterymount:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1_2:
+        bogie_bracket_leg_v2_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1_3:
+        bogie_bracket_leg_v2_1__1_:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1_4:
+        bogie_plate_v1_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1_5:
+        bogie_plate_v1_1__1_:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_1_6:
+        camera:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_3:
+        chassismain:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_4:
+        crossbar:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        top__mid__arm:
+        drivebaseplate:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ttb_0094_ttb_0095_2x1_grid_pattern_aluminum_extrusion:
+        drivebaseplate_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg_bracket_long_v7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        leg_bracket_long_v7__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        part_2_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rocker_crank_arm_plate_v1_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rocker_crank_arm_plate_v1_1__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        shortened_short_leg_bracket_v4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        shortened_short_leg_bracket_v4_3__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        shortened_short_leg_bracket_v4_3__1__1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        shortened_short_leg_bracket_v4__1_:
           Alpha: 1
           Show Axes: false
           Show Trail: false

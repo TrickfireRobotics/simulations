@@ -12,10 +12,10 @@ controller_manager:
 forward_velocity_controller:
   ros__parameters:
     joints:
-      - fl_wheel
-      - ml_wheel
-      - bl_wheel
-      - fr_wheel
-      - mr_wheel
-      - br_wheel
+      - wheel_front_left_to_motor
+      - wheel_mid_left_to_motor
+      - wheel_back_left_to_motor
+      - wheel_front_right_to_motor
+      - wheel_mid_right_to_motor
+      - wheel_back_right_to_motor
     interface_name: velocity
