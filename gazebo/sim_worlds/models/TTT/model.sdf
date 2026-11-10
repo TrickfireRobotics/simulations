@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="TTT">
+    <static>true</static>
+    <link name="link">
+      <!-- Bounding box of the mesh (1.31 x 1.06 x 1.9 m), origin at the base centre -->
+      <collision name="collision">
+        <pose>0 0 0.95 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1.31 1.06 1.9</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- glTF is Y-up and Gazebo loads it as-is, so roll +90 deg to stand it up
+           on Z. This restores the Blender axes, so the model faces +X. The mesh
+           is already in metres, so no scale is needed -->
+      <visual name="visual">
+        <pose>0 0 0 1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://TTT/meshes/TTT.glb</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

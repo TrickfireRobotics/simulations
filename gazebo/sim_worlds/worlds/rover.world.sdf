@@ -151,13 +151,21 @@
 
         <!-- PEOPLE -->
         <!-- Resolved from sim_worlds/models via GZ_SIM_RESOURCE_PATH -->
-        <!-- Directly ahead of the rover's spawn point (+X); the mesh faces -Y, so
+        <!-- Ahead of the rover's spawn point (+X), offset to -Y; the mesh faces -Y, so
              yaw -90 deg turns the person to face the rover -->
         <include>
             <name>person_walking</name>
             <static>true</static>
-            <pose>3.0 0.0 0.0 0 0 -1.5708</pose>
+            <pose>3.0 -1.5 0.0 0 0 -1.5708</pose>
             <uri>model://person_walking</uri>
+        </include>
+
+        <!-- TTT faces +X in its own frame; yaw 180 deg turns it to face the rover -->
+        <include>
+            <name>TTT</name>
+            <static>true</static>
+            <pose>6.5 0.0 0.0 0 0 3.1416</pose>
+            <uri>model://TTT</uri>
         </include>
     </world>
 </sdf>
