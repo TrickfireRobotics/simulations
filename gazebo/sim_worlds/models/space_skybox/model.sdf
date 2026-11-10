@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<?xml-model href="http://sdformat.org/schemas/root.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<sdf version="1.7">
+  <model name="space_skybox">
+    <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+
+    <link name="skybox_link">
+
+      <visual name="skybox_visual">
+        <!-- double_sided so the inward-facing texture is visible from inside
+             the sphere; no collision since this is a backdrop only -->
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <sphere>
+            <radius>500</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <double_sided>true</double_sided>
+          <emissive>1 1 1 1</emissive>
+          <pbr>
+            <metal>
+              <albedo_map>model://space_skybox/starfield.png</albedo_map>
+              <emissive_map>model://space_skybox/starfield.png</emissive_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+    </link>
+
+  </model>
+</sdf>

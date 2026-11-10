@@ -25,6 +25,15 @@
             </dart>
         </physics>
 
+        <!-- SCENE -->
+        <!-- no <sky> here: gz-sim (Harmonic) parses <sky><cubemap_uri> but never
+             wires it to the renderer, so a real skybox cubemap isn't possible -
+             the space_skybox model below (a large unlit sphere) is the workaround -->
+        <scene>
+            <ambient>0.4 0.4 0.4 1</ambient>
+            <background>0 0 0 1</background>
+        </scene>
+
         <!-- LIGHTS -->
         <light type="directional" name="sun">
             <cast_shadows>true</cast_shadows>
@@ -44,6 +53,13 @@
         <model name="marsyard">
             <include>
                 <uri>model://marsyard2022_terrain</uri>
+            </include>
+        </model>
+
+        <!-- BACKDROP -->
+        <model name="space_skybox">
+            <include>
+                <uri>model://space_skybox</uri>
             </include>
         </model>
     </world>

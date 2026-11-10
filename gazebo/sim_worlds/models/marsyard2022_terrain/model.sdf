@@ -13,9 +13,9 @@
             <uri>model://marsyard2022_terrain/dem/marsyard2022_terrain_hm.tif</uri>
             <pos>0 0 0</pos>
             <!-- upstream's raw relief (4.82m over 50m) towers over our ~0.9m-long rover;
-                 scaled to a quarter so slopes stay within what a small rover can
+                 scaled to a third so slopes stay within what a small rover can
                  skid-steer on without tumbling -->
-            <size>50 50 1.2052008183915</size>
+            <size>50 50 1.606934424522</size>
           </heightmap>
         </geometry>
         <surface>
@@ -34,9 +34,9 @@
             <use_terrain_paging>false</use_terrain_paging>
             <uri>model://marsyard2022_terrain/dem/marsyard2022_terrain_hm.tif</uri>
             <pos>0 0 0</pos>
-            <size>50 50 1.2052008183915</size>
+            <size>50 50 1.606934424522</size>
             <texture>
-              <diffuse>model://marsyard2022_terrain/dem/marsyard2022_terrain_texture.jpg</diffuse>
+              <diffuse>model://marsyard2022_terrain/dem/marsyard2022_terrain_texture.png</diffuse>
               <normal>model://marsyard2022_terrain/dem/flat_normal.png</normal>
               <size>50</size>
             </texture>
