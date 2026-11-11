@@ -73,10 +73,10 @@ def cmd_create(args) -> None:
 
     info(f"Creating packages for robot: {robot}")
 
-    api_url, doc_id, ws_id, el_id = parse_onshape_url(args.onshape_url)
-    info(f"documentId={doc_id}  workspaceId={ws_id}  elementId={el_id}")
+    api_url, doc_id, context_type, context_id, el_id = parse_onshape_url(args.onshape_url)
+    info(f"documentId={doc_id}  {context_type}Id={context_id}  elementId={el_id}")
 
-    workdir = download(robot, doc_id, ws_id, el_id, api_url)
+    workdir = download(robot, doc_id, context_type, context_id, el_id, api_url)
 
     urdf_path = workdir / "robot.urdf"
     if not urdf_path.exists():
@@ -151,10 +151,10 @@ def cmd_raw(args) -> None:
             )
         url = entry["url"]
 
-    api_url, doc_id, ws_id, el_id = parse_onshape_url(url)
-    info(f"documentId={doc_id}  workspaceId={ws_id}  elementId={el_id}")
+    api_url, doc_id, context_type, context_id, el_id = parse_onshape_url(url)
+    info(f"documentId={doc_id}  {context_type}Id={context_id}  elementId={el_id}")
 
-    workdir = download(robot, doc_id, ws_id, el_id, api_url)
+    workdir = download(robot, doc_id, context_type, context_id, el_id, api_url)
 
     dest = out_dir / robot
     if dest.exists():
@@ -185,10 +185,10 @@ def cmd_update(args) -> None:
             "  Use 'sim create' to add a new robot."
         )
 
-    api_url, doc_id, ws_id, el_id = parse_onshape_url(entry["url"])
-    info(f"documentId={doc_id}  workspaceId={ws_id}  elementId={el_id}")
+    api_url, doc_id, context_type, context_id, el_id = parse_onshape_url(entry["url"])
+    info(f"documentId={doc_id}  {context_type}Id={context_id}  elementId={el_id}")
 
-    workdir = download(robot, doc_id, ws_id, el_id, api_url)
+    workdir = download(robot, doc_id, context_type, context_id, el_id, api_url)
 
     exported_urdf_path = workdir / "robot.urdf"
     exported_meshes_src = workdir / "assets"

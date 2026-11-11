@@ -14,7 +14,7 @@ from ...output import die as err
 from ...output import info, warn
 
 _ONSHAPE_URL_RE = re.compile(
-    r"documents/([0-9a-f]+)/[wv]/([0-9a-f]+)/e/([0-9a-f]+)",
+    r"documents/([0-9a-f]+)/([wv])/([0-9a-f]+)/e/([0-9a-f]+)",
     re.IGNORECASE,
 )
 
@@ -31,7 +31,7 @@ def parse_onshape_url(url: str) -> tuple:
         )
     parsed = urlparse(url)
     api_url = f"{parsed.scheme}://{parsed.netloc}"
-    return api_url, m.group(1), m.group(2), m.group(3)
+    return api_url, m.group(1), m.group(2), m.group(3), m.group(4)
 
 
 def _error_message(resp: requests.Response, fallback: str) -> str:
@@ -65,7 +65,14 @@ def _poll_job(dashboard_url: str, job_id: str) -> requests.Response:
 
 
 def download(
-    robot: str, doc_id: str, ws_id: str, el_id: str, api_url: str, *, force_refresh: bool = False
+    robot: str,
+    doc_id: str,
+    context_type: str,
+    context_id: str,
+    el_id: str,
+    api_url: str,
+    *,
+    force_refresh: bool = False,
 ) -> Path:
     dashboard_url = DASHBOARD_URL
 
@@ -80,7 +87,9 @@ def download(
             resp = requests.post(
                 f"{dashboard_url}/api/sim/export",
                 json={
-                    "onshapeUrl": f"{api_url}/documents/{doc_id}/w/{ws_id}/e/{el_id}",
+                    "onshapeUrl": (
+                        f"{api_url}/documents/{doc_id}/{context_type}/{context_id}/e/{el_id}"
+                    ),
                     "forceRefresh": force_refresh,
                 },
                 headers=headers(code),

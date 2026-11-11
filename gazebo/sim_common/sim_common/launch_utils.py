@@ -75,7 +75,12 @@ def process_robot_description(urdf_file, controller_config):
 
 
 def gazebo_launch_actions(
-    world_file, gz_gui_config, gui_launch_arg="gui", gui_delay=2.0, combined_gui=False
+    world_file,
+    gz_gui_config,
+    gui_launch_arg="gui",
+    gui_delay=2.0,
+    combined_gui=False,
+    physics_engine=None,
 ):
     """
     Bring up the gz sim server, plus its GUI if the installed `gz` supports launching
@@ -94,6 +99,8 @@ def gazebo_launch_actions(
         if use_split_gui
         else ["-r", world_file, "--gui-config", gz_gui_config]
     )
+    if physics_engine:
+        gz_server_args.extend(["--physics-engine", physics_engine])
 
     gz_server = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

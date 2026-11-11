@@ -27,7 +27,7 @@ def generate_launch_description():
     """ROS launch method, must have this name"""
 
     controller_config = get_asset("arm_bringup", "config", "arm.controller.yaml")
-    world_file = get_asset("sim_worlds", "worlds", "empty.world.sdf")
+    world_file = get_asset("sim_worlds", "worlds", "arm.world.sdf")
     rviz_config = get_asset("arm_bringup", "config", "arm.rviz")
     urdf_file = get_asset("arm_description", "urdf", "arm.urdf")
     gz_gui_config = get_asset("sim_worlds", "gui", "gui.config")
@@ -54,7 +54,11 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            *gazebo_launch_actions(world_file, gz_gui_config),
+            *gazebo_launch_actions(
+                world_file,
+                gz_gui_config,
+                physics_engine="gz-physics-bullet-featherstone-plugin",
+            ),
             TimerAction(period=5.0, actions=[spawn_robot]),
             robot_state_publisher_node(robot_desc),
             DeclareLaunchArgument("rviz", default_value="true", description="Open RViz."),

@@ -24,7 +24,7 @@ def _inject_xacro_properties(urdf_text: str, robot_name: str) -> str:
 
 def _rewrite_mesh_paths(urdf_text: str) -> str:
     return re.sub(
-        r'filename="package://assets/([^"]+)"',
+        r'filename="package://(?:assets|[^/]+/meshes)/([^"]+)"',
         r'filename="${mesh_path}/\1"',
         urdf_text,
     )
@@ -109,14 +109,25 @@ def _generate_control_xacro(robot_name: str, joints: list) -> str:
 
 
 def _inject_world_base_link(urdf_text: str) -> str:
+    root = ET.fromstring(_strip_xacro_for_parsing(urdf_text))
+    links = {link.get("name") for link in root.findall("link") if link.get("name")}
+    children = {
+        child.get("link")
+        for joint in root.findall("joint")
+        if (child := joint.find("child")) is not None and child.get("link")
+    }
+    roots = links - children
+    if len(roots) != 1:
+        raise ValueError(f"Expected one root link, found: {', '.join(sorted(roots))}")
+    root_link = roots.pop()
     snippet = (
         "\n"
         "  <!-- World base link -->\n"
         '  <link name="world"/>\n'
         "\n"
-        '  <joint name="world_to_base_link" type="fixed">\n'
+        f'  <joint name="world_to_{root_link}" type="fixed">\n'
         '    <parent link="world"/>\n'
-        '    <child link="base_link"/>\n'
+        f'    <child link="{root_link}"/>\n'
         '    <origin xyz="0 0 0" rpy="0 0 0"/>\n'
         "  </joint>\n"
         "\n"
