@@ -86,6 +86,16 @@ def generate_launch_description():
     )
 
     # ----------------------------------------------
+    # Arm bridge
+    # ----------------------------------------------
+
+    arm_bridge = Node(
+        package="sim_common",
+        executable="arm",
+        output="screen",
+    )
+
+    # ----------------------------------------------
     # Rosbridge
     # ----------------------------------------------
 
@@ -98,21 +108,6 @@ def generate_launch_description():
         ],
     )
 
-    # ----------------------------------------------
-    # Arm joint GUI
-    # ----------------------------------------------
-    # see arm.launch.py - points at the raw xacro file since joint_gui.py
-    # processes it itself, and only shows revolute joints (the arm's), since
-    # the chassis wheel joints are type="continuous"
-
-    joint_gui = Node(
-        package="sim_common",
-        executable="joint_gui",
-        arguments=[urdf_file],
-        condition=IfCondition(LaunchConfiguration("arm_gui")),
-        output="screen",
-    )
-
     return LaunchDescription(
         [
             *gazebo_launch_actions(world_file, gz_gui_config),
@@ -120,9 +115,6 @@ def generate_launch_description():
             robot_state_publisher_node(robot_desc),
             DeclareLaunchArgument("rviz", default_value="true", description="Open RViz."),
             DeclareLaunchArgument("gui", default_value="true", description="Open Gazebo GUI."),
-            DeclareLaunchArgument(
-                "arm_gui", default_value="true", description="Open arm Joint GUI."
-            ),
             DeclareLaunchArgument(
                 "rosbridge_port",
                 default_value=os.environ.get("ROSBRIDGE_PORT", "9090"),
@@ -138,7 +130,7 @@ def generate_launch_description():
             clock_bridge_node(),
             rviz_node(rviz_config),
             drivebase_bridge,
+            arm_bridge,
             rosbridge,
-            joint_gui,
         ]
     )

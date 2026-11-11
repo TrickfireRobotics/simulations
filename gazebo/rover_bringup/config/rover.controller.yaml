@@ -26,10 +26,12 @@ forward_velocity_controller:
 joint_trajectory_controller:
   ros__parameters:
     joints:
-      - wrist_2
-      - wrist_1
-      - elbow_1
-      - shoulder_1
+      - baseplate_left_right
+      - shoulder_up_down
+      - elbow_up_down
+      - gripper_up_down
+      - gripper_left_right
+      - claw_open_close
 
     command_interfaces:
       - position

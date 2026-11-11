@@ -2,11 +2,13 @@
 Launch script for the Gazebo arm simulation
 """
 
+import os
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, TimerAction
-from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from sim_common.launch_utils import (
     chain_controller_spawners,
     clock_bridge_node,
@@ -41,15 +43,26 @@ def generate_launch_description():
     )
 
     # ----------------------------------------------
-    # Joint GUI
+    # Arm bridge
     # ----------------------------------------------
 
-    joint_gui = Node(
+    arm_bridge = Node(
         package="sim_common",
-        executable="joint_gui",
-        arguments=[urdf_file],
-        condition=IfCondition(LaunchConfiguration("gui")),
+        executable="arm",
         output="screen",
+    )
+
+    # ----------------------------------------------
+    # Rosbridge
+    # ----------------------------------------------
+
+    rosbridge = Node(
+        package="rosbridge_server",
+        executable="rosbridge_websocket",
+        output="screen",
+        parameters=[
+            {"port": ParameterValue(LaunchConfiguration("rosbridge_port"), value_type=int)}
+        ],
     )
 
     return LaunchDescription(
@@ -62,12 +75,18 @@ def generate_launch_description():
             TimerAction(period=5.0, actions=[spawn_robot]),
             robot_state_publisher_node(robot_desc),
             DeclareLaunchArgument("rviz", default_value="true", description="Open RViz."),
-            DeclareLaunchArgument("gui", default_value="true", description="Open Joint GUI."),
+            DeclareLaunchArgument("gui", default_value="true", description="Open Gazebo GUI."),
+            DeclareLaunchArgument(
+                "rosbridge_port",
+                default_value=os.environ.get("ROSBRIDGE_PORT", "9090"),
+                description="Port for the rosbridge WebSocket server.",
+            ),
             *chain_controller_spawners(
                 spawn_robot, joint_state_broadcaster, joint_trajectory_controller
             ),
             clock_bridge_node(),
             rviz_node(rviz_config),
-            joint_gui,
+            arm_bridge,
+            rosbridge,
         ]
     )

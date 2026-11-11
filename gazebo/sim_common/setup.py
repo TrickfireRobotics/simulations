@@ -17,6 +17,7 @@ setup(
             "move_joints = sim_common.move_joints:main",
             "joint_gui = sim_common.joint_gui:main",
             "drivebase = sim_common.drivebase:main",
+            "arm = sim_common.arm:main",
         ],
     },
     install_requires=["setuptools"],

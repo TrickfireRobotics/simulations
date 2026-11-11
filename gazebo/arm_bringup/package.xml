@@ -9,6 +9,7 @@
 
     <depend>arm_description</depend>
     <exec_depend>sim_common</exec_depend>
+    <exec_depend>rosbridge_server</exec_depend>
 
     <buildtool_depend>ament_cmake</buildtool_depend>
 
