@@ -6,15 +6,18 @@
 
         
     
+    <xacro:arg name="standalone" default="true" />
+    <xacro:if value="$(arg standalone)">
     <link name="world" />
 
     <joint name="world_to_root" type="fixed">
         <parent link="world" />
-        <child link="root" />
+        <child link="arm_root" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
+    </xacro:if>
 
-<link name="0_4m_shaft">
+<link name="arm_0_4m_shaft">
                 <inertial>
                         <mass value="0.157794" />
                         <origin xyz="-1.24836e-18 0.15 -8.67362e-19" rpy="0 -0 0" />
@@ -30,7 +33,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="0_4m_shaft_1">
+        <link name="arm_0_4m_shaft_1">
                 <inertial>
                         <mass value="0.157794" />
                         <origin xyz="-1.24836e-18 0.15 -8.67362e-19" rpy="0 -0 0" />
@@ -46,7 +49,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="1911_0025_0836_assembly">
+        <link name="arm_1911_0025_0836_assembly">
                 <inertial>
                         <mass value="0.000759188" />
                         <origin xyz="-2.20622e-09 -0.0128123 -8.43851e-09" rpy="0 -0 0" />
@@ -62,7 +65,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="1911_0025_0836_assembly_1">
+        <link name="arm_1911_0025_0836_assembly_1">
                 <inertial>
                         <mass value="0.00418026" />
                         <origin xyz="-4.47906e-15 0.0127028 3.36745e-14" rpy="0 -0.181514 0" />
@@ -78,7 +81,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="1mt_054_006">
+        <link name="arm_1mt_054_006">
                 <inertial>
                         <mass value="1.41525e-05" />
                         <origin xyz="1.1726e-18 -0.00306353 1.58064e-17" rpy="0 -0 0" />
@@ -94,7 +97,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="1mt_054_006_1">
+        <link name="arm_1mt_054_006_1">
                 <inertial>
                         <mass value="0.000786323" />
                         <origin xyz="0.000689267 0.0277471 0.000153873" rpy="0 -0 0" />
@@ -110,7 +113,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="200mm_linear_actuator_base">
+        <link name="arm_200mm_linear_actuator_base">
                 <inertial>
                         <mass value="0.000304027" />
                         <origin xyz="-6.83347e-18 0.0990263 -0.0121127" rpy="0 -0 0" />
@@ -126,7 +129,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="200mm_linear_actuator_piston">
+        <link name="arm_200mm_linear_actuator_piston">
                 <inertial>
                         <mass value="7.10594e-05" />
                         <origin xyz="1.26738e-11 -0.115105 8.70003e-11" rpy="0 -0 0" />
@@ -142,7 +145,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="57545k631_steel_worm_57545k631">
+        <link name="arm_57545k631_steel_worm_57545k631">
                 <inertial>
                         <mass value="0.121589" />
                         <origin xyz="4.68556e-05 -2.07458e-05 -0.0216273" rpy="0 -0 0" />
@@ -158,7 +161,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="57545k756_metal_worm_gear_57545k756">
+        <link name="arm_57545k756_metal_worm_gear_57545k756">
                 <inertial>
                         <mass value="0.0792177" />
                         <origin xyz="-5.7858e-08 -9.13457e-09 0.0108094" rpy="0 -0 0" />
@@ -174,7 +177,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="6056n16_carbon_steel_set_screw_collar_6056n16">
+        <link name="arm_6056n16_carbon_steel_set_screw_collar_6056n16">
                 <inertial>
                         <mass value="0.00308529" />
                         <origin xyz="-1.85719e-11 -0.000272437 0.00394886" rpy="0 -0 0" />
@@ -190,7 +193,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="6056n16_carbon_steel_set_screw_collar_6056n16_1">
+        <link name="arm_6056n16_carbon_steel_set_screw_collar_6056n16_1">
                 <inertial>
                         <mass value="0.000126718" />
                         <origin xyz="-3.94646e-06 0.00549346 4.73614e-06" rpy="0 -0 0" />
@@ -206,7 +209,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="actuator_linkage">
+        <link name="arm_actuator_linkage">
                 <inertial>
                         <mass value="0.00821493" />
                         <origin xyz="-0.0190808 -0.0015 0.0351637" rpy="0 -0.478417 0" />
@@ -222,7 +225,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="actuator_linkage_1">
+        <link name="arm_actuator_linkage_1">
                 <inertial>
                         <mass value="0.00821493" />
                         <origin xyz="-0.0351637 -0.0015 0.0190808" rpy="0 -1.05488 0" />
@@ -238,7 +241,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="camera_mount_v1_0">
+        <link name="arm_camera_mount_v1_0">
                 <inertial>
                         <mass value="0.0220883" />
                         <origin xyz="2.08431e-05 0.00822709 -0.029845" rpy="0 -0 0" />
@@ -254,7 +257,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="camerabracket">
+        <link name="arm_camerabracket">
                 <inertial>
                         <mass value="0.0122891" />
                         <origin xyz="8.74301e-16 0.029845 0.0039125" rpy="0 -0 0" />
@@ -270,9 +273,9 @@
                         </material>
                 </visual>
         </link>
-        <link name="cylindrical_1_link"><inertial><mass value="1e-9" /><inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9" /></inertial></link>
-        <link name="cylindrical_2_link"><inertial><mass value="1e-9" /><inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9" /></inertial></link>
-        <link name="deleteface2">
+        <link name="arm_cylindrical_1_link"><inertial><mass value="1e-9" /><inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9" /></inertial></link>
+        <link name="arm_cylindrical_2_link"><inertial><mass value="1e-9" /><inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9" /></inertial></link>
+        <link name="arm_deleteface2">
                 <inertial>
                         <mass value="0.0780781" />
                         <origin xyz="-3.63619e-08 -0.0036506 2.68568e-09" rpy="0 -0 0" />
@@ -288,7 +291,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="exampleballbearing">
+        <link name="arm_exampleballbearing">
                 <inertial>
                         <mass value="0.00138977" />
                         <origin xyz="0 0.0025 -5.71482e-19" rpy="0 -0 0" />
@@ -304,7 +307,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="exampleballbearing_1">
+        <link name="arm_exampleballbearing_1">
                 <inertial>
                         <mass value="0.00138977" />
                         <origin xyz="1.03163e-19 0.0025 -5.62093e-19" rpy="0 -0.181514 0" />
@@ -320,7 +323,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="exampleballbearing_2">
+        <link name="arm_exampleballbearing_2">
                 <inertial>
                         <mass value="0.00138977" />
                         <origin xyz="-1.03163e-19 -0.0025 -5.62093e-19" rpy="0 0.181514 0" />
@@ -336,7 +339,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="exampleballbearing_3">
+        <link name="arm_exampleballbearing_3">
                 <inertial>
                         <mass value="0.00138977" />
                         <origin xyz="0 -0.0025 -5.71482e-19" rpy="0 -0 0" />
@@ -352,7 +355,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="examplemotor">
+        <link name="arm_examplemotor">
                 <inertial>
                         <mass value="0.086931" />
                         <origin xyz="-0.0247326 -0.0103593 -0.00500001" rpy="0 -0 0" />
@@ -368,7 +371,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="extrude_thin1">
+        <link name="arm_extrude_thin1">
                 <inertial>
                         <mass value="1.14078e-06" />
                         <origin xyz="-6.02027e-07 0.000198363 -3.65253e-09" rpy="0 -0 0" />
@@ -384,7 +387,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="extrude_thin1_1">
+        <link name="arm_extrude_thin1_1">
                 <inertial>
                         <mass value="1.14078e-06" />
                         <origin xyz="-6.02027e-07 0.000198363 -3.65253e-09" rpy="0 -0 0" />
@@ -400,7 +403,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="finger_pad_3_0">
+        <link name="arm_finger_pad_3_0">
                 <inertial>
                         <mass value="0.0589889" />
                         <origin xyz="-0.00767089 -0.0324125 -0.009525" rpy="0 -0 0" />
@@ -416,7 +419,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="finger_pad_3_0_1">
+        <link name="arm_finger_pad_3_0_1">
                 <inertial>
                         <mass value="0.0589889" />
                         <origin xyz="-0.00767089 -0.0324125 -0.009525" rpy="0 -0 0" />
@@ -432,7 +435,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_finger_plate_top_section">
+        <link name="arm_left_finger_plate_top_section">
                 <inertial>
                         <mass value="0.0203589" />
                         <origin xyz="-0.0134576 -0.0434872 -0.0015875" rpy="0 -0 0" />
@@ -448,7 +451,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_finger_plate_top_section_1">
+        <link name="arm_left_finger_plate_top_section_1">
                 <inertial>
                         <mass value="0.0203589" />
                         <origin xyz="-0.0134576 -0.0434872 -0.0015875" rpy="0 -0 0" />
@@ -464,7 +467,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_finger_plate_top_section_2">
+        <link name="arm_left_finger_plate_top_section_2">
                 <inertial>
                         <mass value="0.0203589" />
                         <origin xyz="0.00488744 0.045723 -0.0015875" rpy="0 -0 0" />
@@ -480,7 +483,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_finger_plate_top_section_3">
+        <link name="arm_left_finger_plate_top_section_3">
                 <inertial>
                         <mass value="0.0203589" />
                         <origin xyz="0.00488744 0.045723 -0.0015875" rpy="0 -0 0" />
@@ -496,7 +499,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_l_part">
+        <link name="arm_left_l_part">
                 <inertial>
                         <mass value="0.0233083" />
                         <origin xyz="0.0356469 0.00266079 -0.00964788" rpy="0 -0 0" />
@@ -512,7 +515,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="left_l_part_1">
+        <link name="arm_left_l_part_1">
                 <inertial>
                         <mass value="0.0233083" />
                         <origin xyz="0.0356469 0.00266079 -0.00964788" rpy="0 -0 0" />
@@ -528,7 +531,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="long_motor_l_piece">
+        <link name="arm_long_motor_l_piece">
                 <inertial>
                         <mass value="0.00765308" />
                         <origin xyz="-0.00722992 0.005025 -0.0118343" rpy="0 -0 0" />
@@ -544,7 +547,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="longmotorbracketspacer">
+        <link name="arm_longmotorbracketspacer">
                 <inertial>
                         <mass value="0.00583244" />
                         <origin xyz="0.00687913 0.005025 -0.002275" rpy="0 -0 0" />
@@ -560,7 +563,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="metal_worm_gear__right_hand__57545k756">
+        <link name="arm_metal_worm_gear__right_hand__57545k756">
                 <inertial>
                         <mass value="0.0792177" />
                         <origin xyz="-5.7858e-08 -9.13457e-09 0.0108094" rpy="0 -0 0" />
@@ -576,7 +579,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="newbasemount">
+        <link name="arm_newbasemount">
                 <inertial>
                         <mass value="0.0791677" />
                         <origin xyz="-4.92332e-18 2.66279e-18 0.0103886" rpy="0 -0 0" />
@@ -592,7 +595,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1">
+        <link name="arm_part_1">
                 <inertial>
                         <mass value="0.000835371" />
                         <origin xyz="-1.0097e-17 0.00085 7.50633e-18" rpy="0 -0 0" />
@@ -608,7 +611,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_1">
+        <link name="arm_part_1_1">
                 <inertial>
                         <mass value="0.0403052" />
                         <origin xyz="0.00664835 0.034 0.0160618" rpy="0 0.392451 0" />
@@ -624,7 +627,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_10">
+        <link name="arm_part_1_10">
                 <inertial>
                         <mass value="0.0395007" />
                         <origin xyz="0.00416861 0.0273392 0.022" rpy="0 -0 0" />
@@ -640,7 +643,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_11">
+        <link name="arm_part_1_11">
                 <inertial>
                         <mass value="0.0918441" />
                         <origin xyz="0.01 0.00335789 -0.0525383" rpy="0 -0 0" />
@@ -656,7 +659,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_12">
+        <link name="arm_part_1_12">
                 <inertial>
                         <mass value="0.339992" />
                         <origin xyz="-0.0255 0 5.35999e-19" rpy="0 -0 0" />
@@ -672,7 +675,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_13">
+        <link name="arm_part_1_13">
                 <inertial>
                         <mass value="0.044307" />
                         <origin xyz="-1.23397e-17 0.003716 4.89377e-18" rpy="0 -0 0" />
@@ -688,7 +691,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_14">
+        <link name="arm_part_1_14">
                 <inertial>
                         <mass value="0.0441919" />
                         <origin xyz="-4.4503e-08 -1.05861e-09 0.00581177" rpy="0 -0 0" />
@@ -704,7 +707,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_15">
+        <link name="arm_part_1_15">
                 <inertial>
                         <mass value="0.11045" />
                         <origin xyz="-4.80313e-10 0.0156027 3.1265e-08" rpy="0 -0 0" />
@@ -720,7 +723,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_16">
+        <link name="arm_part_1_16">
                 <inertial>
                         <mass value="0.0311517" />
                         <origin xyz="8.62297e-11 0.00917566 -0.0317744" rpy="0 -0 0" />
@@ -736,7 +739,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_17">
+        <link name="arm_part_1_17">
                 <inertial>
                         <mass value="0.0826911" />
                         <origin xyz="-0.0225886 7.44173e-05 0.0118927" rpy="0 -0 0" />
@@ -752,7 +755,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_18">
+        <link name="arm_part_1_18">
                 <inertial>
                         <mass value="0.142618" />
                         <origin xyz="-0.0225 0.0175 -7.2932e-09" rpy="0 -0 0" />
@@ -768,7 +771,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_19">
+        <link name="arm_part_1_19">
                 <inertial>
                         <mass value="0.033978" />
                         <origin xyz="0.0180734 -0.014325 0.00675362" rpy="0 -0 0" />
@@ -784,7 +787,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_2">
+        <link name="arm_part_1_2">
                 <inertial>
                         <mass value="0.000835371" />
                         <origin xyz="-1.0097e-17 -0.00085 7.80991e-18" rpy="0 -0 0" />
@@ -800,7 +803,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_20">
+        <link name="arm_part_1_20">
                 <inertial>
                         <mass value="0.0145582" />
                         <origin xyz="6.40141e-11 0.0186856 1.45399e-10" rpy="0 -0 0" />
@@ -816,7 +819,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_21">
+        <link name="arm_part_1_21">
                 <inertial>
                         <mass value="0.0292204" />
                         <origin xyz="-2.32325e-05 1.34133e-05 -0.00360417" rpy="0 -0 0" />
@@ -832,7 +835,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_22">
+        <link name="arm_part_1_22">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -848,7 +851,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_23">
+        <link name="arm_part_1_23">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -864,7 +867,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_24">
+        <link name="arm_part_1_24">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -880,7 +883,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_25">
+        <link name="arm_part_1_25">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -896,7 +899,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_26">
+        <link name="arm_part_1_26">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -912,7 +915,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_27">
+        <link name="arm_part_1_27">
                 <inertial>
                         <mass value="0.209032" />
                         <origin xyz="0.0207942 0.0325 0.0269553" rpy="0 -0 0" />
@@ -928,7 +931,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_28">
+        <link name="arm_part_1_28">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -944,7 +947,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_29">
+        <link name="arm_part_1_29">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -960,7 +963,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_3">
+        <link name="arm_part_1_3">
                 <inertial>
                         <mass value="0.00485343" />
                         <origin xyz="0.00273726 0.00021139 -0.00509153" rpy="-0.0215963 0 0" />
@@ -976,7 +979,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_30">
+        <link name="arm_part_1_30">
                 <inertial>
                         <mass value="0.0984153" />
                         <origin xyz="2.41759e-08 -0.0124833 -0.000951823" rpy="0 -0 0" />
@@ -992,7 +995,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_31">
+        <link name="arm_part_1_31">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1008,7 +1011,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_32">
+        <link name="arm_part_1_32">
                 <inertial>
                         <mass value="0.0101625" />
                         <origin xyz="4.98544e-05 1.39929e-18 0.0015875" rpy="0 -0 0" />
@@ -1024,7 +1027,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_33">
+        <link name="arm_part_1_33">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1040,7 +1043,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_34">
+        <link name="arm_part_1_34">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1056,7 +1059,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_35">
+        <link name="arm_part_1_35">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -1072,7 +1075,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_36">
+        <link name="arm_part_1_36">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1088,7 +1091,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_37">
+        <link name="arm_part_1_37">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -1104,7 +1107,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_38">
+        <link name="arm_part_1_38">
                 <inertial>
                         <mass value="7.2164e-05" />
                         <origin xyz="2.66502e-18 -1.20455e-05 -0.00464757" rpy="0 -0 0" />
@@ -1120,7 +1123,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_39">
+        <link name="arm_part_1_39">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1136,7 +1139,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_4">
+        <link name="arm_part_1_4">
                 <inertial>
                         <mass value="0.117005" />
                         <origin xyz="1.35949e-08 0.0125242 3.22324e-09" rpy="0 -0 0" />
@@ -1152,7 +1155,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_40">
+        <link name="arm_part_1_40">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -1168,7 +1171,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_41">
+        <link name="arm_part_1_41">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1184,7 +1187,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_42">
+        <link name="arm_part_1_42">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1200,7 +1203,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_43">
+        <link name="arm_part_1_43">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -1216,7 +1219,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_44">
+        <link name="arm_part_1_44">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -1232,7 +1235,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_45">
+        <link name="arm_part_1_45">
                 <inertial>
                         <mass value="0.982995" />
                         <origin xyz="-3.57806e-18 -8.09859e-18 0.00742087" rpy="0 -0 0" />
@@ -1248,7 +1251,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_46">
+        <link name="arm_part_1_46">
                 <inertial>
                         <mass value="0.101822" />
                         <origin xyz="0.00481286 -3.06688e-18 1.32195e-18" rpy="1.95985 -0 0" />
@@ -1264,7 +1267,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_47">
+        <link name="arm_part_1_47">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -1280,7 +1283,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_48">
+        <link name="arm_part_1_48">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -1296,7 +1299,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_49">
+        <link name="arm_part_1_49">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1312,7 +1315,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_5">
+        <link name="arm_part_1_5">
                 <inertial>
                         <mass value="0.339992" />
                         <origin xyz="-0.0255 0 5.35999e-19" rpy="0 -0 0" />
@@ -1328,7 +1331,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_50">
+        <link name="arm_part_1_50">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1344,7 +1347,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_51">
+        <link name="arm_part_1_51">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -1360,7 +1363,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_52">
+        <link name="arm_part_1_52">
                 <inertial>
                         <mass value="6.18762e-08" />
                         <origin xyz="-2.95422e-19 0 -0.00055" rpy="0 -0 0" />
@@ -1376,7 +1379,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_53">
+        <link name="arm_part_1_53">
                 <inertial>
                         <mass value="5.3668e-07" />
                         <origin xyz="-2.7093e-20 -9.72795e-21 -0.00306535" rpy="0 -0 0" />
@@ -1392,7 +1395,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_54">
+        <link name="arm_part_1_54">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1408,7 +1411,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_55">
+        <link name="arm_part_1_55">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1424,7 +1427,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_56">
+        <link name="arm_part_1_56">
                 <inertial>
                         <mass value="1.42051e-07" />
                         <origin xyz="1.1106e-17 -3.25092e-10 -0.002" rpy="0 -0 0" />
@@ -1440,7 +1443,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_57">
+        <link name="arm_part_1_57">
                 <inertial>
                         <mass value="0.101957" />
                         <origin xyz="-4.85482e-19 -0.053 -0.0054121" rpy="0 -0 0" />
@@ -1456,7 +1459,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_58">
+        <link name="arm_part_1_58">
                 <inertial>
                         <mass value="6.55795e-07" />
                         <origin xyz="4.05061e-10 -5.19236e-12 -0.00636617" rpy="0 -0 0" />
@@ -1472,7 +1475,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_6">
+        <link name="arm_part_1_6">
                 <inertial>
                         <mass value="0.0100789" />
                         <origin xyz="-4.74214e-35 0.00496932 1.10612e-19" rpy="0 -0 0" />
@@ -1488,7 +1491,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_7">
+        <link name="arm_part_1_7">
                 <inertial>
                         <mass value="0.0395007" />
                         <origin xyz="0.00416861 0.0273392 0.022" rpy="0 -0 0" />
@@ -1504,7 +1507,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_8">
+        <link name="arm_part_1_8">
                 <inertial>
                         <mass value="0.120864" />
                         <origin xyz="0.0075 0.0223585 0.0220174" rpy="0.777712 1.61096e-16 6.6004e-17" />
@@ -1520,7 +1523,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_1_9">
+        <link name="arm_part_1_9">
                 <inertial>
                         <mass value="0.0100789" />
                         <origin xyz="-4.74214e-35 0.00496932 1.10612e-19" rpy="0 -0 0" />
@@ -1536,7 +1539,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_2">
+        <link name="arm_part_2">
                 <inertial>
                         <mass value="0.00482252" />
                         <origin xyz="-1.2744e-05 -0.00032129 0.00508577" rpy="0 -0 0" />
@@ -1552,7 +1555,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_3">
+        <link name="arm_part_3">
                 <inertial>
                         <mass value="0.000266195" />
                         <origin xyz="7.34938e-07 0.00775002 0.00203832" rpy="0 -0 0" />
@@ -1568,7 +1571,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="part_4">
+        <link name="arm_part_4">
                 <inertial>
                         <mass value="0.000266195" />
                         <origin xyz="7.34938e-07 -0.00775002 -0.00203832" rpy="0 -0 0" />
@@ -1584,7 +1587,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="right_l_part">
+        <link name="arm_right_l_part">
                 <inertial>
                         <mass value="0.0233083" />
                         <origin xyz="0.0356469 -0.00964788 0.00266079" rpy="0 -0 0" />
@@ -1600,7 +1603,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="right_l_part_1">
+        <link name="arm_right_l_part_1">
                 <inertial>
                         <mass value="0.0233083" />
                         <origin xyz="0.0356469 -0.00964788 0.00266079" rpy="0 -0 0" />
@@ -1616,7 +1619,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2">
+        <link name="arm_rmd_x8pro_p9_v2">
                 <inertial>
                         <mass value="0.00283008" />
                         <origin xyz="-0.0116913 0.0059 0.00675" rpy="0 -0 0" />
@@ -1632,7 +1635,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_1">
+        <link name="arm_rmd_x8pro_p9_v2_1">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="-0.00160638 0.002 -0.00494393" rpy="0 -0 0" />
@@ -1648,7 +1651,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_10">
+        <link name="arm_rmd_x8pro_p9_v2_10">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="0.00160638 0.002 0.00494393" rpy="0 -0 0" />
@@ -1664,7 +1667,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_11">
+        <link name="arm_rmd_x8pro_p9_v2_11">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="-0.00420556 0.002 -0.00305552" rpy="0 -0 0" />
@@ -1680,7 +1683,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_12">
+        <link name="arm_rmd_x8pro_p9_v2_12">
                 <inertial>
                         <mass value="0.0016834" />
                         <origin xyz="4.76794e-16 0.00190093 -3.78026e-16" rpy="0 -0 0" />
@@ -1696,7 +1699,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_13">
+        <link name="arm_rmd_x8pro_p9_v2_13">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="0.00160638 0.002 -0.00494393" rpy="0 -0 0" />
@@ -1712,7 +1715,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_14">
+        <link name="arm_rmd_x8pro_p9_v2_14">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="-0.00420556 0.002 0.00305552" rpy="0 -0 0" />
@@ -1728,7 +1731,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_15">
+        <link name="arm_rmd_x8pro_p9_v2_15">
                 <inertial>
                         <mass value="0.00417374" />
                         <origin xyz="-2.32244e-08 0.00901772 1.2042e-08" rpy="0 -0 0" />
@@ -1744,7 +1747,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_16">
+        <link name="arm_rmd_x8pro_p9_v2_16">
                 <inertial>
                         <mass value="0.00406197" />
                         <origin xyz="4.76445e-16 0.002 -3.77227e-16" rpy="0 -0 0" />
@@ -1760,7 +1763,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_17">
+        <link name="arm_rmd_x8pro_p9_v2_17">
                 <inertial>
                         <mass value="0.160258" />
                         <origin xyz="-0.000266214 0.032166 0.0001941" rpy="0 -0 0" />
@@ -1776,7 +1779,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_18">
+        <link name="arm_rmd_x8pro_p9_v2_18">
                 <inertial>
                         <mass value="0.0566458" />
                         <origin xyz="0.000587343 0.0427351 -0.00042673" rpy="0 -0 0" />
@@ -1792,7 +1795,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_19">
+        <link name="arm_rmd_x8pro_p9_v2_19">
                 <inertial>
                         <mass value="0.00116447" />
                         <origin xyz="-2.58565e-05 0.002 -5.31126e-10" rpy="0 -0 0" />
@@ -1808,7 +1811,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_2">
+        <link name="arm_rmd_x8pro_p9_v2_2">
                 <inertial>
                         <mass value="0.357596" />
                         <origin xyz="4.98705e-05 0.00959369 6.8321e-07" rpy="0 -0 0" />
@@ -1824,7 +1827,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_20">
+        <link name="arm_rmd_x8pro_p9_v2_20">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="-0.00160638 0.002 0.00494393" rpy="0 -0 0" />
@@ -1840,7 +1843,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_3">
+        <link name="arm_rmd_x8pro_p9_v2_3">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="0.00420556 0.002 0.00305552" rpy="0 -0 0" />
@@ -1856,7 +1859,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_4">
+        <link name="arm_rmd_x8pro_p9_v2_4">
                 <inertial>
                         <mass value="0.00283008" />
                         <origin xyz="3.24362e-16 0.0059 -0.0135" rpy="0 -0 0" />
@@ -1872,7 +1875,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_5">
+        <link name="arm_rmd_x8pro_p9_v2_5">
                 <inertial>
                         <mass value="0.0439096" />
                         <origin xyz="3.72954e-16 0.003 -2.99556e-16" rpy="0 -0 0" />
@@ -1888,7 +1891,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_6">
+        <link name="arm_rmd_x8pro_p9_v2_6">
                 <inertial>
                         <mass value="4.89144e-05" />
                         <origin xyz="-0.0116913 0.00305 0.00675" rpy="0 -0 0" />
@@ -1904,7 +1907,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_7">
+        <link name="arm_rmd_x8pro_p9_v2_7">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="0.00420556 0.002 -0.00305552" rpy="0 -0 0" />
@@ -1920,7 +1923,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_8">
+        <link name="arm_rmd_x8pro_p9_v2_8">
                 <inertial>
                         <mass value="4.06777e-05" />
                         <origin xyz="0.00519836 0.002 3.49502e-09" rpy="0 -0 0" />
@@ -1936,7 +1939,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="rmd_x8pro_p9_v2_9">
+        <link name="arm_rmd_x8pro_p9_v2_9">
                 <inertial>
                         <mass value="0.0766136" />
                         <origin xyz="-9.1976e-05 0.00116537 -0.000159307" rpy="0 -0 0" />
@@ -1952,8 +1955,8 @@
                         </material>
                 </visual>
         </link>
-        <link name="root" />
-        <link name="shaft_support">
+        <link name="arm_root" />
+        <link name="arm_shaft_support">
                 <inertial>
                         <mass value="0.0877404" />
                         <origin xyz="-0.0296046 0.0233375 0.029845" rpy="0 -0 0" />
@@ -1969,7 +1972,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="short_motor_l_piece">
+        <link name="arm_short_motor_l_piece">
                 <inertial>
                         <mass value="0.00501114" />
                         <origin xyz="-0.00250944 -0.005025 -0.00886703" rpy="0 -0 0" />
@@ -1985,7 +1988,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="turntable_plate">
+        <link name="arm_turntable_plate">
                 <inertial>
                         <mass value="0.641521" />
                         <origin xyz="1.90791e-18 0 0.003175" rpy="0 -0 0" />
@@ -2001,7 +2004,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="washer_spacer">
+        <link name="arm_washer_spacer">
                 <inertial>
                         <mass value="0.00132813" />
                         <origin xyz="1.32348e-19 0 -0.0014" rpy="0 -0 0" />
@@ -2017,7 +2020,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="washer_spacer_1">
+        <link name="arm_washer_spacer_1">
                 <inertial>
                         <mass value="0.00132813" />
                         <origin xyz="0.00135165 0.0073772 0.0014" rpy="0 0 -0.181211" />
@@ -2033,7 +2036,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="washer_spacer_2">
+        <link name="arm_washer_spacer_2">
                 <inertial>
                         <mass value="0.00132813" />
                         <origin xyz="-0.00135165 0.0073772 -0.0014" rpy="0 -0 0.181211" />
@@ -2049,7 +2052,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="washer_spacer_3">
+        <link name="arm_washer_spacer_3">
                 <inertial>
                         <mass value="0.00132813" />
                         <origin xyz="1.32348e-19 0 0.0014" rpy="0 -0 0" />
@@ -2068,790 +2071,923 @@
         <joint name="baseplate_left_right" type="revolute">
                 <origin xyz="-1.38745e-16 5.7804e-16 0.015" rpy="-3.14159 -1.59694e-16 -2.92371" />
                 <axis xyz="-0 -0 1" />
-                <parent link="part_1_45" />
-                <child link="part_1_38" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_38" />
         <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793" /></joint>
         <joint name="cylindrical_1" type="fixed">
                 <origin xyz="0.0025 -0.009 -6.64052e-14" rpy="-3.14159 2.36471e-12 -1.5708" />
                 <axis xyz="0 1 0" />
-                <parent link="200mm_linear_actuator_piston" />
-                <child link="cylindrical_1_link" />
+                <parent link="arm_200mm_linear_actuator_piston" />
+                <child link="arm_cylindrical_1_link" />
                 <limit effort="1" velocity="1" lower="-10000" upper="10000" />
         </joint>
         <joint name="cylindrical_1_1" type="fixed">
                 <origin xyz="0 0 0" rpy="0 -0 0" />
                 <axis xyz="0 1 0" />
-                <parent link="cylindrical_1_link" />
-                <child link="actuator_linkage_1" />
+                <parent link="arm_cylindrical_1_link" />
+                <child link="arm_actuator_linkage_1" />
         </joint>
         <joint name="cylindrical_2" type="fixed">
                 <origin xyz="-0.0175 -0.009 -6.93889e-17" rpy="0 -1.5708 -1.5708" />
                 <axis xyz="0 1 0" />
-                <parent link="200mm_linear_actuator_piston" />
-                <child link="cylindrical_2_link" />
+                <parent link="arm_200mm_linear_actuator_piston" />
+                <child link="arm_cylindrical_2_link" />
                 <limit effort="1" velocity="1" lower="-10000" upper="10000" />
         </joint>
         <joint name="cylindrical_2_1" type="fixed">
                 <origin xyz="0 0 0" rpy="0 -0 0" />
                 <axis xyz="0 1 0" />
-                <parent link="cylindrical_2_link" />
-                <child link="actuator_linkage" />
+                <parent link="arm_cylindrical_2_link" />
+                <child link="arm_actuator_linkage" />
         </joint>
         <joint name="fastened" type="fixed">
                 <origin xyz="-1.04083e-17 0.0026 0" rpy="0 1.5708 3.14159" />
                 <axis xyz="0 -1 0" />
-                <parent link="deleteface2" />
-                <child link="part_1_20" />
+                <parent link="arm_deleteface2" />
+                <child link="arm_part_1_20" />
         </joint>
         <joint name="fastened_1" type="fixed">
                 <origin xyz="0.0110912 0.034 0.0267953" rpy="1.96325 5.55112e-17 1.5708" />
                 <axis xyz="0 -1 1.78574e-16" />
-                <parent link="part_1_1" />
-                <child link="part_1" />
+                <parent link="arm_part_1_1" />
+                <child link="arm_part_1" />
         </joint>
         <joint name="fastened_10" type="fixed">
                 <origin xyz="-2.08167e-17 -0.005 1.11022e-16" rpy="-1.5708 0.181514 -7.33699e-16" />
                 <axis xyz="-0 -0 1" />
-                <parent link="exampleballbearing_2" />
-                <child link="washer_spacer" />
+                <parent link="arm_exampleballbearing_2" />
+                <child link="arm_washer_spacer" />
         </joint>
         <joint name="fastened_10_1" type="fixed">
                 <origin xyz="-1.54074e-33 9.90658e-19 0.00635" rpy="-3.41394e-15 -8.8124e-16 -2.67147e-16" />
                 <axis xyz="0 0 -1" />
-                <parent link="turntable_plate" />
-                <child link="part_1_45" />
+                <parent link="arm_turntable_plate" />
+                <child link="arm_part_1_45" />
         </joint>
         <joint name="fastened_11" type="fixed">
                 <origin xyz="-0.00135165 0.0073772 -0.0028" rpy="1.5708 4.71845e-16 0.181211" />
                 <axis xyz="0 1 0" />
-                <parent link="washer_spacer_2" />
-                <child link="exampleballbearing_3" />
+                <parent link="arm_washer_spacer_2" />
+                <child link="arm_exampleballbearing_3" />
         </joint>
         <joint name="fastened_11_1" type="fixed">
                 <origin xyz="-0.0525 5.48389e-16 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_58" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_58" />
         </joint>
         <joint name="fastened_12" type="fixed">
                 <origin xyz="0.00135165 -0.0073772 -0.003175" rpy="-3.14159 2.51535e-15 -3.14159" />
                 <axis xyz="-3.49148e-15 0 -1" />
-                <parent link="left_finger_plate_top_section_3" />
-                <child link="metal_worm_gear__right_hand__57545k756" />
+                <parent link="arm_left_finger_plate_top_section_3" />
+                <child link="arm_metal_worm_gear__right_hand__57545k756" />
         </joint>
         <joint name="fastened_12_1" type="fixed">
                 <origin xyz="-0.0371231 -0.0371231 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_49" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_49" />
         </joint>
         <joint name="fastened_13" type="fixed">
                 <origin xyz="1.73472e-17 0.005 0" rpy="-1.5708 -0.181514 1.82014e-15" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="exampleballbearing_1" />
-                <child link="washer_spacer_3" />
+                <parent link="arm_exampleballbearing_1" />
+                <child link="arm_washer_spacer_3" />
         </joint>
         <joint name="fastened_13_1" type="fixed">
                 <origin xyz="-2.0238e-18 -0.0525 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_36" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_36" />
         </joint>
         <joint name="fastened_14" type="fixed">
                 <origin xyz="0.00135165 0.0073772 0.0028" rpy="1.5708 2.1233e-15 -0.181211" />
                 <axis xyz="0 -1 0" />
-                <parent link="washer_spacer_1" />
-                <child link="exampleballbearing" />
+                <parent link="arm_washer_spacer_1" />
+                <child link="arm_exampleballbearing" />
         </joint>
         <joint name="fastened_14_1" type="fixed">
                 <origin xyz="0.0371231 -0.0371231 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_34" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_34" />
         </joint>
         <joint name="fastened_15" type="fixed">
                 <origin xyz="-0.0169933 -0.0965874 1.11022e-16" rpy="-2.07299e-16 -2.61076e-15 -1.3005e-16" />
                 <axis xyz="-3.49148e-15 0 -1" />
-                <parent link="left_finger_plate_top_section" />
-                <child link="57545k756_metal_worm_gear_57545k756" />
+                <parent link="arm_left_finger_plate_top_section" />
+                <child link="arm_57545k756_metal_worm_gear_57545k756" />
         </joint>
         <joint name="fastened_15_1" type="fixed">
                 <origin xyz="0.0525 -1.80194e-16 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_22" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_22" />
         </joint>
         <joint name="fastened_16" type="fixed">
                 <origin xyz="0 0 -0.00455" rpy="0 -1.5708 5.04805e-16" />
                 <axis xyz="1 -0 -2.73185e-16" />
-                <parent link="longmotorbracketspacer" />
-                <child link="long_motor_l_piece" />
+                <parent link="arm_longmotorbracketspacer" />
+                <child link="arm_long_motor_l_piece" />
         </joint>
         <joint name="fastened_16_1" type="fixed">
                 <origin xyz="0.0371231 0.0371231 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_29" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_29" />
         </joint>
         <joint name="fastened_17" type="fixed">
                 <origin xyz="-0.042 -0.005025 0.022451" rpy="0 -1.5708 2.28116e-15" />
                 <axis xyz="-1.06991e-14 0 1" />
-                <parent link="newbasemount" />
-                <child link="longmotorbracketspacer" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_longmotorbracketspacer" />
         </joint>
         <joint name="fastened_17_1" type="fixed">
                 <origin xyz="-3.16872e-18 0.0525 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_50" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_50" />
         </joint>
         <joint name="fastened_18" type="fixed">
                 <origin xyz="0.042 -0.005025 0.022451" rpy="-3.14159 3.07472e-15 -6.59195e-17" />
                 <axis xyz="1 0 -1.36592e-16" />
-                <parent link="newbasemount" />
-                <child link="short_motor_l_piece" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_short_motor_l_piece" />
         </joint>
         <joint name="fastened_18_1" type="fixed">
                 <origin xyz="-0.0371231 0.0371231 0.0096" rpy="2.95823e-30 -3.23344e-59 2.18607e-29" />
                 <axis xyz="0 4.8013e-57 -1" />
-                <parent link="part_1_45" />
-                <child link="part_1_54" />
+                <parent link="arm_part_1_45" />
+                <child link="arm_part_1_54" />
         </joint>
         <joint name="fastened_19" type="fixed">
                 <origin xyz="-0.0073 -2.5e-05 -0.015875" rpy="-1.5708 -3.76218e-17 -4.48697e-16" />
                 <axis xyz="0 1 0" />
-                <parent link="short_motor_l_piece" />
-                <child link="examplemotor" />
+                <parent link="arm_short_motor_l_piece" />
+                <child link="arm_examplemotor" />
         </joint>
         <joint name="fastened_19_1" type="fixed">
                 <origin xyz="-0.053 6.30325e-18 5.4611e-20" rpy="-3.44169e-15 -8.53484e-16 -2.74086e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="turntable_plate" />
-                <child link="part_1_37" />
+                <parent link="arm_turntable_plate" />
+                <child link="arm_part_1_37" />
         </joint>
         <joint name="fastened_1_1" type="fixed">
                 <origin xyz="0.042 -0.0265 0.008175" rpy="0 -1.5708 -1.5708" />
                 <axis xyz="0 1 -1.22465e-16" />
-                <parent link="newbasemount" />
-                <child link="right_l_part" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_right_l_part" />
         </joint>
         <joint name="fastened_1_2" type="fixed">
                 <origin xyz="0 -1.11022e-16 1.11022e-16" rpy="-6.93889e-17 -5.83843e-16 3.14159" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="part_1_21" />
-                <child link="newbasemount" />
+                <parent link="arm_part_1_21" />
+                <child link="arm_newbasemount" />
         </joint>
         <joint name="fastened_1_3" type="fixed">
                 <origin xyz="-0.048175 -0.0175 6.93889e-18" rpy="-3.14159 1.85774e-15 3.14159" />
                 <axis xyz="1 0 1.59189e-16" />
-                <parent link="part_1_17" />
-                <child link="part_1_18" />
+                <parent link="arm_part_1_17" />
+                <child link="arm_part_1_18" />
         </joint>
         <joint name="fastened_1_4" type="fixed">
                 <origin xyz="-4.25979e-18 0.3 -2.77556e-17" rpy="-3.14159 7.38606e-16 -1.20079e-15" />
                 <axis xyz="-0 1 -0" />
-                <parent link="0_4m_shaft_1" />
-                <child link="part_1_15" />
+                <parent link="arm_0_4m_shaft_1" />
+                <child link="arm_part_1_15" />
         </joint>
         <joint name="fastened_1_5" type="fixed">
                 <origin xyz="0 -0.007 1.41399e-18" rpy="5.55112e-17 2.46792e-16 -1.35316e-15" />
                 <axis xyz="0 1 0" />
-                <parent link="1mt_054_006_1" />
-                <child link="1mt_054_006" />
+                <parent link="arm_1mt_054_006_1" />
+                <child link="arm_1mt_054_006" />
         </joint>
         <joint name="fastened_2" type="fixed">
                 <origin xyz="1.30104e-17 0.3 0" rpy="1.11022e-16 7.31895e-16 3.14159" />
                 <axis xyz="-0 1 -0" />
-                <parent link="0_4m_shaft" />
-                <child link="part_1_4" />
+                <parent link="arm_0_4m_shaft" />
+                <child link="arm_part_1_4" />
         </joint>
         <joint name="fastened_20" type="fixed">
                 <origin xyz="-4.44089e-16 2.77556e-17 -0.04" rpy="-3.14159 -5.30717e-16 1.5708" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="57545k631_steel_worm_57545k631" />
-                <child link="6056n16_carbon_steel_set_screw_collar_6056n16" />
+                <parent link="arm_57545k631_steel_worm_57545k631" />
+                <child link="arm_6056n16_carbon_steel_set_screw_collar_6056n16" />
         </joint>
         <joint name="fastened_20_1" type="fixed">
                 <origin xyz="0 0 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_37" />
-                <child link="part_1_55" />
+                <parent link="arm_part_1_37" />
+                <child link="arm_part_1_55" />
         </joint>
         <joint name="fastened_21" type="fixed">
                 <origin xyz="-3.46945e-18 -2.22045e-16 0" rpy="1.5708 1.38928 -4.02836e-14" />
                 <axis xyz="6.98296e-15 -0 1" />
-                <parent link="1911_0025_0836_assembly_1" />
-                <child link="57545k631_steel_worm_57545k631" />
+                <parent link="arm_1911_0025_0836_assembly_1" />
+                <child link="arm_57545k631_steel_worm_57545k631" />
         </joint>
         <joint name="fastened_21_1" type="fixed">
                 <origin xyz="0.053 2.31717e-19 -5.4611e-20" rpy="-3.44169e-15 -8.53484e-16 -2.74086e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="turntable_plate" />
-                <child link="part_1_52" />
+                <parent link="arm_turntable_plate" />
+                <child link="arm_part_1_52" />
         </joint>
         <joint name="fastened_22" type="fixed">
                 <origin xyz="2.08167e-17 0.0288 0" rpy="-3.18035e-18 -0.181514 -1.3102e-17" />
                 <axis xyz="0 -1 0" />
-                <parent link="1911_0025_0836_assembly_1" />
-                <child link="1911_0025_0836_assembly" />
+                <parent link="arm_1911_0025_0836_assembly_1" />
+                <child link="arm_1911_0025_0836_assembly" />
         </joint>
         <joint name="fastened_22_1" type="fixed">
                 <origin xyz="0 0 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_52" />
-                <child link="part_1_39" />
+                <parent link="arm_part_1_52" />
+                <child link="arm_part_1_39" />
         </joint>
         <joint name="fastened_23" type="fixed">
                 <origin xyz="4.44089e-16 0.04985 0.05969" rpy="-1.5708 -7.08445e-16 -7.66938e-16" />
                 <axis xyz="0 0 -1" />
-                <parent link="shaft_support" />
-                <child link="camerabracket" />
+                <parent link="arm_shaft_support" />
+                <child link="arm_camerabracket" />
         </joint>
         <joint name="fastened_23_1" type="fixed">
                 <origin xyz="0 -6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_23" />
-                <child link="part_1_33" />
+                <parent link="arm_part_1_23" />
+                <child link="arm_part_1_33" />
         </joint>
         <joint name="fastened_24" type="fixed">
                 <origin xyz="0 6.245e-17 0.007825" rpy="1.5708 1.25789e-15 1.2503e-15" />
                 <axis xyz="0 -1 0" />
-                <parent link="camerabracket" />
-                <child link="camera_mount_v1_0" />
+                <parent link="arm_camerabracket" />
+                <child link="arm_camera_mount_v1_0" />
         </joint>
         <joint name="fastened_24_1" type="fixed">
                 <origin xyz="0.0374767 -0.0904767 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_23" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_23" />
         </joint>
         <joint name="fastened_25" type="fixed">
                 <origin xyz="-6.50521e-18 -0.106 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_28" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_28" />
         </joint>
         <joint name="fastened_26" type="fixed">
                 <origin xyz="0 6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_28" />
-                <child link="part_1_31" />
+                <parent link="arm_part_1_28" />
+                <child link="arm_part_1_31" />
         </joint>
         <joint name="fastened_27" type="fixed">
                 <origin xyz="-0.0374767 -0.0904767 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_25" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_25" />
         </joint>
         <joint name="fastened_28" type="fixed">
                 <origin xyz="0 -6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_25" />
-                <child link="part_1_42" />
+                <parent link="arm_part_1_25" />
+                <child link="arm_part_1_42" />
         </joint>
         <joint name="fastened_29" type="fixed">
                 <origin xyz="0.0374767 -0.0155233 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_48" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_48" />
         </joint>
         <joint name="fastened_2_1" type="fixed">
                 <origin xyz="0.00917891 0.034 0.0221754" rpy="1.5708 -0.392451 -3.14159" />
                 <axis xyz="0 1 -1.78574e-16" />
-                <parent link="part_1_1" />
-                <child link="part_1_2" />
+                <parent link="arm_part_1_1" />
+                <child link="arm_part_1_2" />
         </joint>
         <joint name="fastened_2_2" type="fixed">
                 <origin xyz="-1.11022e-16 0.038 0" rpy="0 -1.5708 -1.5708" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="part_1_20" />
-                <child link="part_1_21" />
+                <parent link="arm_part_1_20" />
+                <child link="arm_part_1_21" />
         </joint>
         <joint name="fastened_2_3" type="fixed">
                 <origin xyz="-0.042 -0.0265 0.008175" rpy="0 -1.5708 2.42514e-15" />
                 <axis xyz="0 -1.22465e-16 1" />
-                <parent link="newbasemount" />
-                <child link="left_l_part_1" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_left_l_part_1" />
         </joint>
         <joint name="fastened_2_4" type="fixed">
                 <origin xyz="-0.0225 -0.0175 -2.08167e-17" rpy="-3.14159 3.1795e-15 -3.14159" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_18" />
-                <child link="0_4m_shaft_1" />
+                <parent link="arm_part_1_18" />
+                <child link="arm_0_4m_shaft_1" />
         </joint>
         <joint name="fastened_2_5" type="fixed">
                 <origin xyz="-0.04 -0.03 0.03" rpy="-8.09057e-15 -6.98645e-15 1.5708" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="part_1_17" />
-                <child link="part_1_19" />
+                <parent link="arm_part_1_17" />
+                <child link="arm_part_1_19" />
         </joint>
         <joint name="fastened_2_6" type="fixed">
                 <origin xyz="0.01 6.17617e-18 -1.38778e-17" rpy="-1.95985 4.48418e-15 -3.14159" />
                 <axis xyz="1 0 6.12323e-17" />
-                <parent link="part_1_46" />
-                <child link="part_1_17" />
+                <parent link="arm_part_1_46" />
+                <child link="arm_part_1_17" />
         </joint>
         <joint name="fastened_2_7" type="fixed">
                 <origin xyz="0.051175 0.0325 0.075" rpy="0 1.5708 -1.5708" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_27" />
-                <child link="1mt_054_006_1" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_1mt_054_006_1" />
         </joint>
         <joint name="fastened_3" type="fixed">
                 <origin xyz="-8.95117e-16 0.030625 0.022" rpy="-1.5708 1.18525e-15 5.13477e-15" />
                 <axis xyz="1 0 0" />
-                <parent link="part_1_10" />
-                <child link="part_1_12" />
+                <parent link="arm_part_1_10" />
+                <child link="arm_part_1_12" />
         </joint>
         <joint name="fastened_30" type="fixed">
                 <origin xyz="0 6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_48" />
-                <child link="part_1_56" />
+                <parent link="arm_part_1_48" />
+                <child link="arm_part_1_56" />
         </joint>
         <joint name="fastened_31" type="fixed">
                 <origin xyz="-1.54074e-33 0 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_40" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_40" />
         </joint>
         <joint name="fastened_32" type="fixed">
                 <origin xyz="0 -6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_40" />
-                <child link="part_1_24" />
+                <parent link="arm_part_1_40" />
+                <child link="arm_part_1_24" />
         </joint>
         <joint name="fastened_33" type="fixed">
                 <origin xyz="-0.0374767 -0.0155233 -0.003175" rpy="-2.77556e-17 2.77556e-17 -6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_57" />
-                <child link="part_1_51" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_part_1_51" />
         </joint>
         <joint name="fastened_34" type="fixed">
                 <origin xyz="0 6.93889e-18 -0.0011" rpy="9.8598e-31 -2.77556e-17 6.93889e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_51" />
-                <child link="part_1_41" />
+                <parent link="arm_part_1_51" />
+                <child link="arm_part_1_41" />
         </joint>
         <joint name="fastened_35" type="fixed">
                 <origin xyz="-6.16298e-33 -0.053 -0.013175" rpy="-1.5708 2.42861e-17 -2.42861e-17" />
                 <axis xyz="-0 -1 -0" />
-                <parent link="part_1_57" />
-                <child link="rmd_x8pro_p9_v2_2" />
+                <parent link="arm_part_1_57" />
+                <child link="arm_rmd_x8pro_p9_v2_2" />
         </joint>
         <joint name="fastened_36" type="fixed">
                 <origin xyz="3.06162e-18 0.053 1.2477e-19" rpy="-3.41394e-15 -8.8124e-16 -2.67147e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="turntable_plate" />
-                <child link="part_1_57" />
+                <parent link="arm_turntable_plate" />
+                <child link="arm_part_1_57" />
         </joint>
         <joint name="fastened_37" type="fixed">
                 <origin xyz="3.28577e-16 0.107953 0.00635" rpy="-1.5708 -7.44196e-16 4.4013e-16" />
                 <axis xyz="0 1 0" />
-                <parent link="turntable_plate" />
-                <child link="part_1_30" />
+                <parent link="arm_turntable_plate" />
+                <child link="arm_part_1_30" />
         </joint>
         <joint name="fastened_3_1" type="fixed">
                 <origin xyz="0.083 0.030625 0.022" rpy="-1.5708 -2.78189e-15 -3.14159" />
                 <axis xyz="1 0 0" />
-                <parent link="part_1_10" />
-                <child link="part_1_5" />
+                <parent link="arm_part_1_10" />
+                <child link="arm_part_1_5" />
         </joint>
         <joint name="fastened_3_2" type="fixed">
                 <origin xyz="0.036 0.002825 -0.012155" rpy="-3.14159 -5.31286e-16 3.14159" />
                 <axis xyz="6.99624e-15 1 0" />
-                <parent link="left_l_part_1" />
-                <child link="shaft_support" />
+                <parent link="arm_left_l_part_1" />
+                <child link="arm_shaft_support" />
         </joint>
         <joint name="fastened_3_3" type="fixed">
                 <origin xyz="0.002 -0.014325 0.023" rpy="3.14159 -3.81163e-15 1.5708" />
                 <axis xyz="1 -0 1.73472e-16" />
-                <parent link="part_1_19" />
-                <child link="200mm_linear_actuator_base" />
+                <parent link="arm_part_1_19" />
+                <child link="arm_200mm_linear_actuator_base" />
         </joint>
         <joint name="fastened_3_4" type="fixed">
                 <origin xyz="8.59446e-18 -0.0175 -4.16334e-17" rpy="0 1.5708 3.14159" />
                 <axis xyz="0 0 -1" />
-                <parent link="part_1_15" />
-                <child link="part_1_14" />
+                <parent link="arm_part_1_15" />
+                <child link="arm_part_1_14" />
         </joint>
         <joint name="fastened_3_5" type="fixed">
                 <origin xyz="-6.88108e-17 -0.0325 -0.01" rpy="-3.14159 -1.62964e-18 -3.14159" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="part_1_38" />
-                <child link="part_1_27" />
+                <parent link="arm_part_1_38" />
+                <child link="arm_part_1_27" />
         </joint>
         <joint name="fastened_4" type="fixed">
                 <origin xyz="0.0058 0.030625 0.022" rpy="3.14159 -1.17071e-16 1.5708" />
                 <axis xyz="0 1 0" />
-                <parent link="part_1_10" />
-                <child link="part_1_9" />
+                <parent link="arm_part_1_10" />
+                <child link="arm_part_1_9" />
         </joint>
         <joint name="fastened_4_1" type="fixed">
                 <origin xyz="0.0772 0.030625 0.022" rpy="2.33047e-15 -1.01897e-15 1.5708" />
                 <axis xyz="0 1 0" />
-                <parent link="part_1_10" />
-                <child link="part_1_6" />
+                <parent link="arm_part_1_10" />
+                <child link="arm_part_1_6" />
         </joint>
         <joint name="fastened_4_2" type="fixed">
                 <origin xyz="-0.042 0.0265 0.008175" rpy="0 -1.5708 -4.71239" />
                 <axis xyz="0 1 -1.22465e-16" />
-                <parent link="newbasemount" />
-                <child link="right_l_part_1" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_right_l_part_1" />
         </joint>
         <joint name="fastened_4_3" type="fixed">
                 <origin xyz="-6.94824e-18 0.303 1.38778e-17" rpy="-3.14159 1.37811e-15 3.14159" />
                 <axis xyz="0 -1 0" />
-                <parent link="200mm_linear_actuator_base" />
-                <child link="part_1_16" />
+                <parent link="arm_200mm_linear_actuator_base" />
+                <child link="arm_part_1_16" />
         </joint>
         <joint name="fastened_4_4" type="fixed">
                 <origin xyz="2.23999e-18 1.38778e-17 0.003175" rpy="2.30402e-17 7.30004e-30 4.10238e-34" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_47" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_47" />
         </joint>
         <joint name="fastened_5" type="fixed">
                 <origin xyz="0.0415 0.005 0.022" rpy="3.14159 1.01431e-15 -3.14159" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_13" />
-                <child link="part_1_10" />
+                <parent link="arm_part_1_13" />
+                <child link="arm_part_1_10" />
         </joint>
         <joint name="fastened_5_1" type="fixed">
                 <origin xyz="-0.0415 0.005 -0.022" rpy="-1.11022e-16 1.0479e-15 -7.8196e-18" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_13" />
-                <child link="part_1_7" />
+                <parent link="arm_part_1_13" />
+                <child link="arm_part_1_7" />
         </joint>
         <joint name="fastened_5_2" type="fixed">
                 <origin xyz="0.042 0.0265 0.008175" rpy="0 -1.5708 3.14159" />
                 <axis xyz="0 -1.22465e-16 1" />
-                <parent link="newbasemount" />
-                <child link="left_l_part" />
+                <parent link="arm_newbasemount" />
+                <child link="arm_left_l_part" />
         </joint>
         <joint name="fastened_5_3" type="fixed">
                 <origin xyz="0.022981 0.00951903 0.003175" rpy="5.09995e-17 -1.83981e-18 -1.95677e-15" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_53" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_53" />
         </joint>
         <joint name="fastened_6" type="fixed">
                 <origin xyz="1.64799e-17 -0.01 0" rpy="9.71445e-16 -4.00208e-16 -3.14159" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_4" />
-                <child link="part_1_13" />
+                <parent link="arm_part_1_4" />
+                <child link="arm_part_1_13" />
         </joint>
         <joint name="fastened_6_1" type="fixed">
                 <origin xyz="-7.80626e-18 -1.11022e-16 -0.01905" rpy="-9.88792e-17 -3.38271e-16 -5.65764e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="finger_pad_3_0_1" />
-                <child link="left_finger_plate_top_section" />
+                <parent link="arm_finger_pad_3_0_1" />
+                <child link="arm_left_finger_plate_top_section" />
         </joint>
         <joint name="fastened_6_2" type="fixed">
                 <origin xyz="0.022981 0.055481 0.003175" rpy="5.09995e-17 -1.83981e-18 -1.95677e-15" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_43" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_43" />
         </joint>
         <joint name="fastened_7" type="fixed">
                 <origin xyz="0.0075 0.0129144 0.0127174" rpy="0.777712 1.58596e-16 1.87633e-16" />
                 <axis xyz="-0 1 -0" />
-                <parent link="part_1_8" />
-                <child link="0_4m_shaft" />
+                <parent link="arm_part_1_8" />
+                <child link="arm_0_4m_shaft" />
         </joint>
         <joint name="fastened_7_1" type="fixed">
                 <origin xyz="0.018345 0.0892102 -0.003175" rpy="-1.5439e-16 4.3715e-16 -1.13895e-16" />
                 <axis xyz="-0 -0 1" />
-                <parent link="left_finger_plate_top_section_2" />
-                <child link="finger_pad_3_0_1" />
+                <parent link="arm_left_finger_plate_top_section_2" />
+                <child link="arm_finger_pad_3_0_1" />
         </joint>
         <joint name="fastened_7_2" type="fixed">
                 <origin xyz="5.70944e-18 0.065 0.003175" rpy="5.09995e-17 -1.83981e-18 -1.95677e-15" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_44" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_44" />
         </joint>
         <joint name="fastened_8" type="fixed">
                 <origin xyz="-4.85723e-17 -2.22045e-16 -0.01905" rpy="4.54498e-16 3.85109e-16 -8.08706e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="finger_pad_3_0" />
-                <child link="left_finger_plate_top_section_1" />
+                <parent link="arm_finger_pad_3_0" />
+                <child link="arm_left_finger_plate_top_section_1" />
         </joint>
         <joint name="fastened_8_1" type="fixed">
                 <origin xyz="-0.022981 0.055481 0.003175" rpy="5.09995e-17 -1.83981e-18 -1.95677e-15" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_35" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_35" />
         </joint>
         <joint name="fastened_9" type="fixed">
                 <origin xyz="0.018345 0.0892102 -0.003175" rpy="-4.48426e-16 1.82146e-16 1.13782e-15" />
                 <axis xyz="-0 -0 1" />
-                <parent link="left_finger_plate_top_section_3" />
-                <child link="finger_pad_3_0" />
+                <parent link="arm_left_finger_plate_top_section_3" />
+                <child link="arm_finger_pad_3_0" />
         </joint>
         <joint name="fastened_9_1" type="fixed">
                 <origin xyz="-0.022981 0.00951903 0.003175" rpy="5.09995e-17 -1.83981e-18 -1.95677e-15" />
                 <axis xyz="0 -2.30402e-17 -1" />
-                <parent link="part_1_27" />
-                <child link="part_1_26" />
+                <parent link="arm_part_1_27" />
+                <child link="arm_part_1_26" />
         </joint>
         <joint name="fixed_node_to_root_joint" type="fixed">
                 <origin xyz="-1.30046e-17 2.20242e-17 -2.35895e-31" rpy="4.66294e-15 1.17267e-15 -3.14159" />
                 <axis xyz="0 0 1" />
-                <parent link="root" />
-                <child link="turntable_plate" />
+                <parent link="arm_root" />
+                <child link="arm_turntable_plate" />
         </joint>
         <joint name="gripper_left_right" type="revolute">
                 <origin xyz="0 -0.0017 -8.76035e-17" rpy="-8.37558e-16 2.18433e-15 -1.5708" />
                 <axis xyz="-1 0 0" />
-                <parent link="part_1_2" />
-                <child link="part_1_3" />
+                <parent link="arm_part_1_2" />
+                <child link="arm_part_1_3" />
         <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793" /></joint>
         <joint name="gripper_up_down" type="revolute">
                 <origin xyz="0.0075 0.030625 0.022" rpy="0 -1.5708 -1.5708" />
                 <axis xyz="0 -1 0" />
-                <parent link="part_1_7" />
-                <child link="part_1_1" />
+                <parent link="arm_part_1_7" />
+                <child link="arm_part_1_1" />
         <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793" /></joint>
         <joint name="group_1_fastened_joint" type="fixed">
                 <origin xyz="0.015 6.99441e-15 -1.0075e-13" rpy="3.14159 -1.5492 1.5708" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="part_1_3" />
-                <child link="deleteface2" />
+                <parent link="arm_part_1_3" />
+                <child link="arm_deleteface2" />
         </joint>
         <joint name="group_1_fastened_joint_1" type="fixed">
                 <origin xyz="5.55112e-17 1.11022e-16 -3.46945e-18" rpy="-1.73472e-18 -2.24972e-17 -8.67362e-19" />
                 <axis xyz="0 0 1" />
-                <parent link="part_4" />
-                <child link="part_3" />
+                <parent link="arm_part_4" />
+                <child link="arm_part_3" />
         </joint>
         <joint name="group_1_fastened_joint_10" type="fixed">
                 <origin xyz="-1.38778e-16 1.40513e-16 -1.55431e-15" rpy="-3.60822e-16 -7.45931e-17 8.67362e-17" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_3" />
-                <child link="rmd_x8pro_p9_v2_11" />
+                <parent link="arm_rmd_x8pro_p9_v2_3" />
+                <child link="arm_rmd_x8pro_p9_v2_11" />
         </joint>
         <joint name="group_1_fastened_joint_11" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_10" />
-                <child link="rmd_x8pro_p9_v2_20" />
+                <parent link="arm_rmd_x8pro_p9_v2_10" />
+                <child link="arm_rmd_x8pro_p9_v2_20" />
         </joint>
         <joint name="group_1_fastened_joint_12" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_12" />
-                <child link="rmd_x8pro_p9_v2_15" />
+                <parent link="arm_rmd_x8pro_p9_v2_12" />
+                <child link="arm_rmd_x8pro_p9_v2_15" />
         </joint>
         <joint name="group_1_fastened_joint_13" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="rmd_x8pro_p9_v2_17" />
-                <child link="rmd_x8pro_p9_v2_5" />
+                <parent link="arm_rmd_x8pro_p9_v2_17" />
+                <child link="arm_rmd_x8pro_p9_v2_5" />
         </joint>
         <joint name="group_1_fastened_joint_14" type="fixed">
                 <origin xyz="9.75594e-05 -0.003 0.000168978" rpy="0 1.5708 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_2" />
-                <child link="part_1_32" />
+                <parent link="arm_rmd_x8pro_p9_v2_2" />
+                <child link="arm_part_1_32" />
         </joint>
         <joint name="group_1_fastened_joint_15" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_19" />
-                <child link="rmd_x8pro_p9_v2_7" />
+                <parent link="arm_rmd_x8pro_p9_v2_19" />
+                <child link="arm_rmd_x8pro_p9_v2_7" />
         </joint>
         <joint name="group_1_fastened_joint_16" type="fixed">
                 <origin xyz="2.77556e-17 -0.0005 -1.00023e-15" rpy="0 2.8026e-45 0" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="rmd_x8pro_p9_v2_2" />
-                <child link="rmd_x8pro_p9_v2_18" />
+                <parent link="arm_rmd_x8pro_p9_v2_2" />
+                <child link="arm_rmd_x8pro_p9_v2_18" />
         </joint>
         <joint name="group_1_fastened_joint_17" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_6" />
-                <child link="rmd_x8pro_p9_v2_16" />
+                <parent link="arm_rmd_x8pro_p9_v2_6" />
+                <child link="arm_rmd_x8pro_p9_v2_16" />
         </joint>
         <joint name="group_1_fastened_joint_18" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_7" />
-                <child link="rmd_x8pro_p9_v2_14" />
+                <parent link="arm_rmd_x8pro_p9_v2_7" />
+                <child link="arm_rmd_x8pro_p9_v2_14" />
         </joint>
         <joint name="group_1_fastened_joint_19" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_11" />
-                <child link="rmd_x8pro_p9_v2_1" />
+                <parent link="arm_rmd_x8pro_p9_v2_11" />
+                <child link="arm_rmd_x8pro_p9_v2_1" />
         </joint>
         <joint name="group_1_fastened_joint_2" type="fixed">
                 <origin xyz="5.55112e-17 1.11022e-16 -3.46945e-18" rpy="-1.73472e-18 -2.24972e-17 -8.67362e-19" />
                 <axis xyz="0 0 1" />
-                <parent link="part_3" />
-                <child link="part_2" />
+                <parent link="arm_part_3" />
+                <child link="arm_part_2" />
         </joint>
         <joint name="group_1_fastened_joint_20" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_16" />
-                <child link="rmd_x8pro_p9_v2_12" />
+                <parent link="arm_rmd_x8pro_p9_v2_16" />
+                <child link="arm_rmd_x8pro_p9_v2_12" />
         </joint>
         <joint name="group_1_fastened_joint_21" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_13" />
-                <child link="rmd_x8pro_p9_v2_8" />
+                <parent link="arm_rmd_x8pro_p9_v2_13" />
+                <child link="arm_rmd_x8pro_p9_v2_8" />
         </joint>
         <joint name="group_1_fastened_joint_22" type="fixed">
                 <origin xyz="1.38778e-16 -1.42247e-16 1.55431e-15" rpy="3.60822e-16 7.45931e-17 -8.67362e-17" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_14" />
-                <child link="rmd_x8pro_p9_v2_3" />
+                <parent link="arm_rmd_x8pro_p9_v2_14" />
+                <child link="arm_rmd_x8pro_p9_v2_3" />
         </joint>
         <joint name="group_1_fastened_joint_23" type="fixed">
                 <origin xyz="2.46519e-32 0 0" rpy="-4.01608e-64 8.14559e-33 -9.86076e-32" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2" />
-                <child link="rmd_x8pro_p9_v2_4" />
+                <parent link="arm_rmd_x8pro_p9_v2" />
+                <child link="arm_rmd_x8pro_p9_v2_4" />
         </joint>
         <joint name="group_1_fastened_joint_24" type="fixed">
                 <origin xyz="0.000168978 -9.75594e-05 -0.0025" rpy="-1.5708 2.27596e-15 1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_32" />
-                <child link="rmd_x8pro_p9_v2" />
+                <parent link="arm_part_1_32" />
+                <child link="arm_rmd_x8pro_p9_v2" />
         </joint>
         <joint name="group_1_fastened_joint_25" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_15" />
-                <child link="rmd_x8pro_p9_v2_19" />
+                <parent link="arm_rmd_x8pro_p9_v2_15" />
+                <child link="arm_rmd_x8pro_p9_v2_19" />
         </joint>
         <joint name="group_1_fastened_joint_3" type="fixed">
                 <origin xyz="0.00275 -1.11022e-16 -1.12757e-17" rpy="-0.0215963 -4.46249e-18 -1.68674e-18" />
                 <axis xyz="0 0 1" />
-                <parent link="part_1_3" />
-                <child link="part_4" />
+                <parent link="arm_part_1_3" />
+                <child link="arm_part_4" />
         </joint>
         <joint name="group_1_fastened_joint_4" type="fixed">
                 <origin xyz="0 0 0.004" rpy="-1.73472e-18 -3.36103e-18 -1.38778e-17" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="6056n16_carbon_steel_set_screw_collar_6056n16" />
-                <child link="6056n16_carbon_steel_set_screw_collar_6056n16_1" />
+                <parent link="arm_6056n16_carbon_steel_set_screw_collar_6056n16" />
+                <child link="arm_6056n16_carbon_steel_set_screw_collar_6056n16_1" />
         </joint>
         <joint name="group_1_fastened_joint_5" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_20" />
-                <child link="rmd_x8pro_p9_v2_13" />
+                <parent link="arm_rmd_x8pro_p9_v2_20" />
+                <child link="arm_rmd_x8pro_p9_v2_13" />
         </joint>
         <joint name="group_1_fastened_joint_6" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="rmd_x8pro_p9_v2_18" />
-                <child link="rmd_x8pro_p9_v2_17" />
+                <parent link="arm_rmd_x8pro_p9_v2_18" />
+                <child link="arm_rmd_x8pro_p9_v2_17" />
         </joint>
         <joint name="group_1_fastened_joint_7" type="fixed">
                 <origin xyz="9.75594e-05 -6.03684e-16 0.000168978" rpy="-1.11022e-16 5.37764e-17 -1.02349e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_4" />
-                <child link="rmd_x8pro_p9_v2_9" />
+                <parent link="arm_rmd_x8pro_p9_v2_4" />
+                <child link="arm_rmd_x8pro_p9_v2_9" />
         </joint>
         <joint name="group_1_fastened_joint_8" type="fixed">
                 <origin xyz="3.08149e-33 0 -1.65436e-24" rpy="0 2.8026e-45 0" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_1" />
-                <child link="rmd_x8pro_p9_v2_10" />
+                <parent link="arm_rmd_x8pro_p9_v2_1" />
+                <child link="arm_rmd_x8pro_p9_v2_10" />
         </joint>
         <joint name="group_1_fastened_joint_9" type="fixed">
                 <origin xyz="-9.75594e-05 -1.9082e-16 -0.000168978" rpy="-6.81692e-17 -4.33237e-16 -1.19696e-16" />
                 <axis xyz="0 0 1" />
-                <parent link="rmd_x8pro_p9_v2_9" />
-                <child link="rmd_x8pro_p9_v2_6" />
+                <parent link="arm_rmd_x8pro_p9_v2_9" />
+                <child link="arm_rmd_x8pro_p9_v2_6" />
         </joint>
         <joint name="revolute_1" type="fixed">
                 <origin xyz="1.11022e-16 0.014 -5.55112e-17" rpy="1.05325e-16 -0.0443675 -1.00581e-15" />
                 <axis xyz="-0 -1 -0" />
-                <parent link="part_1_6" />
-                <child link="extrude_thin1_1" />
+                <parent link="arm_part_1_6" />
+                <child link="arm_extrude_thin1_1" />
         </joint>
         <joint name="revolute_10" type="fixed">
                 <origin xyz="0.0664582 0.006 -0.0138902" rpy="0 -1.5708 3.14159" />
                 <axis xyz="0 1 0" />
-                <parent link="left_l_part" />
-                <child link="exampleballbearing_2" />
+                <parent link="arm_left_l_part" />
+                <child link="arm_exampleballbearing_2" />
         </joint>
         <joint name="revolute_11" type="fixed">
                 <origin xyz="-0.0347 0.01425 -0.005" rpy="5.6552e-16 6.36644e-16 -4.13856e-15" />
                 <axis xyz="0 1 0" />
-                <parent link="examplemotor" />
-                <child link="1911_0025_0836_assembly_1" />
+                <parent link="arm_examplemotor" />
+                <child link="arm_1911_0025_0836_assembly_1" />
         </joint>
         <joint name="claw_open_close" type="revolute">
                 <origin xyz="-6.93889e-18 -0.0075 -0.0028" rpy="5.00713e-16 2.06404e-16 2.96038" />
                 <axis xyz="-0 -0 1" />
-                <parent link="washer_spacer" />
-                <child link="left_finger_plate_top_section_3" />
+                <parent link="arm_washer_spacer" />
+                <child link="arm_left_finger_plate_top_section_3" />
         <limit effort="10" velocity="10" lower="-0.8" upper="0.8" /></joint>
         <joint name="revolute_2" type="fixed">
                 <origin xyz="0 0.014 5.55112e-17" rpy="3.14159 -0.0443675 -3.14159" />
                 <axis xyz="-0 -1 -0" />
-                <parent link="part_1_9" />
-                <child link="extrude_thin1" />
+                <parent link="arm_part_1_9" />
+                <child link="arm_extrude_thin1" />
         </joint>
         <joint name="revolute_3" type="fixed">
                 <origin xyz="-0.0703274 1.56125e-17 0.0381616" rpy="-2.36388 -6.66134e-16 1.5708" />
                 <axis xyz="-1 -0 -0" />
-                <parent link="actuator_linkage_1" />
-                <child link="part_1_11" />
+                <parent link="arm_actuator_linkage_1" />
+                <child link="arm_part_1_11" />
                 <limit effort="1" velocity="1" lower="-8.29559e-13" upper="0.610865" />
         </joint>
         <joint name="revolute_3_1" type="fixed">
                 <origin xyz="-0.018345 -0.0892102 -0.003175" rpy="6.9042e-16 1.70697e-15 -3.14159" />
                 <axis xyz="0 0 1" />
-                <parent link="left_finger_plate_top_section_1" />
-                <child link="washer_spacer_2" />
+                <parent link="arm_left_finger_plate_top_section_1" />
+                <child link="arm_washer_spacer_2" />
         </joint>
         <joint name="revolute_5" type="fixed">
                 <origin xyz="-2.77556e-17 -0.0075 0.0028" rpy="3.14159 -2.32221e-16 0.181211" />
                 <axis xyz="-0 -0 -1" />
-                <parent link="washer_spacer_3" />
-                <child link="left_finger_plate_top_section_2" />
+                <parent link="arm_washer_spacer_3" />
+                <child link="arm_left_finger_plate_top_section_2" />
         </joint>
         <joint name="claw_open_close_follower" type="revolute">
                 <origin xyz="-0.018345 -0.0892102 -0.003175" rpy="3.14159 -2.71137e-15 2.72574e-15" />
                 <axis xyz="0 0 -1" />
-                <parent link="left_finger_plate_top_section" />
-                <child link="washer_spacer_1" />
+                <parent link="arm_left_finger_plate_top_section" />
+                <child link="arm_washer_spacer_1" />
         <limit effort="10" velocity="10" lower="-0.8" upper="0.8" />
         <mimic joint="claw_open_close" multiplier="-1" offset="0" />
         </joint>
         <joint name="revolute_9" type="fixed">
                 <origin xyz="0.0664582 0.006 -0.0138902" rpy="0 1.5708 -7.54605e-16" />
                 <axis xyz="0 -1 0" />
-                <parent link="left_l_part_1" />
-                <child link="exampleballbearing_1" />
+                <parent link="arm_left_l_part_1" />
+                <child link="arm_exampleballbearing_1" />
                 <limit effort="1" velocity="1" lower="-2.26245e-11" upper="2.26195" />
         </joint>
         <joint name="elbow_up_down" type="revolute">
                 <origin xyz="-3.99778e-17 -0.0175 -2.63678e-16" rpy="-2.37144e-12 -1.07869e-16 3.14159" />
                 <axis xyz="-1 -2.29596e-16 0" />
-                <parent link="part_1_15" />
-                <child link="part_1_8" />
+                <parent link="arm_part_1_15" />
+                <child link="arm_part_1_8" />
         <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793" /></joint>
         <joint name="shoulder_up_down" type="revolute">
                 <origin xyz="0 -0.0155 5.46631e-19" rpy="-1.5708 -3.66374e-15 -1.5708" />
                 <axis xyz="-1 0 0" />
-                <parent link="1mt_054_006_1" />
-                <child link="part_1_46" />
+                <parent link="arm_1mt_054_006_1" />
+                <child link="arm_part_1_46" />
                 <limit effort="10" velocity="10" lower="-1.61808" upper="0.912649" />
         </joint>
         <joint name="slider_1" type="fixed">
                 <origin xyz="-3.8565e-17 0.331327 -9.71445e-17" rpy="-3.14159 5.38097e-15 -3.14159" />
                 <axis xyz="0 1 0" />
-                <parent link="200mm_linear_actuator_base" />
-                <child link="200mm_linear_actuator_piston" />
+                <parent link="arm_200mm_linear_actuator_base" />
+                <child link="arm_200mm_linear_actuator_piston" />
                 <limit effort="1" velocity="1" lower="-10000" upper="10000" />
         </joint>
     <xacro:include filename="$(find arm_description)/urdf/arm_control.urdf.xacro" />
+
+  <gazebo reference="world"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_0_4m_shaft"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_0_4m_shaft_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_1911_0025_0836_assembly"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_1911_0025_0836_assembly_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_1mt_054_006"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_1mt_054_006_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_200mm_linear_actuator_base"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_200mm_linear_actuator_piston"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_57545k631_steel_worm_57545k631"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_57545k756_metal_worm_gear_57545k756"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_6056n16_carbon_steel_set_screw_collar_6056n16"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_6056n16_carbon_steel_set_screw_collar_6056n16_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_actuator_linkage"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_actuator_linkage_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_camera_mount_v1_0"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_camerabracket"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_cylindrical_1_link"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_cylindrical_2_link"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_deleteface2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_exampleballbearing"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_exampleballbearing_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_exampleballbearing_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_exampleballbearing_3"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_examplemotor"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_extrude_thin1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_extrude_thin1_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_finger_pad_3_0"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_finger_pad_3_0_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_finger_plate_top_section"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_finger_plate_top_section_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_finger_plate_top_section_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_finger_plate_top_section_3"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_l_part"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_left_l_part_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_long_motor_l_piece"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_longmotorbracketspacer"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_metal_worm_gear__right_hand__57545k756"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_newbasemount"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_10"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_11"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_12"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_13"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_14"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_15"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_16"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_17"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_18"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_19"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_20"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_21"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_22"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_23"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_24"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_25"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_26"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_27"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_28"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_29"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_3"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_30"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_31"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_32"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_33"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_34"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_35"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_36"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_37"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_38"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_39"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_4"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_40"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_41"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_42"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_43"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_44"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_45"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_46"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_47"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_48"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_49"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_5"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_50"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_51"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_52"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_53"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_54"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_55"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_56"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_57"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_58"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_6"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_7"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_8"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_1_9"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_3"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_part_4"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_right_l_part"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_right_l_part_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_10"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_11"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_12"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_13"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_14"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_15"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_16"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_17"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_18"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_19"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_20"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_3"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_4"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_5"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_6"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_7"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_8"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_rmd_x8pro_p9_v2_9"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_root"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_shaft_support"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_short_motor_l_piece"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_turntable_plate"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_washer_spacer"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_washer_spacer_1"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_washer_spacer_2"><gravity>false</gravity></gazebo>
+  <gazebo reference="arm_washer_spacer_3"><gravity>false</gravity></gazebo>
 </robot>

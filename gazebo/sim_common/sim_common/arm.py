@@ -96,38 +96,49 @@ class Arm(Node):
         if self._seen_joints >= set(JOINT_ORDER):
             self._positions_initialized = True
 
+    def _step_joint(self, joint: str, rate: float) -> float:
+        """Advance one joint's target by `rate` (rad/s) for one tick, clamped to its
+        limits. Returns the feedforward velocity to report for this tick: `rate`, or 0
+        if the limit clamped the move (so the spline aims to stop there instead of
+        planning to drive through it)."""
+        lo, hi = JOINT_LIMITS[joint]
+        unclamped = self.target_positions[joint] + rate * UPDATE_PERIOD_S
+        self.target_positions[joint] = _clamp(unclamped, lo, hi)
+        return rate if self.target_positions[joint] == unclamped else 0.0
+
     def _on_timer(self) -> None:
         if not self._positions_initialized:
             return
 
+        velocities: dict[str, float] = dict.fromkeys(JOINT_ORDER, 0.0)
         moved = False
+
         for topic, joints in AXIS_TO_JOINTS.items():
             value = self.axis_values[topic]
             if value == 0.0:
                 continue
             moved = True
+            rate = value * JOINT_SPEED
             for joint in joints:
-                lo, hi = JOINT_LIMITS[joint]
-                self.target_positions[joint] = _clamp(
-                    self.target_positions[joint] + value * JOINT_SPEED * UPDATE_PERIOD_S, lo, hi
-                )
+                velocities[joint] = self._step_joint(joint, rate)
 
-        claw_delta = (self.claw_open - self.claw_close) * CLAW_SPEED * UPDATE_PERIOD_S
-        if claw_delta != 0.0:
+        claw_rate = (self.claw_open - self.claw_close) * CLAW_SPEED
+        if claw_rate != 0.0:
             moved = True
-            lo, hi = JOINT_LIMITS["claw_open_close"]
-            self.target_positions["claw_open_close"] = _clamp(
-                self.target_positions["claw_open_close"] + claw_delta, lo, hi
-            )
+            velocities["claw_open_close"] = self._step_joint("claw_open_close", claw_rate)
 
         if moved:
-            self._publish_target()
+            self._publish_target(velocities)
 
-    def _publish_target(self) -> None:
+    def _publish_target(self, velocities: dict[str, float]) -> None:
         msg = JointTrajectory()
         msg.joint_names = JOINT_ORDER
         point = JointTrajectoryPoint()
         point.positions = [self.target_positions[joint] for joint in JOINT_ORDER]
+        # feed forward the commanded velocity so the controller plans continuous motion
+        # instead of braking to a stop at every republished waypoint - that stop-start
+        # cycling at UPDATE_PERIOD_S is what made the arm look like jello
+        point.velocities = [velocities[joint] for joint in JOINT_ORDER]
         point.time_from_start = Duration(sec=0, nanosec=int(TRAJECTORY_DURATION_S * 1e9))
         msg.points = [point]
         self.trajectory_pub.publish(msg)

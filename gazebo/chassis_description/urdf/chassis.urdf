@@ -4,7 +4,7 @@
     <xacro:property name="mesh_path" value="package://chassis_description/meshes"/>
     <xacro:arg name="controller_config" default=""/>
 
-        <link name="ak10_9v2_0">
+        <link name="chassis_ak10_9v2_0">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0278764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -20,7 +20,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="ak10_9v2_0_1">
+        <link name="chassis_ak10_9v2_0_1">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0278764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -36,7 +36,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="ak10_9v2_0_2">
+        <link name="chassis_ak10_9v2_0_2">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0278764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -52,7 +52,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="ak10_9v2_0_3">
+        <link name="chassis_ak10_9v2_0_3">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0171764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -68,7 +68,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="ak10_9v2_0_4">
+        <link name="chassis_ak10_9v2_0_4">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0171764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -84,7 +84,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="ak10_9v2_0_5">
+        <link name="chassis_ak10_9v2_0_5">
                 <inertial>
                         <mass value="0.93797" />
                         <origin xyz="-0.0171764 9.62441e-20 9.8187e-19" rpy="0 -0 0" />
@@ -100,7 +100,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="battery">
+        <link name="chassis_battery">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.0022583 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -117,7 +117,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="batterymount">
+        <link name="chassis_batterymount">
                 <inertial>
                         <mass value="1.04368" />
                         <origin xyz="0.00138787 -0.0301101 0.0407599" rpy="0 -0 0" />
@@ -133,7 +133,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="bogie_bracket_leg_v2_1">
+        <link name="chassis_bogie_bracket_leg_v2_1">
                 <inertial>
                         <mass value="0.10076" />
                         <origin xyz="0.569537 -0.201189 0.11606" rpy="0 -0 0" />
@@ -153,14 +153,14 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="bogie_bracket_leg_v2_1__1_">
+        <link name="chassis_bogie_bracket_leg_v2_1__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="-0.628431 0.00135102 -0.0593428" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="bogie_plate_v1_1">
+        <link name="chassis_bogie_plate_v1_1">
                 <inertial>
                         <mass value="0.081412" />
                         <origin xyz="8.04019e-08 -0.00238756 -0.0245267" rpy="0 -0 0" />
@@ -180,14 +180,14 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="bogie_plate_v1_1__1_">
+        <link name="chassis_bogie_plate_v1_1__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="0 0 0" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="camera">
+        <link name="chassis_camera">
                 <inertial>
                         <mass value="0.1" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.00022387 kg (missing/default material in CAD). Set to a plausible 0.1 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -204,7 +204,7 @@
                         </material>
                 </visual>
         </link>
-        <link name="chassismain">
+        <link name="chassis_chassismain">
                 <inertial>
                         <mass value="4.0" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.00152407 kg (missing/default material in CAD). Set to a plausible 4.0 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -228,7 +228,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="crossbar">
+        <link name="chassis_crossbar">
                 <inertial>
                         <mass value="0.4" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000136309 kg (missing/default material in CAD). Set to a plausible 0.4 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -252,7 +252,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="drivebaseplate">
+        <link name="chassis_drivebaseplate">
                 <inertial>
                         <mass value="0.333173" />
                         <origin xyz="0.0375 -0.000381049 0.00416009" rpy="0 -0 0" />
@@ -275,7 +275,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="drivebaseplate_1">
+        <link name="chassis_drivebaseplate_1">
                 <inertial>
                         <mass value="0.333173" />
                         <origin xyz="-0.0375 -0.000381049 0.00416009" rpy="0 -0 0" />
@@ -298,7 +298,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="leg_bracket_long_v7">
+        <link name="chassis_leg_bracket_long_v7">
                 <inertial>
                         <mass value="0.300397" />
                         <origin xyz="0.166837 -0.201697 0.0317225" rpy="0 -0 0" />
@@ -318,14 +318,14 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="leg_bracket_long_v7__1_">
+        <link name="chassis_leg_bracket_long_v7__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="-0.00894396 0.000842987 0.0591692" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="part_2">
+        <link name="chassis_part_2">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -349,7 +349,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="part_2_1">
+        <link name="chassis_part_2_1">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -373,7 +373,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="part_2_2">
+        <link name="chassis_part_2_2">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -397,7 +397,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="part_2_3">
+        <link name="chassis_part_2_3">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -421,7 +421,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="part_2_4">
+        <link name="chassis_part_2_4">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -445,7 +445,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="part_2_5">
+        <link name="chassis_part_2_5">
                 <inertial>
                         <mass value="0.5" />
 		<!-- PLACEHOLDER MASS: Onshape export gave this part 0.000119531 kg (missing/default material in CAD). Set to a plausible 0.5 kg pending a real material assignment or measured weight. Inertia scaled proportionally. -->
@@ -469,7 +469,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="rocker_crank_arm_plate_v1_1">
+        <link name="chassis_rocker_crank_arm_plate_v1_1">
                 <inertial>
                         <mass value="0.0930273" />
                         <origin xyz="-5.60718e-08 0.00158752 0.0145077" rpy="0 -0 0" />
@@ -489,14 +489,14 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="rocker_crank_arm_plate_v1_1__1_">
+        <link name="chassis_rocker_crank_arm_plate_v1_1__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="-0.444394 0.150957 -0.169998" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="base_link">
+        <link name="chassis_base_link">
                 <inertial>
                         <mass value="1.06899" />
                         <origin xyz="-0.0925338 -0.100943 -0.23289" rpy="0 -0 0" />
@@ -1026,7 +1026,7 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="shortened_short_leg_bracket_v4">
+        <link name="chassis_shortened_short_leg_bracket_v4">
                 <inertial>
                         <mass value="0.155013" />
                         <origin xyz="-0.0480604 -7.02419e-08 0.0333172" rpy="0 -0 0" />
@@ -1046,21 +1046,21 @@
 			</geometry>
 		</collision>
 	</link>
-        <link name="shortened_short_leg_bracket_v4_3__1_">
+        <link name="chassis_shortened_short_leg_bracket_v4_3__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="0 0 0" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="shortened_short_leg_bracket_v4_3__1__1">
+        <link name="chassis_shortened_short_leg_bracket_v4_3__1__1">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="-0.45049 0.198649 0.0655126" rpy="0 -0 0" />
                         <inertia ixx="4e-14" ixy="0" ixz="0" iyy="4e-14" iyz="0" izz="4e-14" />
                 </inertial>
         </link>
-        <link name="shortened_short_leg_bracket_v4__1_">
+        <link name="chassis_shortened_short_leg_bracket_v4__1_">
                 <inertial>
                         <mass value="1e-09" />
                         <origin xyz="0 0 0" rpy="0 -0 0" />
@@ -1070,14 +1070,14 @@
         <joint name="batteryholder_to_battery" type="fixed">
                 <origin xyz="-7.13587e-05 -0.0462617 0" rpy="0 -0 0" />
                 <axis xyz="0 0 -1" />
-                <parent link="batterymount" />
-                <child link="battery" />
+                <parent link="chassis_batterymount" />
+                <child link="chassis_battery" />
         </joint>
         <joint name="batteryholder_to_camera" type="fixed">
                 <origin xyz="-2.77556e-17 -0.0787712 -0.0354497" rpy="0 -0 0" />
                 <axis xyz="0 0 -1" />
-                <parent link="batterymount" />
-                <child link="camera" />
+                <parent link="chassis_batterymount" />
+                <child link="chassis_camera" />
         </joint>
         <!--
           TEMP: pinned fixed instead of continuous, same reason as the drivebase
@@ -1089,27 +1089,27 @@
         <joint name="bogey_l" type="fixed">
                 <origin xyz="0.628431 0.00372898 0.0593428" rpy="1.58819e-21 6.28081e-28 4.26632e-22" />
                 <axis xyz="3.5318e-07 1 -1.59881e-06" />
-                <parent link="bogie_plate_v1_1__1_" />
-                <child link="bogie_bracket_leg_v2_1__1_" />
+                <parent link="chassis_bogie_plate_v1_1__1_" />
+                <child link="chassis_bogie_bracket_leg_v2_1__1_" />
         </joint>
         <!-- TEMP: pinned fixed instead of continuous, see bogey_l above -->
         <joint name="bogey_r" type="fixed">
                 <origin xyz="0.628431 -0.203729 0.0593428" rpy="1.69407e-21 -5.22884e-28 2.91168e-22" />
                 <axis xyz="-3.5318e-07 1 1.59881e-06" />
-                <parent link="bogie_bracket_leg_v2_1" />
-                <child link="bogie_plate_v1_1" />
+                <parent link="chassis_bogie_bracket_leg_v2_1" />
+                <child link="chassis_bogie_plate_v1_1" />
         </joint>
         <joint name="chassis_to_batteryholder" type="fixed">
                 <origin xyz="-0.155321 -0.5715 -0.0596395" rpy="0 -0 0" />
                 <axis xyz="0 0 1" />
-                <parent link="chassismain" />
-                <child link="batterymount" />
+                <parent link="chassis_chassismain" />
+                <child link="chassis_batterymount" />
         </joint>
         <joint name="chassis_to_crossbar" type="fixed">
                 <origin xyz="-0.155321 -0.3761 0.060198" rpy="0 -0 0" />
                 <axis xyz="0 0 1" />
-                <parent link="chassismain" />
-                <child link="crossbar" />
+                <parent link="chassis_chassismain" />
+                <child link="chassis_crossbar" />
         </joint>
         <!--
           TEMP: pinned fixed instead of continuous. This is really one pivot of a
@@ -1123,153 +1123,153 @@
         <joint name="chassis_to_drivebase_arm_topl" type="fixed">
                 <origin xyz="-0.0375 -0.00164733 0.018" rpy="1.5708 -3.5318e-07 -3.14159" />
                 <axis xyz="-3.5318e-07 -1 1.59881e-06" />
-                <parent link="drivebaseplate_1" />
-                <child link="rocker_crank_arm_plate_v1_1" />
+                <parent link="chassis_drivebaseplate_1" />
+                <child link="chassis_rocker_crank_arm_plate_v1_1" />
         </joint>
         <!-- TEMP: pinned fixed instead of continuous, see chassis_to_drivebase_arm_topl above -->
         <joint name="chassis_to_drivebase_arm_topr" type="fixed">
                 <origin xyz="0.0375 -0.00164733 0.018" rpy="-1.5708 -3.5318e-07 -1.9429e-15" />
                 <axis xyz="-3.5318e-07 1 1.59881e-06" />
-                <parent link="drivebaseplate" />
-                <child link="rocker_crank_arm_plate_v1_1__1_" />
+                <parent link="chassis_drivebaseplate" />
+                <child link="chassis_rocker_crank_arm_plate_v1_1__1_" />
         </joint>
         <joint name="chassis_to_drivebaseplatel" type="fixed">
                 <origin xyz="0.038354 -0.2277 -0.0136208" rpy="1.5708 -1.11022e-16 1.5708" />
                 <axis xyz="0 0 -1" />
-                <parent link="chassismain" />
-                <child link="drivebaseplate_1" />
+                <parent link="chassis_chassismain" />
+                <child link="chassis_drivebaseplate_1" />
         </joint>
         <joint name="chassis_to_drivebaseplater" type="fixed">
                 <origin xyz="-0.348996 -0.2277 -0.0136208" rpy="1.5708 -5.55112e-17 -1.5708" />
                 <axis xyz="0 0 -1" />
-                <parent link="chassismain" />
-                <child link="drivebaseplate" />
+                <parent link="chassis_chassismain" />
+                <child link="chassis_drivebaseplate" />
         </joint>
         <joint name="hanging_node_to_root_joint" type="fixed">
                 <origin xyz="-0.041523 0.122739 -0.0734114" rpy="0 -0 0" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="chassismain" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_chassismain" />
         </joint>
         <joint name="hanging_node_to_root_joint_1" type="fixed">
                 <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.22681e-20 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="leg_bracket_long_v7" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_leg_bracket_long_v7" />
         </joint>
         <joint name="hanging_node_to_root_joint_2" type="fixed">
                 <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.22681e-20 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="bogie_bracket_leg_v2_1" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_bogie_bracket_leg_v2_1" />
         </joint>
         <joint name="hanging_node_to_root_joint_3" type="fixed">
 		<origin xyz="-0.466911 -0.148558 -0.3241899357" rpy="-2.653589793e-06 1.293243727e-17 -3.141592654" />
 		<axis xyz="0 0 1" />
-		<parent link="base_link" />
-		<child link="ak10_9v2_0_1" />
+		<parent link="chassis_base_link" />
+		<child link="chassis_ak10_9v2_0_1" />
         </joint>
         <joint name="hanging_node_to_root_joint_4" type="fixed">
 		<origin xyz="-0.469451 -0.504683 -0.3238409357" rpy="-2.653589793e-06 1.293243727e-17 -3.141592654" />
 		<axis xyz="0 0 1" />
-		<parent link="base_link" />
-		<child link="ak10_9v2_0_2" />
+		<parent link="chassis_base_link" />
+		<child link="chassis_ak10_9v2_0_2" />
         </joint>
         <joint name="hanging_node_to_root_joint_5" type="fixed">
                 <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33067e-16 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="shortened_short_leg_bracket_v4_3__1_" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_shortened_short_leg_bracket_v4_3__1_" />
         </joint>
         <joint name="hanging_node_to_root_joint_6" type="fixed">
                 <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33067e-16 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="bogie_plate_v1_1__1_" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_bogie_plate_v1_1__1_" />
         </joint>
         <joint name="hanging_node_to_root_joint_7" type="fixed">
                 <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33067e-16 -1.5708" />
                 <axis xyz="0 0 1" />
-                <parent link="base_link" />
-                <child link="shortened_short_leg_bracket_v4__1_" />
+                <parent link="chassis_base_link" />
+                <child link="chassis_shortened_short_leg_bracket_v4__1_" />
         </joint>
         <joint name="hanging_node_to_root_joint_8" type="fixed">
 		<origin xyz="0.0732312 0.292989 -0.3178469357" rpy="3.50453e-32 -6.177235059e-23 -7.77155e-16" />
 		<axis xyz="0 0 1" />
-		<parent link="base_link" />
-		<child link="ak10_9v2_0" />
+		<parent link="chassis_base_link" />
+		<child link="chassis_ak10_9v2_0" />
         </joint>
         <joint name="motor_back_left_to_drivebase" type="fixed">
                 <origin xyz="-0.0102 5.55112e-17 0" rpy="1.59881e-06 6.35275e-22 -1.5708" />
                 <axis xyz="-3.5318e-07 -1 1.59881e-06" />
-                <parent link="ak10_9v2_0" />
-                <child link="leg_bracket_long_v7__1_" />
+                <parent link="chassis_ak10_9v2_0" />
+                <child link="chassis_leg_bracket_long_v7__1_" />
         </joint>
         <joint name="motor_back_right_to_drivebase" type="fixed">
                 <origin xyz="0.00894396 -0.199157 -0.0591692" rpy="5.64669e-13 1.59881e-06 -1.5708" />
                 <axis xyz="-1 0 0" />
-                <parent link="leg_bracket_long_v7" />
-                <child link="ak10_9v2_0_3" />
+                <parent link="chassis_leg_bracket_long_v7" />
+                <child link="chassis_ak10_9v2_0_3" />
         </joint>
         <joint name="motor_front_left_to_drivebase" type="fixed">
                 <origin xyz="0.806616 -0.00135128 -0.0651636" rpy="-5.64669e-13 1.59881e-06 1.5708" />
                 <axis xyz="-1 0 0" />
-                <parent link="shortened_short_leg_bracket_v4__1_" />
-                <child link="ak10_9v2_0_5" />
+                <parent link="chassis_shortened_short_leg_bracket_v4__1_" />
+                <child link="chassis_ak10_9v2_0_5" />
         </joint>
         <joint name="motor_front_right_to_drivebase" type="fixed">
                 <origin xyz="-0.0107 0 -1.11022e-16" rpy="-1.59881e-06 4.23516e-22 1.5708" />
                 <axis xyz="3.5318e-07 -1 -1.59881e-06" />
-                <parent link="ak10_9v2_0_2" />
-                <child link="shortened_short_leg_bracket_v4" />
+                <parent link="chassis_ak10_9v2_0_2" />
+                <child link="chassis_shortened_short_leg_bracket_v4" />
         </joint>
         <joint name="motor_mid_left_to_drivebase" type="fixed">
                 <origin xyz="0.45049 -0.00135115 -0.0655126" rpy="-5.64669e-13 1.59881e-06 1.5708" />
                 <axis xyz="-1 0 0" />
-                <parent link="shortened_short_leg_bracket_v4_3__1_" />
-                <child link="ak10_9v2_0_4" />
+                <parent link="chassis_shortened_short_leg_bracket_v4_3__1_" />
+                <child link="chassis_ak10_9v2_0_4" />
         </joint>
         <joint name="motor_mid_right_to_drivebase" type="fixed">
                 <origin xyz="-0.0107 2.77556e-17 -5.55112e-17" rpy="-1.59881e-06 -2.11758e-22 1.5708" />
                 <axis xyz="3.5318e-07 -1 -1.59881e-06" />
-                <parent link="ak10_9v2_0_1" />
-                <child link="shortened_short_leg_bracket_v4_3__1__1" />
+                <parent link="chassis_ak10_9v2_0_1" />
+                <child link="chassis_shortened_short_leg_bracket_v4_3__1__1" />
         </joint>
         <joint name="wheel_back_left_to_motor" type="continuous">
 		<origin xyz="0.0175 1.11022e-16 -6.428108931e-08" rpy="-3.141592654 1.570792654 -3.141592654" />
 		<axis xyz="3.673205103e-06 1.287285748e-37 -1" />
-		<parent link="ak10_9v2_0" />
-		<child link="part_2_2" />
+		<parent link="chassis_ak10_9v2_0" />
+		<child link="chassis_part_2_2" />
         </joint>
         <joint name="wheel_back_right_to_motor" type="continuous">
                 <origin xyz="0.0107 0 5.55112e-17" rpy="0 -1.5708 3.14159" />
                 <axis xyz="0 0 -1" />
-                <parent link="ak10_9v2_0_3" />
-                <child link="part_2_4" />
+                <parent link="chassis_ak10_9v2_0_3" />
+                <child link="chassis_part_2_4" />
         </joint>
         <joint name="wheel_front_left_to_motor" type="continuous">
                 <origin xyz="0.0107 0 5.55112e-17" rpy="0 1.5708 -1.03957e-32" />
                 <axis xyz="0 0 -1" />
-                <parent link="ak10_9v2_0_5" />
-                <child link="part_2_3" />
+                <parent link="chassis_ak10_9v2_0_5" />
+                <child link="chassis_part_2_3" />
         </joint>
         <joint name="wheel_front_right_to_motor" type="continuous">
 		<origin xyz="0.0175 1.473039279e-22 -6.428108936e-08" rpy="-2.515978905 -1.570791795 -0.6256137489" />
 		<axis xyz="-3.673205103e-06 9.747179571e-12 -1" />
-		<parent link="ak10_9v2_0_2" />
-		<child link="part_2_5" />
+		<parent link="chassis_ak10_9v2_0_2" />
+		<child link="chassis_part_2_5" />
         </joint>
         <joint name="wheel_mid_left_to_motor" type="continuous">
                 <origin xyz="0.0107 0 5.55112e-17" rpy="0 1.5708 -1.03946e-32" />
                 <axis xyz="0 0 -1" />
-                <parent link="ak10_9v2_0_4" />
-                <child link="part_2_1" />
+                <parent link="chassis_ak10_9v2_0_4" />
+                <child link="chassis_part_2_1" />
         </joint>
         <joint name="wheel_mid_right_to_motor" type="continuous">
 		<origin xyz="0.0175 5.55112e-17 -6.428108931e-08" rpy="-2.515978905 -1.570791795 -0.6256137489" />
 		<axis xyz="-3.673205103e-06 9.747179571e-12 -1" />
-		<parent link="ak10_9v2_0_1" />
-		<child link="part_2" />
+		<parent link="chassis_ak10_9v2_0_1" />
+		<child link="chassis_part_2" />
         </joint>
     <!--
       Wheel ground-contact friction (collision uses a cylinder primitive, not the STL mesh).
@@ -1304,7 +1304,7 @@
     </gazebo>
 
     <xacro:include filename="$(find chassis_description)/urdf/chassis_control.urdf.xacro"/>
-	<link name="part_1">
+	<link name="chassis_part_1">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1325,7 +1325,7 @@
 			</material>
 		</visual>
 	</link>
-	<link name="part_1_1">
+	<link name="chassis_part_1_1">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1346,7 +1346,7 @@
 			</material>
 		</visual>
 	</link>
-	<link name="part_1_2">
+	<link name="chassis_part_1_2">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1367,7 +1367,7 @@
 			</material>
 		</visual>
 	</link>
-	<link name="part_1_3">
+	<link name="chassis_part_1_3">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1388,7 +1388,7 @@
 			</material>
 		</visual>
 	</link>
-	<link name="part_1_4">
+	<link name="chassis_part_1_4">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1409,7 +1409,7 @@
 			</material>
 		</visual>
 	</link>
-	<link name="part_1_5">
+	<link name="chassis_part_1_5">
 		<inertial>
 			<mass value="0.5" />
 			<!-- PLACEHOLDER MASS/INERTIA: this is Part_1.stl (the wheel rim/grousers), which
@@ -1439,8 +1439,8 @@
 	<joint name="part_2_to_rim" type="fixed">
 		<origin xyz="-1.891070633e-11 -7.349149067e-12 0" rpy="7.252849981e-10 2.853505366e-10 -2.061444063e-10" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2" />
-		<child link="part_1" />
+		<parent link="chassis_part_2" />
+		<child link="chassis_part_1" />
 	</joint>
 	<!--
 	  Part_1.stl (the real wheel rim/grousers) was statically merged into base_link by
@@ -1451,8 +1451,8 @@
 	<joint name="part_2_1_to_rim" type="fixed">
 		<origin xyz="3.335521507e-07 -1.004965705e-06 0.0175018" rpy="-2.83432093e-17 -1.078690281e-17 6.437759118e-12" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2_1" />
-		<child link="part_1_1" />
+		<parent link="chassis_part_2_1" />
+		<child link="chassis_part_1_1" />
 	</joint>
 	<!--
 	  Part_1.stl (the real wheel rim/grousers) was statically merged into base_link by
@@ -1463,8 +1463,8 @@
 	<joint name="part_2_2_to_rim" type="fixed">
 		<origin xyz="1.891065082e-11 -1.110223025e-16 6.938893904e-17" rpy="2.766724837e-21 4.10206635e-10 -1.506605651e-15" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2_2" />
-		<child link="part_1_2" />
+		<parent link="chassis_part_2_2" />
+		<child link="chassis_part_1_2" />
 	</joint>
 	<!--
 	  Part_1.stl (the real wheel rim/grousers) was statically merged into base_link by
@@ -1475,8 +1475,8 @@
 	<joint name="part_2_3_to_rim" type="fixed">
 		<origin xyz="3.33546658e-07 -4.968587541e-09 0.01750323868" rpy="-2.834299755e-17 -1.078690281e-17 6.437759118e-12" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2_3" />
-		<child link="part_1_3" />
+		<parent link="chassis_part_2_3" />
+		<child link="chassis_part_1_3" />
 	</joint>
 	<!--
 	  Part_1.stl (the real wheel rim/grousers) was statically merged into base_link by
@@ -1487,8 +1487,8 @@
 	<joint name="part_2_4_to_rim" type="fixed">
 		<origin xyz="-5.413365772e-08 -1.025150231e-06 0.01749987254" rpy="9.999999999e-06 2.115277821e-16 -4.316947716e-11" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2_4" />
-		<child link="part_1_4" />
+		<parent link="chassis_part_2_4" />
+		<child link="chassis_part_1_4" />
 	</joint>
 	<!--
 	  Part_1.stl (the real wheel rim/grousers) was statically merged into base_link by
@@ -1499,7 +1499,7 @@
 	<joint name="part_2_5_to_rim" type="fixed">
 		<origin xyz="-1.891065082e-11 -7.349343356e-12 5.551115123e-17" rpy="7.252849981e-10 2.853505366e-10 -2.061444063e-10" />
 		<axis xyz="0 0 1" />
-		<parent link="part_2_5" />
-		<child link="part_1_5" />
+		<parent link="chassis_part_2_5" />
+		<child link="chassis_part_1_5" />
 	</joint>
 </robot>

@@ -24,17 +24,19 @@
          numbers can't be trusted here - this origin still needs the real
          mount offset/orientation from CAD.
 
-         The -Y offset below is a stopgap, not a CAD number: at xyz="0 0 0" the
-         arm's collision geometry overlapped chassismain/crossbar/base_link's
-         own collision meshes (a drivetrain bracket), which gz_ros2_control's
-         physics then fought every tick, causing the arm to jitter. -Y is
-         forward here (front wheels sit at lower Y than the back wheels; see
-         chassis_control.urdf.xacro's wheel joint names vs. their link
-         positions) - 0.5m forward clears all three overlapping collision
-         meshes with margin, verified against their STL bounding boxes. -->
+         The -Y offset below is a stopgap, not a CAD number, but -0.08m is the
+         value actually confirmed (visually, in sim) to seat the arm correctly on
+         the crossbar - leave it alone. (It was bumped to -0.5 then -0.46 during
+         an investigation into the arm swinging/flinging on spawn, on the theory
+         that the mount overlapped the chassis's own collision meshes; that
+         theory was wrong - the real cause was the arm having no gravity
+         compensation in its position controller, fixed separately by disabling
+         gravity on the arm's links - and the offset change only pushed the arm
+         visibly off the mount. Still needs the real mount offset/orientation
+         from CAD to replace this placeholder outright.) -->
     <joint name="chassis_to_arm_mount" type="fixed">
-        <parent link="crossbar"/>
-        <child link="arm_base_link"/>
+        <parent link="chassis_crossbar"/>
+        <child link="arm_root"/>
         <origin xyz="0 -0.08 0" rpy="0 0 0"/>
     </joint>
 
