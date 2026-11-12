@@ -122,6 +122,13 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         help="Don't launch QGroundControl in-container (drone only) - use your own local one",
     )
     p.add_argument(
+        "-c",
+        "--controller",
+        action="store_true",
+        help="Open a keyboard-to-gamepad GUI alongside the simulation "
+        "(WASD/arrows/Q,E -> virtual gamepad)",
+    )
+    p.add_argument(
         "launch_args",
         nargs="*",
         metavar="name:=value",
@@ -144,6 +151,7 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         build_only=args.build_only,
         no_build=args.no_build,
         local_qgc=args.local_qgc,
+        controller_gui=args.controller,
         launch_args=args.launch_args,
     )
 

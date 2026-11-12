@@ -33,3 +33,9 @@ trimesh = "*"
 pyfqmr = "*"
 requests = "*"
 pre-commit = "*"
+
+[target.linux-64.pypi-dependencies]
+evdev = "*"
+
+[target.linux-aarch64.pypi-dependencies]
+evdev = "*"

@@ -53,6 +53,7 @@ This is a shared package containing cross-package repetitive code & also indepen
 | ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `move_joints` | `sim_common/move_joints.py` | Publishes a single `JointTrajectory` and exits. See [Moving Joints](./moving-joints#move_joints-node-cli).                                                         |
 | `joint_gui`   | `sim_common/joint_gui.py`   | Tkinter joint slider GUI. See [Moving Joints](./moving-joints#joint-gui) for usage, or [Joint GUI internals](#joint-gui-internals) below for how it's implemented. |
+| `controller_gui` | `sim_common/controller_gui.py` | Tkinter keyboard-to-virtual-gamepad GUI, for driving a sim without a physical controller. See [Running Gazebo](./gazebo#driving-without-a-physical-gamepad). |
 | `drivebase`   | `sim_common/drivebase.py`   | Sim equivalent of the real rover's drivebase node - converts joystick deflection messages into wheel velocity commands, mirroring `urc-2023/src/drivebase`.        |
 
 It also exports `sim_common/launch_utils.py`, a library (not a node) of helpers every `<robot>.launch.py` imports - `get_asset()` for resolving files in a package's share directory, plus node/launch-action builders for the Gazebo server, spawning, controllers, and the ROS-Gazebo bridge. See [launch_utils.py](#launch_utilspy) below for what each helper does.

@@ -16,11 +16,12 @@ setup(
         "console_scripts": [
             "move_joints = sim_common.move_joints:main",
             "joint_gui = sim_common.joint_gui:main",
+            "controller_gui = sim_common.controller_gui:main",
             "drivebase = sim_common.drivebase:main",
             "arm = sim_common.arm:main",
         ],
     },
-    install_requires=["setuptools"],
+    install_requires=["setuptools", 'evdev; sys_platform == "linux"'],
     zip_safe=True,
     maintainer="Trickfire Robotics",
     maintainer_email="tfrbtcs@uw.edu",

@@ -24,3 +24,14 @@ joint_trajectory_controller:
     state_interfaces:
       - position
       - velocity
+
+    # arm.py republishes a single-point trajectory every tick with a feed-forward
+    # velocity so jogging looks continuous instead of braking to a stop at each
+    # waypoint (see sim_common/arm.py's _publish_target). Without this, the
+    # controller rejects every one of those trajectories (logging "Velocity of
+    # last trajectory point ... is not zero") since it refuses non-zero velocity
+    # at a trajectory's end by default - meanwhile arm.py's local position
+    # tracker keeps advancing regardless, so once a message finally slips through
+    # (e.g. a joint hitting its limit momentarily zeroes its velocity) the arm
+    # snaps hard to wherever that tracker drifted to.
+    allow_nonzero_velocity_at_trajectory_end: true

@@ -237,6 +237,25 @@ def _display_reachable(display: str) -> bool:
     )
 
 
+def _check_uinput_access() -> None:
+    """The controller GUI needs to open /dev/uinput to create its virtual gamepad."""
+    info("Checking for /dev/uinput...")
+    uinput_path = Path("/dev/uinput")
+    if not uinput_path.exists():
+        die(
+            "controller GUI needs /dev/uinput, which doesn't exist on this machine.\n"
+            "Load the kernel module on the host: sudo modprobe uinput\n"
+            "(then restart the container so the bind mount in docker-compose.yml picks it up)"
+        )
+    if not os.access(uinput_path, os.W_OK):
+        die(
+            f"controller GUI can't write to {uinput_path} (permission denied).\n"
+            "Add yourself to the 'input' group and re-login, or fix its udev rule:\n"
+            '  echo \'KERNEL=="uinput", GROUP="input", MODE="0660"\' | sudo tee /etc/udev/rules.d/60-uinput.rules\n'
+            "  sudo udevadm control --reload-rules && sudo udevadm trigger"
+        )
+
+
 def _check_display() -> None:
     info("Checking for display...")
     display = os.environ.get("DISPLAY")
@@ -300,6 +319,7 @@ def _print_launch_banner(
     env: dict[str, str],
     render_prefix: list[str],
     log_path: Path,
+    controller_gui: bool = False,
 ) -> None:
     simulator = "gazebo + ArduPilot SITL" if robot_type == "ardupilot" else "gazebo"
     rows = [
@@ -308,6 +328,8 @@ def _print_launch_banner(
         ("Display", _describe_display(env, render_prefix)),
         ("Log", str(log_path)),
     ]
+    if controller_gui:
+        rows.append(("Controller", "keyboard -> virtual gamepad (WASD/arrows/Q,E)"))
 
     divider = "-" * 64
     label_width = max(len(label) for label, _ in rows) + 1
@@ -360,6 +382,7 @@ def build_and_launch(
     build_only: bool = False,
     no_build: bool = False,
     local_qgc: bool = False,
+    controller_gui: bool = False,
     launch_args: list[str] | None = None,
 ) -> None:
     """Build the ROS 2 workspace and launch a robot simulation."""
@@ -370,6 +393,9 @@ def build_and_launch(
         _setup_pixi_env()
     else:
         _check_display()
+
+    if controller_gui and not build_only:
+        _check_uinput_access()
 
     build = not no_build
     launch = not build_only
@@ -396,6 +422,7 @@ def build_and_launch(
         env=env,
         render_prefix=render_prefix,
         log_path=log_path,
+        controller_gui=controller_gui,
     )
 
     setup_bash = WORKSPACE_DIR / "install" / "setup.bash"
@@ -433,6 +460,10 @@ def build_and_launch(
         ros_launch_args.append("qgc:=false")
     ros_launch_args += launch_args or []
     quoted_launch_args = " ".join(shlex.quote(arg) for arg in ros_launch_args)
+    # started with `&` before `exec` replaces this shell's own pid with ros2 launch, so it
+    # stays a child of that pid and gets cleaned up by _run_logged_command's
+    # KeyboardInterrupt handling like any other descendant of the launch process
+    controller_gui_line = "ros2 run sim_common controller_gui &\n" if controller_gui else ""
     launch_script = f"""
 set -e
 source install/setup.bash
@@ -446,7 +477,7 @@ else
     echo \"       Expected: $SIM_WORLDS_SHARE/worlds\"
 fi
 
-exec {" ".join(render_prefix)} ros2 launch \"{launch_pkg}\" \"{launch_file_name}\" {quoted_launch_args}
+{controller_gui_line}exec {" ".join(render_prefix)} ros2 launch \"{launch_pkg}\" \"{launch_file_name}\" {quoted_launch_args}
 """.strip()
 
     try:

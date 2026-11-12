@@ -60,6 +60,9 @@ services:
               bind:
                   create_host_path: true
             - type: bind
+              source: /dev/uinput
+              target: /dev/uinput
+            - type: bind
               source: ${HOME}/.config/trickfire
               target: /home/trickfire/.config/trickfire
               bind:
