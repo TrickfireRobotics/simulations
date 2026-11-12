@@ -3,7 +3,7 @@ title: Adding a New Robot
 description: How to generate ROS 2 packages from an OnShape CAD model and get a new robot running in Gazebo.
 ---
 
-The command `sim gazebo create` takes a robot from OnShape and produces two ROS 2 packages. To make sure we do not hit the low OnShape API limits, requests to OnShape are routed through the [dashboard](https://github.com/TrickfireRobotics/dashboard.git) that authenticates you and caches common requests long-term.
+The command `sim gazebo create` takes a standalone robot or reusable component from OnShape and produces a description and bringup package. Composed robots such as Viator use explicit package mappings in `robots.json` instead of requiring every physical subassembly to have its own package pair. To make sure we do not hit the low OnShape API limits, requests to OnShape are routed through the [dashboard](https://github.com/TrickfireRobotics/dashboard.git) that authenticates you and caches common requests long-term.
 
 ## Getting access
 
@@ -45,6 +45,8 @@ sim gazebo update arm
 ```
 
 This replaces only `arm_description/urdf/arm.urdf` and `arm_description/meshes/`. Everything else, your control xacro edits, launch file, controller YAML, RViz config is left untouched.
+
+Viator's chassis is registered as `viator_chassis`, but its entry points at `viator_description` and records `chassis` as the CAD source name. Running `sim gazebo update viator_chassis` therefore updates the component without overwriting the composed `viator.urdf.xacro`. The complete `viator` target has no direct OnShape URL and cannot be updated as a single CAD export.
 
 ## Troubleshooting
 

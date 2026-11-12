@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import shlex
 import shutil
 import signal
 import socket
@@ -48,6 +49,12 @@ def _robot_type(robot_name: str) -> str | None:
     return entry.get("type") if entry else None
 
 
+def _robot_entry(robot_name: str) -> dict | None:
+    from .create.registry import load_robots_json
+
+    return next((entry for entry in load_robots_json() if entry["name"] == robot_name), None)
+
+
 def _configure_ardupilot_env(robot_type: str | None, env: dict[str, str]) -> None:
     """Point Gazebo at the plugin/models built into the Docker image"""
     if robot_type != "ardupilot":
@@ -78,30 +85,34 @@ def _strip_ansi(text: str) -> str:
     return _ANSI_RE.sub("", text)
 
 
-def _validate_robot_layout(robot_name: str) -> tuple[str, str, str]:
-    bringup_pkg = f"{robot_name}_bringup"
-    description_pkg = f"{robot_name}_description"
-    launch_file_name = f"{robot_name}.launch.py"
+def _validate_robot_layout(robot_name: str) -> tuple[str, list[str], str]:
+    entry = _robot_entry(robot_name) or {}
+    launch_pkg = entry.get("launch_package", f"{robot_name}_bringup")
+    description_packages = entry.get(
+        "description_packages",
+        [entry.get("description_package", f"{robot_name}_description")],
+    )
+    launch_file_name = entry.get("launch_file", f"{robot_name}.launch.py")
 
-    bringup_dir = WORKSPACE_DIR / bringup_pkg
-    if not bringup_dir.is_dir():
+    launch_dir = WORKSPACE_DIR / launch_pkg
+    if not launch_dir.is_dir():
         die(
-            f"Package '{bringup_pkg}' not found in {WORKSPACE_DIR}\n"
-            f"Expected directory: {bringup_dir}"
+            f"Package '{launch_pkg}' not found in {WORKSPACE_DIR}\nExpected directory: {launch_dir}"
         )
 
-    description_dir = WORKSPACE_DIR / description_pkg
-    if not description_dir.is_dir():
-        die(
-            f"Package '{description_pkg}' not found in {WORKSPACE_DIR}\n"
-            f"Expected directory: {description_dir}"
-        )
+    for description_pkg in description_packages:
+        description_dir = WORKSPACE_DIR / description_pkg
+        if not description_dir.is_dir():
+            die(
+                f"Package '{description_pkg}' not found in {WORKSPACE_DIR}\n"
+                f"Expected directory: {description_dir}"
+            )
 
-    launch_file = bringup_dir / "launch" / launch_file_name
+    launch_file = launch_dir / "launch" / launch_file_name
     if not launch_file.is_file():
         die(f"Launch file not found: {launch_file}")
 
-    return bringup_pkg, description_pkg, launch_file_name
+    return launch_pkg, description_packages, launch_file_name
 
 
 def _drop_missing_prefix_paths(env: dict[str, str]) -> None:
@@ -183,7 +194,7 @@ def _diagnose_display(display: str, xdpyinfo_stderr: str) -> str:
     """Pin down which layer (local socket, DNS, TCP, or X11 auth) is broken."""
     lines = [f"Cannot connect to display {display}", ""]
 
-    if display.startswith(":"):
+    if in_pixi() or display.startswith(":"):
         lines += [
             "Expected a Wayland/X11 socket forwarded in from the hosts",
         ]
@@ -337,11 +348,7 @@ def _setup_pixi_env() -> None:
         if engine_plugins not in paths:
             os.environ["GZ_RENDERING_PLUGIN_PATH"] = ":".join([engine_plugins] + paths)
 
-        ogre2_media = f"{conda_prefix}/share/gz/gz-rendering8/ogre2/media"
-        existing = os.environ.get("GZ_RENDERING_RESOURCE_PATH", "")
-        paths = [p for p in existing.split(":") if p]
-        if ogre2_media not in paths:
-            os.environ["GZ_RENDERING_RESOURCE_PATH"] = ":".join([ogre2_media] + paths)
+        os.environ["GZ_RENDERING_RESOURCE_PATH"] = f"{conda_prefix}/share/gz/gz-rendering8"
 
     if os.environ.get("QT_QPA_PLATFORM") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -353,6 +360,7 @@ def build_and_launch(
     build_only: bool = False,
     no_build: bool = False,
     local_qgc: bool = False,
+    launch_args: list[str] | None = None,
 ) -> None:
     """Build the ROS 2 workspace and launch a robot simulation."""
     if build_only and no_build:
@@ -369,7 +377,7 @@ def build_and_launch(
     env = os.environ.copy()
     render_prefix = _configure_rendering(env)
     _configure_ardupilot_env(robot_type, env)
-    bringup_pkg, description_pkg, launch_file_name = _validate_robot_layout(robot_name)
+    launch_pkg, description_packages, launch_file_name = _validate_robot_layout(robot_name)
 
     if build:
         for directory_name in ("build", "install", "log"):
@@ -399,8 +407,8 @@ def build_and_launch(
                 "colcon",
                 "build",
                 "--packages-up-to",
-                bringup_pkg,
-                description_pkg,
+                launch_pkg,
+                *description_packages,
                 "sim_worlds",
                 "sim_common",
                 "--cmake-args",
@@ -420,23 +428,25 @@ def build_and_launch(
         return
 
     info("Sourcing ROS2 environment and launching simulation...")
-    launch_args = "gui:=true"
+    ros_launch_args = ["gui:=true"]
     if robot_type == "ardupilot" and local_qgc:
-        launch_args += " qgc:=false"
+        ros_launch_args.append("qgc:=false")
+    ros_launch_args += launch_args or []
+    quoted_launch_args = " ".join(shlex.quote(arg) for arg in ros_launch_args)
     launch_script = f"""
 set -e
 source install/setup.bash
 
 SIM_WORLDS_SHARE=\"$PWD/install/sim_worlds/share/sim_worlds\"
 if [ -d \"$SIM_WORLDS_SHARE/worlds\" ]; then
-    export GZ_SIM_RESOURCE_PATH=\"${{GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}}$SIM_WORLDS_SHARE\"
+    export GZ_SIM_RESOURCE_PATH=\"${{GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}}$SIM_WORLDS_SHARE:$SIM_WORLDS_SHARE/models\"
     echo \"[INFO] GZ_SIM_RESOURCE_PATH set to: $GZ_SIM_RESOURCE_PATH\"
 else
     echo \"[WARN] sim_worlds share directory not found - world files may not load\"
     echo \"       Expected: $SIM_WORLDS_SHARE/worlds\"
 fi
 
-exec {" ".join(render_prefix)} ros2 launch \"{bringup_pkg}\" \"{launch_file_name}\" {launch_args}
+exec {" ".join(render_prefix)} ros2 launch \"{launch_pkg}\" \"{launch_file_name}\" {quoted_launch_args}
 """.strip()
 
     try:

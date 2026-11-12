@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="viator">
+    <!-- Combines the chassis and arm into one robot. The chassis model lives
+         in this package and the shared arm lives in
+         arm_description. This file adds the arm mount, Viator sensors, and
+         the single combined ros2_control plugin. standalone=false suppresses the
+         world-mount link in arm.urdf and the per-part gz_ros2_control plugins
+         in viator_chassis_control.urdf.xacro/arm_control.urdf.xacro, since those
+         only make sense when chassis/arm are run as standalone robots. -->
+    <xacro:arg name="controller_config" default=""/>
+    <xacro:arg name="plugin_extension" default=".so"/>
+    <xacro:arg name="standalone" default="false"/>
+    <xacro:property name="plugin_extension" value="$(arg plugin_extension)"/>
+
+    <xacro:include filename="$(find viator_description)/urdf/viator_chassis.urdf.xacro"/>
+    <xacro:include filename="$(find arm_description)/urdf/arm.urdf"/>
+
+    <!-- PLACEHOLDER MOUNT: the arm's turntable plate actually bolts onto the
+         crossbar extrusion (see the "ttb_0094_ttb_0095_2x1_grid_pattern_..."
+         link in zips/full_chassis/urdf/full_chassis.urdf, a fuller CAD export
+         of the same assembly - Viator's "crossbar" link is that
+         same part). That export is a different revision with no part names
+         in common with viator_chassis.urdf.xacro though, so its
+         numbers can't be trusted here - this origin still needs the real
+         mount offset/orientation from CAD.
+
+         The -Y offset below is a stopgap, not a CAD number, but -0.08m is the
+         value actually confirmed (visually, in sim) to seat the arm correctly on
+         the crossbar - leave it alone. (It was bumped to -0.5 then -0.46 during
+         an investigation into the arm swinging/flinging on spawn, on the theory
+         that the mount overlapped the chassis's own collision meshes; that
+         theory was wrong - the real cause was the arm having no gravity
+         compensation in its position controller, fixed separately by disabling
+         gravity on the arm's links - and the offset change only pushed the arm
+         visibly off the mount. Still needs the real mount offset/orientation
+         from CAD to replace this placeholder outright.) -->
+    <joint name="chassis_to_arm_mount" type="fixed">
+        <parent link="chassis_crossbar"/>
+        <child link="arm_root"/>
+        <origin xyz="0 -0.08 0" rpy="0 0 0"/>
+    </joint>
+
+    <xacro:include filename="$(find viator_description)/urdf/viator_zed.urdf.xacro"/>
+    <xacro:include filename="$(find viator_description)/urdf/viator_gps.urdf.xacro"/>
+
+    <gazebo>
+        <!-- JOINT CONTROLLER -->
+        <plugin filename="libgz_ros2_control-system${plugin_extension}" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <robot_param>robot_description</robot_param>
+            <robot_param_node>robot_state_publisher</robot_param_node>
+            <parameters>$(arg controller_config)</parameters>
+            <update_rate>60</update_rate>
+            <!-- gz_ros2_control reads this straight off the plugin element (NOT
+                 from the controller YAML's ros__parameters, which this plugin
+                 never loads) - it's the proportional gain that turns position
+                 error into a velocity command for every position-interface
+                 joint on this robot (just the arm here; the chassis wheels
+                 command velocity directly). One value for the whole plugin,
+                 no per-joint override exists in gz_ros2_control, so this
+                 stiffens all six arm joints together, not shoulder_up_down alone.
+                 gz_ros2_control multiplies the position error by update_rate
+                 (60 here) before applying this gain, so effective stiffness
+                 is gain * update_rate - at the 0.1 default that's already 6;
+                 10.0 (600 effective) was way past stable for this pure-P,
+                 no-damping loop and made every joint oscillate. 0.5 matches
+                 gz_ros2_control's own official demo config (a 5x bump over
+                 default, not 100x) - raise in small steps from here if it
+                 still droops, drop back toward 0.1 if it jitters at all. -->
+            <position_proportional_gain>0.5</position_proportional_gain>
+        </plugin>
+    </gazebo>
+</robot>

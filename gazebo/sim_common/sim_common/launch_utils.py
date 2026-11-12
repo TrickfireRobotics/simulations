@@ -14,7 +14,7 @@ from launch.actions import (
     RegisterEventHandler,
     TimerAction,
 )
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -63,13 +63,14 @@ def gz_supports_sim_command():
     return any(line.strip() == "sim" for line in commands)
 
 
-def process_robot_description(urdf_file, controller_config):
-    """Run xacro over `urdf_file`, wiring in the controller config and platform plugin extension"""
+def process_robot_description(urdf_file, controller_config, extra_mappings=None):
+    """Run xacro with the shared mappings plus robot-specific arguments."""
     return xacro.process_file(
         urdf_file,
         mappings={
             "controller_config": controller_config,
             "plugin_extension": ".dylib" if sys.platform == "darwin" else ".so",
+            **(extra_mappings or {}),
         },
     ).toxml()
 
@@ -93,24 +94,40 @@ def gazebo_launch_actions(
     its own for its Sensors system to use, and never produces any sensor data.
     Returns a list of launch actions to splice into a LaunchDescription.
     """
-    use_split_gui = gz_supports_sim_command() and not combined_gui
-    gz_server_args = (
-        ["-r", "-s", world_file]
-        if use_split_gui
-        else ["-r", world_file, "--gui-config", gz_gui_config]
-    )
-    if physics_engine:
-        gz_server_args.extend(["--physics-engine", physics_engine])
-
-    gz_server = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory("ros_gz_sim"), "launch", "gz_sim.launch.py")
-        ),
-        launch_arguments={"gz_args": " ".join(gz_server_args)}.items(),
+    gz_launch_source = PythonLaunchDescriptionSource(
+        os.path.join(get_package_share_directory("ros_gz_sim"), "launch", "gz_sim.launch.py")
     )
 
-    if not use_split_gui:
-        return [gz_server]
+    def gz_launch(arguments, condition=None):
+        if physics_engine:
+            arguments.extend(["--physics-engine", physics_engine])
+        return IncludeLaunchDescription(
+            gz_launch_source,
+            launch_arguments={"gz_args": " ".join(arguments)}.items(),
+            condition=condition,
+        )
+
+    if combined_gui:
+        gui = LaunchConfiguration(gui_launch_arg)
+        return [
+            gz_launch(
+                ["-r", world_file, "--gui-config", gz_gui_config],
+                condition=IfCondition(gui),
+            ),
+            gz_launch(["-r", "-s", world_file], condition=UnlessCondition(gui)),
+        ]
+
+    if not gz_supports_sim_command():
+        gui = LaunchConfiguration(gui_launch_arg)
+        return [
+            gz_launch(
+                ["-r", world_file, "--gui-config", gz_gui_config],
+                condition=IfCondition(gui),
+            ),
+            gz_launch(["-r", "-s", world_file], condition=UnlessCondition(gui)),
+        ]
+
+    gz_server = gz_launch(["-r", "-s", world_file])
 
     gz_gui = ExecuteProcess(
         cmd=["gz", "sim", "--force-version", "8", "-g", "--gui-config", gz_gui_config],

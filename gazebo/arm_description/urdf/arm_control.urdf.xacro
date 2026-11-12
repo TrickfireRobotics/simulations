@@ -117,7 +117,7 @@
                      gz_ros2_control's own official demo config (a 5x bump over
                      default, not 100x) - raise in small steps from here if it
                      still droops, drop back toward 0.1 if it jitters at all.
-                     Keep this in sync with rover.urdf.xacro's copy. -->
+                     Keep this in sync with viator.urdf.xacro's copy. -->
                 <position_proportional_gain>0.5</position_proportional_gain>
             </plugin>
         </gazebo>

@@ -18,6 +18,14 @@ sim gazebo <robot_name>
 | `--no-build`   | Skip the `colcon build` step.                        |
 | `--build-only` | Build the workspace but don't launch the simulation. |
 
+Available simulation targets include `viator`, `viator_chassis`, and `arm`. Use `viator` for the complete rover with its arm, ZED camera, and GNSS. The component targets are for focused mechanical testing.
+
+Any trailing `name:=value` pairs are passed to ROS launch. For example:
+
+```bash
+sim gazebo viator ttt:=true zed_frame_rate:=30
+```
+
 ## Cleaning the workspace
 
 To remove build artifacts and do a clean rebuild:
@@ -47,8 +55,8 @@ This deletes `gazebo/build/`, `gazebo/install/`, and `gazebo/log/`. Use this whe
     <Accordion title="Package not found errors after launch">
         Try running `sim gazebo clean` and building again.
     </Accordion>
-    <Accordion title="Package '<name>_bringup' not found right after launch">
-        `sim gazebo <robot_name>` takes a robot name (`arm`, `chassis` ...) from configured robots in `robots.json`,
-        not a subcommand. Check the `robots.json` file for list of available robots or [create a new one](./adding-robots.mdx)
+    <Accordion title="The requested target is not found">
+        `sim gazebo <robot_name>` takes a target name (`viator`, `viator_chassis`, `arm` ...)
+        from `robots.json`, not a package name. Check the registry or [create a new robot](./adding-robots.mdx).
     </Accordion>
 </Accordions>

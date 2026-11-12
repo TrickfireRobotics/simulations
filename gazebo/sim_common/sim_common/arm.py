@@ -13,7 +13,7 @@ from std_msgs.msg import Float32
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 # must match the joints list in arm_bringup/config/arm.controller.yaml and
-# rover_bringup/config/rover.controller.yaml
+# viator_sim/config/viator.controller.yaml
 JOINT_LIMITS = {
     "baseplate_left_right": (-3.14, 3.14),
     "shoulder_up_down": (-1.61808, 0.912649),

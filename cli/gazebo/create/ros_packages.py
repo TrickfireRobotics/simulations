@@ -84,16 +84,23 @@ def generate_bringup_pkg(robot: str, joints: list, links: list, out_dir: Path) -
 
 
 def update_description_pkg(
-    robot: str, geometry_urdf: str, generated_meshes_src: Path, out_dir: Path
+    robot: str,
+    geometry_urdf: str,
+    generated_meshes_src: Path,
+    out_dir: Path,
+    package_name: str | None = None,
+    description_file: str | None = None,
 ) -> None:
-    pkg_dir = out_dir / f"{robot}_description"
+    package_name = package_name or f"{robot}_description"
+    description_file = description_file or f"{robot}.urdf"
+    pkg_dir = out_dir / package_name
     urdf_dir = pkg_dir / "urdf"
     meshes_dir = pkg_dir / "meshes"
 
     if not pkg_dir.exists():
         err(f"Package {pkg_dir} does not exist. Use 'sim create' first.")
 
-    (urdf_dir / f"{robot}.urdf").write_text(geometry_urdf)
+    (urdf_dir / description_file).write_text(geometry_urdf)
 
     if generated_meshes_src.exists():
         if meshes_dir.exists():

@@ -4,18 +4,31 @@ workspace_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 model="${1:-}"
 
 case "${model}" in
-arm | chassis | rover) ;;
+arm)
+    package_name="arm_description"
+    source_name="arm.urdf"
+    build_packages=(arm_description)
+    ;;
+viator_chassis)
+    package_name="viator_description"
+    source_name="viator_chassis.urdf.xacro"
+    build_packages=(viator_description)
+    ;;
+viator)
+    package_name="viator_description"
+    source_name="viator.urdf.xacro"
+    build_packages=(arm_description viator_description)
+    ;;
 *)
-    echo "usage: $0 <arm|chassis|rover> [urdf-viz options]" >&2
+    echo "usage: $0 <arm|viator_chassis|viator> [urdf-viz options]" >&2
     exit 2
     ;;
 esac
 
 shift
 
-package_name="${model}_description"
 package_dir="${workspace_dir}/gazebo/${package_name}"
-source_file="${package_dir}/urdf/${model}.urdf"
+source_file="${package_dir}/urdf/${source_name}"
 ros_distro="${ROS_DISTRO:-jazzy}"
 
 set -eo pipefail
@@ -23,7 +36,7 @@ source "/opt/ros/${ros_distro}/setup.bash"
 set -u
 
 cd "${workspace_dir}"
-colcon build --base-paths gazebo --packages-select "${package_name}"
+colcon build --base-paths gazebo --packages-select "${build_packages[@]}"
 set +u
 source "${workspace_dir}/install/setup.bash"
 set -u
@@ -35,4 +48,9 @@ urdf_file="$(mktemp --suffix=.urdf)"
 trap 'rm -f "${urdf_file}"' EXIT
 xacro "${source_file}" >"${urdf_file}"
 
-urdf-viz "${urdf_file}" --package-path "${package_name}=${package_dir}" "$@"
+package_paths=(--package-path "${package_name}=${package_dir}")
+if [[ "${model}" == "viator" ]]; then
+    package_paths+=(--package-path "arm_description=${workspace_dir}/gazebo/arm_description")
+fi
+
+urdf-viz "${urdf_file}" "${package_paths[@]}" "$@"

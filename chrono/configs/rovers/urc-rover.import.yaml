@@ -10,7 +10,7 @@
 # the name it actually describes.
 
 name: urc-rover
-urdf: gazebo/chassis_description/urdf/chassis.urdf
+urdf: gazebo/viator_description/urdf/viator_chassis.urdf.xacro
 
 # Suspension pivots. All four are exported as `fixed`, which is why the prototype had a
 # rigid rover; listing them here is what restores them.

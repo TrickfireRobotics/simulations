@@ -14,7 +14,7 @@ from std_msgs.msg import Float32, Float64MultiArray
 # in sim. Re-tune once real wheel speed/axis convention is confirmed.
 SPEED = -(6.28 * 1.5) * 0.5  # rad/s
 
-# order must match the joints list in chassis_bringup/config/chassis.controller.yaml
+# order must match the joints list in viator_sim/config/viator_chassis.controller.yaml
 WHEEL_ORDER = [
     "wheel_front_left_to_motor",
     "wheel_mid_left_to_motor",
