@@ -185,10 +185,17 @@ def cmd_update(args) -> None:
             "  Use 'sim create' to add a new robot."
         )
 
+    if "url" not in entry:
+        err(
+            f"Robot '{robot}' is assembled from other descriptions and cannot be "
+            "updated directly. Update its source components instead."
+        )
+
     api_url, doc_id, context_type, context_id, el_id = parse_onshape_url(entry["url"])
     info(f"documentId={doc_id}  {context_type}Id={context_id}  elementId={el_id}")
 
-    workdir = download(robot, doc_id, context_type, context_id, el_id, api_url)
+    source_name = entry.get("source_name", robot)
+    workdir = download(source_name, doc_id, context_type, context_id, el_id, api_url)
 
     exported_urdf_path = workdir / "robot.urdf"
     exported_meshes_src = workdir / "assets"
@@ -210,11 +217,27 @@ def cmd_update(args) -> None:
     _reduce_meshes(exported_meshes_src, args.no_reduce)
 
     info("Post-processing URDF...")
-    geometry_urdf, _, _, _ = postprocess(exported_urdf_path, robot, world_base_link)
+    description_package = entry.get("description_package", f"{robot}_description")
+    description_file = entry.get("description_file", f"{robot}.urdf")
+    control_name = entry.get("control_name", Path(description_file).stem.split(".urdf")[0])
+    geometry_urdf, _, _, _ = postprocess(
+        exported_urdf_path,
+        source_name,
+        world_base_link,
+        description_package=description_package,
+        control_name=control_name,
+    )
 
     info("Updating description package...")
-    update_description_pkg(robot, geometry_urdf, exported_meshes_src, out_dir)
+    update_description_pkg(
+        robot,
+        geometry_urdf,
+        exported_meshes_src,
+        out_dir,
+        package_name=description_package,
+        description_file=description_file,
+    )
 
     info("Done!")
-    info(f"Updated {robot}_description/urdf and meshes only.")
+    info(f"Updated {description_package}/urdf and meshes only.")
     info("Bringup package and control xacro were NOT modified.")

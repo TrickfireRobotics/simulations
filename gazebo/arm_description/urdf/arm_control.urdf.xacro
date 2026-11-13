@@ -3,10 +3,14 @@
 
     <xacro:arg name="controller_config" default=""/>
     <xacro:arg name="plugin_extension" default=".so"/>
+    <!-- standalone: true when the arm is its own robot and needs its own
+         gz_ros2_control plugin instance; set false by assemblies (e.g. the
+         rover) that load one combined plugin for the whole robot instead -->
+    <xacro:arg name="standalone" default="true"/>
     <xacro:property name="plugin_extension" value="$(arg plugin_extension)"/>
 
     <!-- ros2_control hardware interface -->
-    <ros2_control name="GazeboSimSystem" type="system">
+    <ros2_control name="ArmGazeboSimSystem" type="system">
         <hardware>
             <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
@@ -90,14 +94,32 @@
         </joint>
     </ros2_control>
 
-    <gazebo>
-        <!-- JOINT CONTROLLER -->
-        <plugin filename="libgz_ros2_control-system${plugin_extension}" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-            <robot_param>robot_description</robot_param>
-            <robot_param_node>robot_state_publisher</robot_param_node>
-            <parameters>$(arg controller_config)</parameters>
-            <update_rate>60</update_rate>
-            <position_proportional_gain>0.5</position_proportional_gain>
-        </plugin>
-    </gazebo>
+    <xacro:if value="$(arg standalone)">
+        <gazebo>
+            <!-- JOINT CONTROLLER -->
+            <plugin filename="libgz_ros2_control-system${plugin_extension}" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                <robot_param>robot_description</robot_param>
+                <robot_param_node>robot_state_publisher</robot_param_node>
+                <parameters>$(arg controller_config)</parameters>
+                <update_rate>60</update_rate>
+                <!-- gz_ros2_control reads this straight off the plugin element (NOT
+                     from the controller YAML's ros__parameters, which this plugin
+                     never loads) - it's the proportional gain that turns position
+                     error into a velocity command for every position-interface
+                     joint on this robot. One value for the whole plugin, no
+                     per-joint override exists in gz_ros2_control, so this stiffens
+                     all six arm joints together, not shoulder_up_down alone.
+                     gz_ros2_control multiplies the position error by update_rate
+                     (60 here) before applying this gain, so effective stiffness
+                     is gain * update_rate - at the 0.1 default that's already 6;
+                     10.0 (600 effective) was way past stable for this pure-P,
+                     no-damping loop and made every joint oscillate. 0.5 matches
+                     gz_ros2_control's own official demo config (a 5x bump over
+                     default, not 100x) - raise in small steps from here if it
+                     still droops, drop back toward 0.1 if it jitters at all.
+                     Keep this in sync with viator.urdf.xacro's copy. -->
+                <position_proportional_gain>0.5</position_proportional_gain>
+            </plugin>
+        </gazebo>
+    </xacro:if>
 </robot>

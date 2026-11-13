@@ -13,10 +13,42 @@ sim gazebo <robot_name>
 
 ## Flags
 
-| Option         | Description                                          |
-| -------------- | ---------------------------------------------------- |
-| `--no-build`   | Skip the `colcon build` step.                        |
-| `--build-only` | Build the workspace but don't launch the simulation. |
+| Option              | Description                                                             |
+| ------------------- | ------------------------------------------------------------------------ |
+| `--no-build`        | Skip the `colcon build` step.                                            |
+| `--build-only`      | Build the workspace but don't launch the simulation.                    |
+| `-c`, `--controller` | Open a keyboard-to-gamepad GUI alongside the simulation (see below).    |
+
+Available simulation targets include `viator`, `viator_chassis`, and `arm`. Use `viator` for the complete rover with its arm, ZED camera, and GNSS. The component targets are for focused mechanical testing.
+
+Any trailing `name:=value` pairs are passed to ROS launch. For example:
+
+```bash
+sim gazebo viator ttt:=true zed_frame_rate:=30
+```
+
+## Driving without a physical gamepad
+
+```bash
+sim gazebo viator -c
+```
+
+Opens a small window that, while focused, turns your keyboard into a virtual Xbox 360
+gamepad (WASD = left stick, arrow keys = right stick, Q/E = left/right bumper, Space = Y
+button) using Linux's `uinput`. It spoofs a real pad's vendor/product ID and raw axis/button
+layout, so anything that reads a gamepad the normal way - like mission-control's browser
+Gamepad API - sees it as a connected controller rather than requiring the real hardware. The
+window includes a live visualizer of both sticks and buttons so you can confirm input is
+flowing before touching mission-control. Losing window focus immediately releases all input,
+so it won't leave the rover driving if you click away.
+
+Space maps to the Y button because mission-control double-taps Y to switch between drivebase
+and arm mode.
+
+This needs `/dev/uinput`, which the Dev Container bind-mounts from the host alongside
+`/dev/input` - see [Docker setup](../../setup/docker/) if it's missing or inaccessible.
+
+Any `name:=value` arguments are passed through to the robot's ROS launch file, e.g. `sim gazebo chassis rviz:=false`.
 
 ## Cleaning the workspace
 
@@ -47,8 +79,14 @@ This deletes `gazebo/build/`, `gazebo/install/`, and `gazebo/log/`. Use this whe
     <Accordion title="Package not found errors after launch">
         Try running `sim gazebo clean` and building again.
     </Accordion>
-    <Accordion title="Package '<name>_bringup' not found right after launch">
-        `sim gazebo <robot_name>` takes a robot name (`arm`, `chassis` ...) from configured robots in `robots.json`,
-        not a subcommand. Check the `robots.json` file for list of available robots or [create a new one](./adding-robots.mdx)
+    <Accordion title="`sim gazebo ... -c` fails with a /dev/uinput error">
+        The error message tells you which fix applies: load the kernel module with
+        `sudo modprobe uinput` if it's missing entirely, or add yourself to the `input` group
+        (and re-login) if it exists but you can't write to it. Restart the Dev Container
+        afterwards so the `/dev/uinput` bind mount picks it up.
+    </Accordion>
+    <Accordion title="The requested target is not found">
+        `sim gazebo <robot_name>` takes a target name (`viator`, `viator_chassis`, `arm` ...)
+        from `robots.json`, not a package name. Check the registry or [create a new robot](./adding-robots.mdx).
     </Accordion>
 </Accordions>

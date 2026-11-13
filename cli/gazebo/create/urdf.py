@@ -11,11 +11,11 @@ def _ensure_xacro_ns(urdf_text: str) -> str:
     return urdf_text.replace("<robot ", '<robot xmlns:xacro="http://www.ros.org/wiki/xacro" ', 1)
 
 
-def _inject_xacro_properties(urdf_text: str, robot_name: str) -> str:
+def _inject_xacro_properties(urdf_text: str, description_package: str) -> str:
     props = (
         "\n"
         "  <!-- XACRO -->\n"
-        f'  <xacro:property name="mesh_path" value="package://{robot_name}_description/meshes"/>\n'
+        f'  <xacro:property name="mesh_path" value="package://{description_package}/meshes"/>\n'
         '  <xacro:arg name="controller_config" default=""/>\n'
     )
     pattern = re.compile(r"(<robot\b[^>]*>)")
@@ -41,6 +41,32 @@ def _strip_xacro_for_parsing(urdf_text: str) -> str:
 def _extract_links(urdf_text: str) -> list:
     root = ET.fromstring(_strip_xacro_for_parsing(urdf_text))
     return [link.get("name") for link in root.findall("link") if link.get("name")]
+
+
+def _prefix_link_names(urdf_text: str, robot_name: str) -> str:
+    """Prefix every link name with the robot name, except "world".
+
+    CAD exports name links after generic part names (e.g. "part_1"), which collide
+    once two robot descriptions are combined into one (for example Viator including
+    both its chassis and arm_description). Prefixing here, at
+    generation time, means that can't happen again no matter what gets merged later -
+    a hand edit to the generated .urdf instead would just get overwritten by the next
+    `sim update`.
+
+    "world" is excluded: it's not a CAD part name, it's the sentinel _inject_world_base_link
+    adds, and Gazebo's URDF->SDF conversion specifically recognizes a fixed joint's parent
+    named exactly "world" as an anchor to the simulation's static global frame rather than an
+    ordinary link - renaming it turns the robot into an ordinary, unanchored floating body.
+    """
+    for name in _extract_links(urdf_text):
+        if name == "world":
+            continue
+        escaped = re.escape(name)
+        prefixed = f"{robot_name}_{name}"
+        urdf_text = re.sub(rf'(<link\s+name)="{escaped}"', rf'\1="{prefixed}"', urdf_text)
+        urdf_text = re.sub(rf'(<parent\s+link)="{escaped}"', rf'\1="{prefixed}"', urdf_text)
+        urdf_text = re.sub(rf'(<child\s+link)="{escaped}"', rf'\1="{prefixed}"', urdf_text)
+    return urdf_text
 
 
 def _extract_revolute_joints(urdf_text: str) -> list:
@@ -120,8 +146,14 @@ def _inject_world_base_link(urdf_text: str) -> str:
     if len(roots) != 1:
         raise ValueError(f"Expected one root link, found: {', '.join(sorted(roots))}")
     root_link = roots.pop()
+    # guarded by `standalone` (default true) so a robot that gets merged into another
+    # one (e.g. arm_description included into viator_description) can pass
+    # standalone:=false and drop this link instead of ending up with two root links -
+    # its own world link plus the other robot's base_link
     snippet = (
         "\n"
+        '  <xacro:arg name="standalone" default="true"/>\n'
+        '  <xacro:if value="$(arg standalone)">\n'
         "  <!-- World base link -->\n"
         '  <link name="world"/>\n'
         "\n"
@@ -130,6 +162,7 @@ def _inject_world_base_link(urdf_text: str) -> str:
         f'    <child link="{root_link}"/>\n'
         '    <origin xyz="0 0 0" rpy="0 0 0"/>\n'
         "  </joint>\n"
+        "  </xacro:if>\n"
         "\n"
     )
     match = re.search(r"<link\b", urdf_text)
@@ -139,10 +172,28 @@ def _inject_world_base_link(urdf_text: str) -> str:
     return urdf_text.replace("</robot>", snippet + "</robot>", 1)
 
 
-def _inject_control_include(urdf_text: str, robot_name: str) -> str:
+def _disable_gravity(urdf_text: str) -> str:
+    """Disable gravity on every link, via a per-link <gazebo reference="..."> tag
+    (SDF has no single model-wide gravity switch).
+
+    Only called for world_base_link robots: a fixed-base manipulator here is driven
+    by gz_ros2_control's bare position_proportional_gain loop, which has no gravity
+    compensation term (see arm_control.urdf.xacro's comment on that gain) - without
+    this, the arm's own weight sags/swings against that bare P controller. A
+    free-moving robot (world_base_link=False) needs real gravity to sit/drive, so
+    this is never applied there.
+    """
+    tags = "".join(
+        f'\n  <gazebo reference="{name}"><gravity>false</gravity></gazebo>'
+        for name in _extract_links(urdf_text)
+    )
+    return urdf_text.replace("</robot>", tags + "\n</robot>")
+
+
+def _inject_control_include(urdf_text: str, description_package: str, control_name: str) -> str:
     include = (
-        f'  <xacro:include filename="$(find {robot_name}_description)'
-        f'/urdf/{robot_name}_control.urdf.xacro"/>\n'
+        f'  <xacro:include filename="$(find {description_package})'
+        f'/urdf/{control_name}_control.urdf.xacro"/>\n'
     )
     return urdf_text.replace("</robot>", include + "</robot>")
 
@@ -157,21 +208,33 @@ def _reindent(text: str, from_spaces: int = 2, to_spaces: int = 4) -> str:
     return "".join(result)
 
 
-def postprocess(raw_urdf_path: str | Path, robot_name: str, world_base_link: bool = False) -> tuple:
+def postprocess(
+    raw_urdf_path: str | Path,
+    robot_name: str,
+    world_base_link: bool = False,
+    description_package: str | None = None,
+    control_name: str | None = None,
+) -> tuple:
     """Read raw URDF and apply all transforms.
 
     Returns (geometry_urdf_string, control_xacro_string, joint_list, link_list).
     joint_list items are (name, lower_limit, upper_limit).
     """
+    description_package = description_package or f"{robot_name}_description"
+    control_name = control_name or robot_name
+
     text = Path(raw_urdf_path).read_text(encoding="utf-8")
     text = _ensure_xacro_ns(text)
-    text = _inject_xacro_properties(text, robot_name)
+    text = _inject_xacro_properties(text, description_package)
     text = _rewrite_mesh_paths(text)
     if world_base_link:
         text = _inject_world_base_link(text)
+    text = _prefix_link_names(text, robot_name)
+    if world_base_link:
+        text = _disable_gravity(text)
     links = _extract_links(text)
     joints = _extract_revolute_joints(text)
     control_xacro = _generate_control_xacro(robot_name, joints)
-    text = _inject_control_include(text, robot_name)
+    text = _inject_control_include(text, description_package, control_name)
     text = _reindent(text)
     return text, control_xacro, joints, links

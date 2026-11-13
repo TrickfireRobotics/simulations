@@ -70,7 +70,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     clangd libomp-18-dev openssh-server python3.12-venv wget zstd \
     build-essential cmake ninja-build git-lfs \
-    libeigen3-dev libvulkan-dev libxcb1-dev pkg-config
+    libeigen3-dev libvulkan-dev libxcb1-dev pkg-config python3-evdev
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install ruff pre-commit --break-system-packages --ignore-installed

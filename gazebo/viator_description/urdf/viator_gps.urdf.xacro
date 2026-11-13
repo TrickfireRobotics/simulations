@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="viator_gps">
+    <xacro:property name="gps_size_x" value="0.06"/>
+    <xacro:property name="gps_size_y" value="0.06"/>
+    <xacro:property name="gps_size_z" value="0.02"/>
+    <xacro:property name="gps_mass" value="0.05"/>
+
+    <link name="gps">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${gps_mass}"/>
+            <inertia
+                ixx="${gps_mass * (gps_size_y**2 + gps_size_z**2) / 12}" ixy="0" ixz="0"
+                iyy="${gps_mass * (gps_size_x**2 + gps_size_z**2) / 12}" iyz="0"
+                izz="${gps_mass * (gps_size_x**2 + gps_size_y**2) / 12}"/>
+        </inertial>
+        <visual>
+            <geometry><box size="${gps_size_x} ${gps_size_y} ${gps_size_z}"/></geometry>
+            <material name="gps_material"><color rgba="0.1 0.1 0.1 1"/></material>
+        </visual>
+    </link>
+
+    <!-- placeholder until the GNSS antenna mount is exported from CAD -->
+    <joint name="gps_joint" type="fixed">
+        <parent link="chassis_crossbar"/>
+        <child link="gps"/>
+        <origin xyz="0 0 0.08" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="gps">
+        <sensor name="ublox_zed_f9p" type="navsat">
+            <always_on>true</always_on>
+            <update_rate>1.0</update_rate>
+            <topic>/viator/gps/navsat</topic>
+            <gz_frame_id>gps</gz_frame_id>
+        </sensor>
+    </gazebo>
+</robot>
