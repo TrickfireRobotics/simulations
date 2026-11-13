@@ -10,6 +10,7 @@ services:
                 NOVNC_PORT: "${NOVNC_PORT:?NOVNC_PORT must be set, see docker/.env}"
                 ROSBRIDGE_PORT: "${ROSBRIDGE_PORT:?ROSBRIDGE_PORT must be set, see docker/.env}"
                 USER_UID: "${UID:-1000}"
+                VSG_CHRONO_TAG: "${VSG_CHRONO_TAG:-latest}"
         image: simulations:latest
         container_name: simulations
         user: trickfire

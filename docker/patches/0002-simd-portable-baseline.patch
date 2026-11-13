@@ -1,0 +1,24 @@
+diff --git a/cmake/FindSIMD.cmake b/cmake/FindSIMD.cmake
+index 0140622..3c0922e 100644
+--- a/cmake/FindSIMD.cmake
++++ b/cmake/FindSIMD.cmake
+@@ -373,6 +373,19 @@ set(SIMD_NATIVE TRUE)
+ 
+ # Determine whether to use automatic detection 
+ 
++# TrickFire: -march=native bakes the build machine's microarchitecture into the
++# binaries. Fine for a local build, but this tree is compiled once in CI and shipped as
++# a prebuilt image, so "native" means "whatever the runner happened to be". Building on
++# an SVE-capable runner emits SVE instructions that SIGILL on CPUs without it.
++# CH_SIMD_BASELINE_FLAGS lets the image build pin a portable baseline instead.
++if(CH_SIMD_BASELINE_FLAGS)
++    set(SIMD_FLAGS "${CH_SIMD_BASELINE_FLAGS}")
++    if(NOT SIMD_FIND_QUIETLY)
++        message(STATUS "Using pinned SIMD baseline flags: ${SIMD_FLAGS}")
++    endif()
++    return()
++endif()
++
+ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+     execute_process(COMMAND ${CMAKE_CXX_COMPILER} "-dumpversion" OUTPUT_VARIABLE GCC_VERSION_STRING)
+     if(GCC_VERSION_STRING VERSION_GREATER 4.2 AND NOT APPLE AND NOT CMAKE_CROSSCOMPILING)

@@ -112,10 +112,25 @@ RUN for patch in /tmp/chrono-patches/*.patch; do \
     git -C /home/trickfire/chrono apply --verbose "${patch}" || exit 1; \
     done && rm -rf /tmp/chrono-patches
 
+# Chrono's FindSIMD.cmake defaults to -march=native, which pins the binaries to the CI
+# runner's microarchitecture. GitHub's arm64 runners have SVE, Apple Silicon does not,
+# so a native build SIGILLs on load for anyone on a Mac. Patch 0002 adds the override
+# below; these baselines cover every machine the team runs on while keeping NEON/SSE.
+ARG TARGETARCH
+ARG SIMD_BASELINE_ARM64="-march=armv8.2-a+fp16+dotprod"
+ARG SIMD_BASELINE_AMD64="-march=x86-64-v2"
+
+RUN case "${TARGETARCH}" in \
+    arm64) echo "${SIMD_BASELINE_ARM64}" ;; \
+    amd64) echo "${SIMD_BASELINE_AMD64}" ;; \
+    *) echo "unsupported TARGETARCH '${TARGETARCH}'" >&2; exit 1 ;; \
+    esac > /tmp/simd-baseline
+
 RUN cmake -S /home/trickfire/chrono -B /home/trickfire/chrono/build \
     -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_PREFIX_PATH=${VSG_INSTALL_DIR} \
+    -DCH_SIMD_BASELINE_FLAGS="$(cat /tmp/simd-baseline)" \
     -DCH_ENABLE_MODULE_VEHICLE=ON \
     -DCH_ENABLE_MODULE_VSG=ON \
     -Dvsg_DIR=${VSG_INSTALL_DIR}/lib/cmake/vsg \
