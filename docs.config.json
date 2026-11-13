@@ -52,14 +52,6 @@
                 {
                     "label": "Running Simulations",
                     "slug": "chrono/chrono"
-                },
-                {
-                    "label": "Authoring Configs",
-                    "slug": "chrono/authoring"
-                },
-                {
-                    "label": "Development Plan",
-                    "slug": "chrono/development-plan"
                 }
             ]
         },

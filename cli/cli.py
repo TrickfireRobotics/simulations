@@ -6,7 +6,7 @@ import shutil
 import sys
 import threading
 
-from .chrono import commands as chrono_commands
+from .chrono import chrono
 from .drpc import rpc_start
 from .output import die, info
 from .paths import GAZEBO_WORKSPACE_DIR
@@ -63,6 +63,23 @@ def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
     return gazebo, gsubs, create_p
 
 
+def _build_chrono_parser(subparsers: argparse._SubParsersAction) -> tuple:
+    chrono = subparsers.add_parser("chrono", help="chrono simulation (Chrono SCM)")
+    wsubs = chrono.add_subparsers(dest="command")
+
+    run_p = wsubs.add_parser("run", help="Run a chrono simulation")
+    run_p.add_argument(
+        "wheel",
+        nargs="?",
+        default=None,
+        help="Wheel to use (default: lugged). See 'sim chrono wheels' for options",
+    )
+
+    wsubs.add_parser("clean", help="Clean chrono build files")
+    wsubs.add_parser("wheels", help="List available wheels for 'sim chrono run <wheel>'")
+    return chrono, wsubs
+
+
 def main() -> None:
     # Pre-route "sim gazebo <robot> [flags]" before argparse sees it,
     # since argparse subparsers always claim positionals before other handlers.
@@ -87,7 +104,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="sim")
 
     gazebo_parser, _gazebo_subs, create_p = _build_gazebo_parser(subparsers)
-    chrono_parser, _chrono_subs = chrono_commands.build_parser(subparsers)
+    chrono_parser, _chrono_subs = _build_chrono_parser(subparsers)
 
     args = parser.parse_args()
 
@@ -102,7 +119,7 @@ def main() -> None:
             if not args.command:
                 chrono_parser.print_help()
                 return
-            chrono_commands.dispatch(args, chrono_parser)
+            _dispath_chrono(args)
         else:
             parser.print_help()
     except KeyboardInterrupt:
@@ -154,6 +171,16 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         controller_gui=args.controller,
         launch_args=args.launch_args,
     )
+
+
+def _dispath_chrono(args) -> None:
+    if args.command == "run":
+        chrono.run(args.wheel)
+    elif args.command == "clean":
+        chrono.clean()
+    elif args.command == "wheels":
+        for name in chrono.list_wheels():
+            print(name)
 
 
 def _dispatch_gazebo(args, create_p) -> None:

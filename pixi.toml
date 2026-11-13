@@ -14,17 +14,12 @@ ros-jazzy-ros2-controllers = "*"
 ros-jazzy-rmw-cyclonedds-cpp = "*"
 ros-jazzy-rosbridge-server = "*"
 colcon-common-extensions = "*"
-# sim chrono
-numpy = "*"
-pyyaml = "*"
-matplotlib = "*"
 
 [activation]
 scripts = [".devcontainer/pixi.sh"]
 
 [pypi-dependencies]
 sim = { path = ".", editable = true }
-zstandard = "*"
 cbor2 = "*"
 sim_common = { path = "gazebo/sim_common", editable = true }
 filelock = "*"
