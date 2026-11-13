@@ -9,25 +9,7 @@ Panels:
         - /RobotModel1
         - /RobotModel1/Description Topic1
       Splitter Ratio: 0.5
-    Tree Height: 770
-  - Class: rviz_common/Selection
-    Name: Selection
-  - Class: rviz_common/Tool Properties
-    Expanded:
-      - /2D Goal Pose1
-      - /Publish Point1
-    Name: Tool Properties
-    Splitter Ratio: 0.5886790156364441
-  - Class: rviz_common/Views
-    Expanded:
-      - /Current View1
-    Name: Views
-    Splitter Ratio: 0.5
-  - Class: rviz_common/Time
-    Experimental: false
-    Name: Time
-    SyncMode: 0
-    SyncSource: ""
+    Tree Height: 827
 Visualization Manager:
   Class: ""
   Displays:
@@ -273,14 +255,14 @@ Visualization Manager:
       Max Value: 1
       Median window: 5
       Min Value: 0
-      Name: ZED RGB
+      Name: Object Detections
       Normalize Range: true
       Topic:
         Depth: 1
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Best Effort
-        Value: /zed/zed_node/rgb/color/rect/image
+        Value: /image_annotated
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -305,7 +287,7 @@ Visualization Manager:
       Value: true
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 28; 32; 38
     Fixed Frame: chassis_base_link
     Frame Rate: 30
   Name: root
@@ -349,40 +331,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.715324878692627
+      Distance: 5.8900017738342285
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.24879240989685059
+        Y: -0.27013447880744934
+        Z: 0.3197430372238159
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7453979253768921
+      Pitch: 0.36039766669273376
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.923583507537842
+      Yaw: 1.053583025932312
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1061
+  Height: 1515
   Hide Left Dock: false
   Hide Right Dock: false
-  Selection:
+  Object Detections:
     collapsed: false
-  Time:
-    collapsed: false
-  Tool Properties:
-    collapsed: false
-  Views:
-    collapsed: false
-  Width: 1920
-  X: 0
-  Y: 0
+  QMainWindow State: 000000ff00000000fd0000000100000000000002f900000595fc0200000002fb00000022004f0062006a00650063007400200044006500740065006300740069006f006e0073010000003b000001cb0000001600fffffffb000000100044006900730070006c006100790073010000020c000003c4000000c700ffffff000006c10000059500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Width: 2496
+  X: 32
+  Y: 116
