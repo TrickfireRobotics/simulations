@@ -16,6 +16,9 @@
         </plugin>
 
         <!-- SENSOR PLUGINS -->
+        <!-- Sensors drives the rendering-based ZED camera; IMU doesn't render. The
+             Sensors system's offscreen render engine also needs the <scene> block
+             below to configure its own scene - without it the render thread hangs -->
         <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
             <render_engine>ogre2</render_engine>
         </plugin>
