@@ -77,7 +77,8 @@ class Drivebase(Node):
         left = (msg.linear.x + turn) / WHEEL_RADIUS
         right = (msg.linear.x - turn) / WHEEL_RADIUS
         # past the motors' top speed, slow both sides together to keep the curvature
-        scale = SPEED / max(abs(left), abs(right), SPEED)
+        max_wheel_speed = max(abs(left), abs(right))
+        scale = min(1.0, abs(SPEED) / max_wheel_speed) if max_wheel_speed else 1.0
         self._set_left(left * scale)
         self._set_right(right * scale)
         self._publish()
