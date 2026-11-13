@@ -48,6 +48,8 @@ and arm mode.
 This needs `/dev/uinput`, which the Dev Container bind-mounts from the host alongside
 `/dev/input` - see [Docker setup](../../setup/docker/) if it's missing or inaccessible.
 
+Any `name:=value` arguments are passed through to the robot's ROS launch file, e.g. `sim gazebo chassis rviz:=false`.
+
 ## Cleaning the workspace
 
 To remove build artifacts and do a clean rebuild:
