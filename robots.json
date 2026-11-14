@@ -2,7 +2,9 @@
     {
         "name": "arm",
         "url": "https://trickfire.onshape.com/documents/9b05a4dfb79241a5b295b397/w/d00f3086da43b93d9c689413/e/f5729953e1df72ab5053d822",
-        "world_base_link": true
+        "world_base_link": true,
+        "collision_boxes": true,
+        "model_collisions": true
     },
     {
         "name": "viator_chassis",

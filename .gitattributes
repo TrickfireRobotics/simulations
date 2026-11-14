@@ -3,3 +3,4 @@ gazebo/sim_worlds/models/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 gazebo/sim_worlds/models/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
 gazebo/sim_worlds/models/**/*.tif filter=lfs diff=lfs merge=lfs -text
 gazebo/sim_worlds/models/**/*.tiff filter=lfs diff=lfs merge=lfs -text
+chrono/data/models/wheels/apollo-wheel-concept.obj filter=lfs diff=lfs merge=lfs -text

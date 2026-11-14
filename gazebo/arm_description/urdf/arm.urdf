@@ -482,6 +482,12 @@
                                 <color rgba="0.792157 0.819608 0.933333 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="0.00685602078 0.0493641813 -0.016599994" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.0452110124 0.147685133 0.0331999879" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_left_finger_plate_top_section_3">
                 <inertial>
@@ -498,6 +504,12 @@
                                 <color rgba="0.792157 0.819608 0.933333 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="0.00685600046 0.0493641572 -0.016600012" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.045211053 0.147685182 0.0332000238" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_left_l_part">
                 <inertial>
@@ -626,6 +638,12 @@
                                 <color rgba="0.713726 0.760784 0.8 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="0.00507564615 0.0339999996 0.0099338081" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.0351304134 0.068 0.0448654064" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_part_1_10">
                 <inertial>
@@ -978,6 +996,12 @@
                                 <color rgba="0.752941 0.752941 0.752941 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="-0.0528252351 0.00974304426 -8.07897017e-08" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.140850491 0.0876855138 0.0916894937" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_part_1_30">
                 <inertial>
@@ -1122,6 +1146,12 @@
                                 <color rgba="0.866667 0.909804 1 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="-0.0353376091 -1.16990365e-07 -0.0749450489" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.17067522 0.150000442 0.169890097" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_part_1_39">
                 <inertial>
@@ -1266,6 +1296,12 @@
                                 <color rgba="0.811765 0.858824 0.898039 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="0.0347115554 0.0356826782 -0.153266718" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.0694231103 0.285916225 0.391529271" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_part_1_47">
                 <inertial>
@@ -1522,6 +1558,12 @@
                                 <color rgba="0.713726 0.760784 0.8 1" />
                         </material>
                 </visual>
+                <collision name="arm_collision_proxy">
+                        <origin xyz="0.00749998176 0.135404753 0.133433749" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.185000073 0.30253909 0.298575786" />
+                        </geometry>
+                </collision>
         </link>
         <link name="arm_part_1_9">
                 <inertial>
@@ -1955,7 +1997,14 @@
                         </material>
                 </visual>
         </link>
-        <link name="arm_root" />
+        <link name="arm_root">
+                <collision name="arm_collision_proxy">
+                        <origin xyz="2.86224599e-07 4.16333634e-17 -0.0125958509" rpy="0 0 0" />
+                        <geometry>
+                                <box size="0.162000059 0.238125413 0.0921585149" />
+                        </geometry>
+                </collision>
+        </link>
         <link name="arm_shaft_support">
                 <inertial>
                         <mass value="0.0877404" />
@@ -2989,4 +3038,6 @@
   <gazebo reference="arm_washer_spacer_1"><gravity>false</gravity></gazebo>
   <gazebo reference="arm_washer_spacer_2"><gravity>false</gravity></gazebo>
   <gazebo reference="arm_washer_spacer_3"><gravity>false</gravity></gazebo>
+
+  <gazebo><self_collide>true</self_collide></gazebo>
 </robot>

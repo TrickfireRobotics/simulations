@@ -132,8 +132,12 @@ The repo-root `robots.json` is the CLI's registry of available robots. For each 
 | `description_packages` | Description packages for a composed target such as Viator          |
 | `url`                  | Optional OnShape assembly URL for an updateable source component   |
 | `world_base_link`      | Whether the exported component is fixed to the world               |
+| `collision_boxes`      | Generate primitive collision proxies from the component's CAD      |
+| `model_collisions`     | Let proxies contact other components in the assembled model        |
 
 Simple entries are added automatically by `sim gazebo create`. Composed targets can override the package and launch fields explicitly. See [Adding a New Robot](./adding-robots.mdx).
+
+`collision_boxes` and `model_collisions` are opt-in update settings. When enabled, `sim gazebo update` fits one box collision proxy around each articulated rigid body and enables contacts with other components in an assembled model. Each proxy gets a non-overlapping collision mask, so generated proxies do not contact each other. The primitive proxies work with Viator's DART physics engine and Bullet collision detector for arm-to-world and arm-to-rover contacts while retaining support for the Mars heightmap.
 
 Entries without a `type` are OnShape-CAD robots (the default, implied by the presence of `url`/`world_base_link`). A `"type"` field distinguishes robots that don't go through the OnShape pipeline at all - for example the drone, which is entirely hand-authored and flown via ArduPilot SITL (see [Drone](./drone)):
 

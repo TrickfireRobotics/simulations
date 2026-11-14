@@ -226,6 +226,8 @@ def cmd_update(args) -> None:
         world_base_link,
         description_package=description_package,
         control_name=control_name,
+        collision_boxes_dir=(exported_meshes_src if entry.get("collision_boxes", False) else None),
+        model_collisions=entry.get("model_collisions", False),
     )
 
     info("Updating description package...")

@@ -4,6 +4,8 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from .collision import add_collision_boxes, enable_model_collisions
+
 
 def _ensure_xacro_ns(urdf_text: str) -> str:
     if "xmlns:xacro" in urdf_text:
@@ -214,6 +216,8 @@ def postprocess(
     world_base_link: bool = False,
     description_package: str | None = None,
     control_name: str | None = None,
+    collision_boxes_dir: str | Path | None = None,
+    model_collisions: bool = False,
 ) -> tuple:
     """Read raw URDF and apply all transforms.
 
@@ -230,6 +234,10 @@ def postprocess(
     if world_base_link:
         text = _inject_world_base_link(text)
     text = _prefix_link_names(text, robot_name)
+    if collision_boxes_dir is not None:
+        text = add_collision_boxes(text, collision_boxes_dir, robot_name)
+    if model_collisions:
+        text = enable_model_collisions(text)
     if world_base_link:
         text = _disable_gravity(text)
     links = _extract_links(text)

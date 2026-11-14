@@ -4,6 +4,8 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import xacro
@@ -75,6 +77,72 @@ def process_robot_description(urdf_file, controller_config, extra_mappings=None)
     ).toxml()
 
 
+def prepare_spawn_description(robot_desc):
+    """Convert collision-enabled URDF to filtered SDF for spawning."""
+    urdf_root = ET.fromstring(robot_desc)
+    model_collisions = any(
+        setting.text and setting.text.strip().lower() == "true"
+        for setting in urdf_root.findall("./gazebo/self_collide")
+    )
+    if not model_collisions:
+        return robot_desc
+
+    with tempfile.TemporaryDirectory(prefix="sim-urdf-") as temp_dir:
+        urdf_path = Path(temp_dir) / "robot.urdf"
+        urdf_path.write_text(robot_desc, encoding="utf-8")
+        result = subprocess.run(
+            ["gz", "sdf", "-p", str(urdf_path)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    if result.returncode != 0:
+        err(f"Could not convert collision-enabled URDF to SDF:\n{result.stderr.strip()}")
+
+    sdf_root = ET.fromstring(result.stdout)
+    model = sdf_root.find("model")
+    if model is None:
+        err("Collision-enabled robot description did not produce an SDF model")
+
+    setting = model.find("self_collide")
+    if setting is None:
+        setting = ET.SubElement(model, "self_collide")
+    setting.text = "true"
+
+    proxy_names = {
+        collision.get("name")
+        for collision in urdf_root.findall(".//collision")
+        if collision.get("name", "").endswith("_collision_proxy")
+    }
+    proxy_collisions = [
+        collision
+        for collision in model.findall(".//collision")
+        if any(
+            collision.get("name", "") == proxy_name
+            or collision.get("name", "").startswith(f"{proxy_name}_")
+            or f"__{proxy_name}_collision" in collision.get("name", "")
+            for proxy_name in proxy_names
+        )
+    ]
+    # gz-physics 7.5 exposes an 8-bit default mask and ignores SDF category masks
+    if len(proxy_collisions) > 8:
+        err("Collision filtering supports at most 8 generated proxies")
+
+    for index, collision in enumerate(proxy_collisions):
+        surface = collision.find("surface")
+        if surface is None:
+            surface = ET.SubElement(collision, "surface")
+        contact = surface.find("contact")
+        if contact is None:
+            contact = ET.SubElement(surface, "contact")
+        mask_setting = contact.find("collide_bitmask")
+        if mask_setting is None:
+            mask_setting = ET.SubElement(contact, "collide_bitmask")
+        mask_setting.text = str(1 << index)
+
+    return ET.tostring(sdf_root, encoding="unicode")
+
+
 def gazebo_launch_actions(
     world_file,
     gz_gui_config,
@@ -144,10 +212,11 @@ def spawn_robot_node(robot_name, robot_desc, z=0.1):
     ground isn't a flat plane at z=0 (e.g. a heightmap terrain), so the robot
     drops onto the surface instead of spawning underneath it.
     """
+    spawn_desc = prepare_spawn_description(robot_desc)
     return Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=["-name", robot_name, "-string", robot_desc, "-x", "0", "-y", "0", "-z", str(z)],
+        arguments=["-name", robot_name, "-string", spawn_desc, "-x", "0", "-y", "0", "-z", str(z)],
         output="screen",
     )
 
