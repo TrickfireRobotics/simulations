@@ -141,9 +141,30 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
     p.add_argument(
         "-c",
         "--controller",
-        action="store_true",
+        "--controller-ui",
+        dest="controller_ui",
+        action=argparse.BooleanOptionalAction,
+        default=False,
         help="Open a keyboard-to-gamepad GUI alongside the simulation "
         "(WASD/arrows/Q,E -> virtual gamepad)",
+    )
+    p.add_argument(
+        "--ttt",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Spawn the TTT task model (Viator only, default: false)",
+    )
+    p.add_argument(
+        "--follow-rover",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Make the Gazebo camera follow the rover (Viator only, default: true)",
+    )
+    p.add_argument(
+        "--joint-gui",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Open the arm joint control GUI (Viator and arm only, default: false)",
     )
     p.add_argument(
         "launch_args",
@@ -155,6 +176,32 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
     for launch_arg in args.launch_args:
         if not _LAUNCH_ARG_RE.fullmatch(launch_arg):
             p.error(f"expected a name:=value launch argument, got '{launch_arg}'")
+
+    launch_flags = {
+        "ttt": args.ttt,
+        "follow_rover": args.follow_rover,
+        "joint_gui": args.joint_gui,
+    }
+    flag_targets = {
+        "ttt": {"viator"},
+        "follow_rover": {"viator"},
+        "joint_gui": {"viator", "arm"},
+    }
+    selected_launch_flags = {
+        name: value for name, value in launch_flags.items() if value is not None
+    }
+    for name in selected_launch_flags:
+        if robot not in flag_targets[name]:
+            targets = " or ".join(sorted(flag_targets[name]))
+            p.error(f"--{name.replace('_', '-')} can only be used with the {targets} target")
+
+    for name in selected_launch_flags:
+        if any(launch_arg.startswith(f"{name}:=") for launch_arg in args.launch_args):
+            p.error(f"use either --{name.replace('_', '-')} or {name}:=value, not both")
+
+    flag_launch_args = [
+        f"{name}:={'true' if value else 'false'}" for name, value in selected_launch_flags.items()
+    ]
 
     from .gazebo.launch import build_and_launch, in_pixi
 
@@ -168,8 +215,8 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         build_only=args.build_only,
         no_build=args.no_build,
         local_qgc=args.local_qgc,
-        controller_gui=args.controller,
-        launch_args=args.launch_args,
+        controller_gui=args.controller_ui,
+        launch_args=[*flag_launch_args, *args.launch_args],
     )
 
 

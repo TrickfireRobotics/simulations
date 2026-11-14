@@ -49,7 +49,7 @@ gazebo/
 
 ## `sim_common`
 
-This is a shared package containing cross-package repetitive code & also independent ROS nodes like the joint GUI. Its `setup.py` registers four console scripts:
+This is a shared package containing cross-package repetitive code & also independent ROS nodes like the joint GUI. Its `setup.py` registers five console scripts:
 
 | Command       | Source                      | Purpose                                                                                                                                                            |
 | ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -57,6 +57,7 @@ This is a shared package containing cross-package repetitive code & also indepen
 | `joint_gui`   | `sim_common/joint_gui.py`   | Tkinter joint slider GUI. See [Moving Joints](./moving-joints#joint-gui) for usage, or [Joint GUI internals](#joint-gui-internals) below for how it's implemented. |
 | `controller_gui` | `sim_common/controller_gui.py` | Tkinter keyboard-to-virtual-gamepad GUI, for driving a sim without a physical controller. See [Running Gazebo](./gazebo#driving-without-a-physical-gamepad). |
 | `drivebase`   | `sim_common/drivebase.py`   | Sim equivalent of the real rover's drivebase node - converts joystick deflection messages into wheel velocity commands, mirroring `urc-2023/src/drivebase`.        |
+| `arm`         | `sim_common/arm.py`         | Sim equivalent of the real rover's arm node - jogs the arm's joints from mission-control's arm-mode bindings (sticks, triggers and A/B) via the joint trajectory controller. |
 
 It also exports `sim_common/launch_utils.py`, a library (not a node) of helpers every `<robot>.launch.py` imports - `get_asset()` for resolving files in a package's share directory, plus node/launch-action builders for the Gazebo server, spawning, controllers, and the ROS-Gazebo bridge. See [launch_utils.py](#launch_utilspy) below for what each helper does.
 
@@ -150,8 +151,9 @@ Entries without a `type` are OnShape-CAD robots (the default, implied by the pre
 `sim gazebo <robot_name>` (see [Running Gazebo](./gazebo)) drives colcon for you, under the hood it uses a command like this:
 
 ```bash
-colcon build --packages-up-to <launch_package> <description_packages...> sim_worlds sim_common \
-    --build-base .artifacts/build --install-base .artifacts/install --log-base .artifacts/log \
+colcon --log-base .artifacts/log build \
+    --build-base .artifacts/build --install-base .artifacts/install \
+    --packages-up-to <launch_package> <description_packages...> sim_worlds sim_common \
     --cmake-args -DBUILD_TESTING=OFF
 ```
 
@@ -160,8 +162,9 @@ colcon build --packages-up-to <launch_package> <description_packages...> sim_wor
 <Callout type="info" title="Building a single package by hand">
     ```bash
     cd gazebo
-    colcon build --build-base .artifacts/build --install-base .artifacts/install \
-        --log-base .artifacts/log --packages-select arm_description
+    colcon --log-base .artifacts/log build \
+        --build-base .artifacts/build --install-base .artifacts/install \
+        --packages-select arm_description
     source .artifacts/install/setup.bash
     ```
 
@@ -321,7 +324,9 @@ Launches RViz2 with a saved config file. Conditional on the `rviz` launch argume
 
 #### Joint GUI
 
-Launches the Tkinter joint control GUI with the URDF file path as an argument. Conditional on the `gui` launch argument. See [Moving Joints](./moving-joints#joint-gui) for how to use it, or [Joint GUI internals](#joint-gui-internals) below for how it's implemented.
+Launches the Tkinter joint control GUI with the URDF file path as an argument. Conditional on the
+`joint_gui` launch argument. See [Moving Joints](./moving-joints.mdx#joint-gui) for how to use it,
+or [Joint GUI internals](#joint-gui-internals) below for how it's implemented.
 
 ### launch_utils.py
 

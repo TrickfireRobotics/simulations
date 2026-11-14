@@ -182,6 +182,16 @@ def rviz_node(rviz_config, rviz_launch_arg="rviz"):
     )
 
 
+def joint_gui_node(urdf_file, joint_gui_launch_arg="joint_gui"):
+    return Node(
+        package="sim_common",
+        executable="joint_gui",
+        arguments=[urdf_file],
+        output="screen",
+        condition=IfCondition(LaunchConfiguration(joint_gui_launch_arg)),
+    )
+
+
 def joint_state_broadcaster_spawner():
     return Node(
         package="controller_manager",

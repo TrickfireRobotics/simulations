@@ -187,8 +187,9 @@ ros2 control list_hardware_interfaces
 
 ```bash
 cd gazebo
-colcon build --build-base .artifacts/build --install-base .artifacts/install \
-    --log-base .artifacts/log --packages-select arm_description
+colcon --log-base .artifacts/log build \
+    --build-base .artifacts/build --install-base .artifacts/install \
+    --packages-select arm_description
 source .artifacts/install/setup.bash
 ```
 

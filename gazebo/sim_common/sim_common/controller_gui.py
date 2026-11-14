@@ -5,7 +5,10 @@ Keyboard -> virtual gamepad bridge, for driving a sim robot without a physical c
 While this window has keyboard focus:
     WASD        -> left stick
     arrow keys  -> right stick
-    Q / E       -> left/right bumper (claw close/open in mission-control's bindings)
+    W / S       -> left stick vertical (shoulder up/down in arm mode)
+    up / down   -> right stick vertical (elbow up/down in arm mode)
+    Z / C       -> left / right trigger (gripper down/up in arm mode)
+    Q / E       -> left / right bumper (claw close/open in arm mode)
     Space       -> Y button (double-tap in mission-control to switch drive/arm mode)
 
 Spoofs a wired Xbox 360 pad (vendor 045e:028e) over uinput, reproducing its exact
@@ -32,6 +35,9 @@ STICK_MIN = -32768
 STICK_MAX = 32767
 STICK_FUZZ = 16
 STICK_FLAT = 128
+# a real pad's triggers are analog; a keyboard key is all or nothing, so a held
+# trigger key sends full deflection
+TRIGGER_MAX = 255
 
 # Must match a real wired Xbox 360 pad's identity and raw joydev layout exactly -
 # consumers keying off this vendor/product ID remap axes/buttons assuming that layout.
@@ -42,10 +48,10 @@ _VERSION = 0x0110
 _AXES = [
     (ecodes.ABS_X, AbsInfo(0, STICK_MIN, STICK_MAX, STICK_FUZZ, STICK_FLAT, 0)),
     (ecodes.ABS_Y, AbsInfo(0, STICK_MIN, STICK_MAX, STICK_FUZZ, STICK_FLAT, 0)),
-    (ecodes.ABS_Z, AbsInfo(0, 0, 255, 0, 0, 0)),  # left trigger, unused
+    (ecodes.ABS_Z, AbsInfo(0, 0, TRIGGER_MAX, 0, 0, 0)),  # left trigger
     (ecodes.ABS_RX, AbsInfo(0, STICK_MIN, STICK_MAX, STICK_FUZZ, STICK_FLAT, 0)),
     (ecodes.ABS_RY, AbsInfo(0, STICK_MIN, STICK_MAX, STICK_FUZZ, STICK_FLAT, 0)),
-    (ecodes.ABS_RZ, AbsInfo(0, 0, 255, 0, 0, 0)),  # right trigger, unused
+    (ecodes.ABS_RZ, AbsInfo(0, 0, TRIGGER_MAX, 0, 0, 0)),  # right trigger
     (ecodes.ABS_HAT0X, AbsInfo(0, -1, 1, 0, 0, 0)),  # dpad, unused
     (ecodes.ABS_HAT0Y, AbsInfo(0, -1, 1, 0, 0, 0)),
 ]
@@ -54,9 +60,9 @@ _BUTTONS = [
     ecodes.BTN_A,
     ecodes.BTN_B,
     ecodes.BTN_X,
-    ecodes.BTN_Y,
-    ecodes.BTN_TL,  # Q - left bumper
-    ecodes.BTN_TR,  # E - right bumper
+    ecodes.BTN_Y,  # Space - mode toggle
+    ecodes.BTN_TL,  # claw close
+    ecodes.BTN_TR,  # claw open
     ecodes.BTN_SELECT,
     ecodes.BTN_START,
     ecodes.BTN_THUMBL,
@@ -123,6 +129,49 @@ class StickView:
         self.canvas.coords(self.dot, px - r, py - r, px + r, py + r)
 
 
+class TriggerView:
+    """A trigger's fill bar, with an arrow for the direction the bumper modifier picks."""
+
+    _WIDTH = 28
+    _HEIGHT = 96
+
+    def __init__(self, canvas: tk.Canvas, cx: int, cy: int, label: str):
+        self.canvas = canvas
+        self.cx = cx
+        self.cy = cy
+        top = cy - self._HEIGHT // 2
+        canvas.create_rectangle(
+            cx - self._WIDTH // 2,
+            top,
+            cx + self._WIDTH // 2,
+            top + self._HEIGHT,
+            outline="#666",
+            width=2,
+        )
+        self.fill = canvas.create_rectangle(0, 0, 0, 0, fill="#2ecc71", outline="")
+        self.arrow = canvas.create_text(cx, cy, text="", fill="#1e1e1e", font=("TkDefaultFont", 14))
+        canvas.create_text(cx, top + self._HEIGHT + 14, text=label, fill="#aaa")
+        self.set(0, False)
+
+    def set(self, value: int, reversed_direction: bool) -> None:
+        top = self.cy - self._HEIGHT // 2
+        height = int((self._HEIGHT - 4) * value / TRIGGER_MAX)
+        if height > 0:
+            self.canvas.coords(
+                self.fill,
+                self.cx - self._WIDTH // 2 + 2,
+                top + self._HEIGHT - height - 2,
+                self.cx + self._WIDTH // 2 - 2,
+                top + self._HEIGHT - 2,
+            )
+        else:
+            # an empty rectangle still draws a line, so park it off the bar
+            self.canvas.coords(self.fill, 0, 0, 0, 0)
+        self.canvas.itemconfig(
+            self.arrow, text=("v" if reversed_direction else "^") if value else ""
+        )
+
+
 class ControllerGui:
     def __init__(self, root: tk.Tk, device: UInput):
         self.root = root
@@ -130,36 +179,40 @@ class ControllerGui:
         self.held: set[str] = set()
         self._pending_release: dict[str, str] = {}
 
-        root.title("Controller GUI - WASD / Arrows / Q,E / Space")
+        root.title("Controller GUI - WASD / Arrows / Z,C / Q,E / Space")
         root.resizable(False, False)
 
         tk.Label(
             root,
             text="Click this window, then drive with WASD (left stick), "
-            "arrows (right stick), Q/E (claw close/open), Space (Y - mode toggle)",
-            wraplength=360,
+            "arrows (right stick). In arm mode, left vertical is shoulder and right "
+            "vertical is elbow, Z/C move the wrist down/up, and Q/E operate the claw. "
+            "Space toggles modes.",
+            wraplength=460,
             justify="center",
             fg="#ccc",
             bg="#1e1e1e",
         ).pack(padx=12, pady=(12, 6))
 
-        canvas = tk.Canvas(root, width=380, height=150, bg="#1e1e1e", highlightthickness=0)
+        canvas = tk.Canvas(root, width=500, height=150, bg="#1e1e1e", highlightthickness=0)
         canvas.pack(padx=12, pady=6)
-        self.left_stick = StickView(canvas, 100, 70, "left stick (WASD)")
-        self.right_stick = StickView(canvas, 280, 70, "right stick (arrows)")
+        self.left_stick = StickView(canvas, 80, 70, "left stick (WASD)")
+        self.right_stick = StickView(canvas, 420, 70, "right stick (arrows)")
+        self.left_trigger = TriggerView(canvas, 195, 70, "left trigger (Z)")
+        self.right_trigger = TriggerView(canvas, 305, 70, "right trigger (C)")
 
         buttons_frame = tk.Frame(root, bg="#1e1e1e")
         buttons_frame.pack(pady=(0, 6))
         self.q_light = tk.Label(
-            buttons_frame, text="Q - claw close", width=16, bg="#444", fg="white"
+            buttons_frame, text="Q - claw close (LB)", width=18, bg="#444", fg="white"
         )
         self.q_light.pack(side=tk.LEFT, padx=6)
         self.e_light = tk.Label(
-            buttons_frame, text="E - claw open", width=16, bg="#444", fg="white"
+            buttons_frame, text="E - claw open (RB)", width=18, bg="#444", fg="white"
         )
         self.e_light.pack(side=tk.LEFT, padx=6)
         self.space_light = tk.Label(
-            buttons_frame, text="Space - Y (mode)", width=16, bg="#444", fg="white"
+            buttons_frame, text="Space - Y (mode)", width=18, bg="#444", fg="white"
         )
         self.space_light.pack(side=tk.LEFT, padx=6)
 
@@ -212,6 +265,9 @@ class ControllerGui:
         left_y = _axis("w" in held, "s" in held)
         right_x = _axis("Left" in held, "Right" in held)
         right_y = _axis("Up" in held, "Down" in held)
+
+        left_trigger = TRIGGER_MAX if "z" in held else 0
+        right_trigger = TRIGGER_MAX if "c" in held else 0
         claw_close = "q" in held
         claw_open = "e" in held
         mode_toggle = "space" in held
@@ -220,13 +276,19 @@ class ControllerGui:
         self.device.write(ecodes.EV_ABS, ecodes.ABS_Y, left_y)
         self.device.write(ecodes.EV_ABS, ecodes.ABS_RX, right_x)
         self.device.write(ecodes.EV_ABS, ecodes.ABS_RY, right_y)
+        self.device.write(ecodes.EV_ABS, ecodes.ABS_Z, left_trigger)
+        self.device.write(ecodes.EV_ABS, ecodes.ABS_RZ, right_trigger)
         self.device.write(ecodes.EV_KEY, ecodes.BTN_TL, int(claw_close))
         self.device.write(ecodes.EV_KEY, ecodes.BTN_TR, int(claw_open))
+        self.device.write(ecodes.EV_KEY, ecodes.BTN_A, 0)
+        self.device.write(ecodes.EV_KEY, ecodes.BTN_B, 0)
         self.device.write(ecodes.EV_KEY, ecodes.BTN_Y, int(mode_toggle))
         self.device.syn()
 
         self.left_stick.set(left_x, left_y)
         self.right_stick.set(right_x, right_y)
+        self.left_trigger.set(left_trigger, False)
+        self.right_trigger.set(right_trigger, False)
         self.q_light.config(bg="#2ecc71" if claw_close else "#444")
         self.e_light.config(bg="#2ecc71" if claw_open else "#444")
         self.space_light.config(bg="#2ecc71" if mode_toggle else "#444")

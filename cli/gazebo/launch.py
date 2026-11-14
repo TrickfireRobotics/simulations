@@ -443,13 +443,13 @@ def build_and_launch(
         _run_logged_command(
             [
                 "colcon",
+                "--log-base",
+                str(GAZEBO_LOG_DIR),
                 "build",
                 "--build-base",
                 str(GAZEBO_BUILD_DIR),
                 "--install-base",
                 str(GAZEBO_INSTALL_DIR),
-                "--log-base",
-                str(GAZEBO_LOG_DIR),
                 "--packages-up-to",
                 launch_pkg,
                 *description_packages,

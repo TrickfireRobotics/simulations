@@ -32,6 +32,7 @@ joint_trajectory_controller:
             - gripper_up_down
             - gripper_left_right
             - claw_open_close
+            - claw_open_close_follower
 
         command_interfaces:
             - position

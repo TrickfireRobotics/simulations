@@ -15,6 +15,7 @@ from sim_common.launch_utils import (
     controller_spawner_node,
     gazebo_launch_actions,
     get_asset,
+    joint_gui_node,
     joint_state_broadcaster_spawner,
     process_robot_description,
     robot_state_publisher_node,
@@ -77,6 +78,11 @@ def generate_launch_description():
             DeclareLaunchArgument("rviz", default_value="true", description="Open RViz."),
             DeclareLaunchArgument("gui", default_value="true", description="Open Gazebo GUI."),
             DeclareLaunchArgument(
+                "joint_gui",
+                default_value="false",
+                description="Open the arm joint control GUI.",
+            ),
+            DeclareLaunchArgument(
                 "rosbridge_port",
                 default_value=os.environ.get("ROSBRIDGE_PORT", "9090"),
                 description="Port for the rosbridge WebSocket server.",
@@ -86,6 +92,7 @@ def generate_launch_description():
             ),
             clock_bridge_node(),
             rviz_node(rviz_config),
+            joint_gui_node(urdf_file),
             arm_bridge,
             rosbridge,
         ]

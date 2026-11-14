@@ -7,7 +7,15 @@ There are two ways to move joints in the simulation: the **Joint GUI** and the *
 
 ## Joint GUI
 
-The Joint GUI launches automatically with the simulation. It provides sliders for each joint discovered from the robot's URDF.
+Launch the Joint GUI with either the complete Viator or standalone arm simulation:
+
+```bash
+sim gazebo viator --joint-gui
+sim gazebo arm --joint-gui
+```
+
+It provides sliders for each active revolute joint discovered from the robot's URDF. The GUI is
+off by default.
 
 ### Controls
 

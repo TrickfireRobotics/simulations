@@ -37,10 +37,9 @@ set -u
 
 cd "${workspace_dir}"
 artifacts_dir="${workspace_dir}/gazebo/.artifacts"
-colcon build --base-paths gazebo \
+colcon --log-base "${artifacts_dir}/log" build --base-paths gazebo \
     --build-base "${artifacts_dir}/build" \
     --install-base "${artifacts_dir}/install" \
-    --log-base "${artifacts_dir}/log" \
     --packages-select "${build_packages[@]}"
 set +u
 source "${artifacts_dir}/install/setup.bash"

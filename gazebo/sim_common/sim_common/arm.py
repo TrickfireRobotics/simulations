@@ -3,6 +3,10 @@ Sim equivalent of the real rover's arm node - jogs the arm's joint_trajectory_co
 from the mission-control webbridge, the same way drivebase.py does for the chassis.
 
 Replaces joint_gui.py (the tkinter "tinker UI") as the normal way to drive the arm.
+
+Each topic carries a -1..1 command from mission-control's controller bindings. In arm
+mode that is: left stick X/Y = baseplate/shoulder, right stick X/Y = wrist/elbow,
+the triggers move the wrist down/up, and the bumpers close/open the claw.
 """
 
 import rclpy
@@ -21,20 +25,25 @@ JOINT_LIMITS = {
     "gripper_up_down": (-3.14, 3.14),
     "gripper_left_right": (-3.14, 3.14),
     "claw_open_close": (-0.80, 0.80),
+    "claw_open_close_follower": (-0.80, 0.80),
 }
 JOINT_ORDER = list(JOINT_LIMITS)
 
-# left stick Y drives both the shoulder and elbow together (one "arm up/down" motion)
-# TEMP: both joints get the same signed delta - this moves the end effector up/down
-# only approximately, not a true IK mix. Re-tune signs once this is driven in sim.
-AXIS_TO_JOINTS = {
-    "arm_left_joy_x": ("baseplate_left_right",),
-    "arm_left_joy_y": ("shoulder_up_down", "elbow_up_down"),
-    "arm_right_joy_x": ("gripper_left_right",),
-    "arm_right_joy_y": ("gripper_up_down",),
+# Maps each mission-control command topic to the joints it jogs and how fast, in rad/s
+# at full deflection. One joint per topic now: the shoulder and elbow used to share the
+# left stick, which made the end effector hard to place. A negative speed flips the
+# joint's direction - for both arm joints positive is up, verified against the URDF.
+#
+# The shoulder and elbow are deliberately the slowest: they carry the most mass, so at
+# the old flat 1.0 rad/s they overshot and threw the rover around.
+AXIS_TO_JOINTS: dict[str, tuple[tuple[str, float], ...]] = {
+    "arm_baseplate_left_right": (("baseplate_left_right", 0.6),),
+    "arm_shoulder_up_down": (("shoulder_up_down", 0.3),),
+    "arm_elbow_up_down": (("elbow_up_down", 0.4),),
+    "arm_gripper_left_right": (("gripper_left_right", 0.8),),
+    "arm_gripper_up_down": (("gripper_up_down", 0.8),),
 }
 
-JOINT_SPEED = 1.0  # rad/s, for the joystick-jogged joints
 CLAW_SPEED = 0.3  # rad/s, slower since the claw should close/open "slowly"
 UPDATE_PERIOD_S = 0.05  # 20 Hz
 TRAJECTORY_DURATION_S = 0.1
@@ -59,6 +68,7 @@ class Arm(Node):
         self.axis_values: dict[str, float] = dict.fromkeys(AXIS_TO_JOINTS, 0.0)
         self.claw_close = 0.0
         self.claw_open = 0.0
+        self._was_moving = False
 
         self.trajectory_pub = self.create_publisher(JointTrajectory, TRAJECTORY_TOPIC, 10)
 
@@ -67,8 +77,8 @@ class Arm(Node):
         for topic in AXIS_TO_JOINTS:
             self.create_subscription(Float32, topic, self._make_axis_callback(topic), 10)
 
-        self.create_subscription(Float32, "arm_gripper_close", self._on_claw_close, 10)
-        self.create_subscription(Float32, "arm_gripper_open", self._on_claw_open, 10)
+        self.create_subscription(Float32, "arm_claw_close", self._on_claw_close, 10)
+        self.create_subscription(Float32, "arm_claw_open", self._on_claw_open, 10)
 
         self.create_timer(UPDATE_PERIOD_S, self._on_timer)
 
@@ -118,17 +128,27 @@ class Arm(Node):
             if value == 0.0:
                 continue
             moved = True
-            rate = value * JOINT_SPEED
-            for joint in joints:
-                velocities[joint] = self._step_joint(joint, rate)
+            for joint, speed in joints:
+                velocities[joint] = self._step_joint(joint, value * speed)
 
         claw_rate = (self.claw_open - self.claw_close) * CLAW_SPEED
         if claw_rate != 0.0:
             moved = True
             velocities["claw_open_close"] = self._step_joint("claw_open_close", claw_rate)
+            velocities["claw_open_close_follower"] = self._step_joint(
+                "claw_open_close_follower", -claw_rate
+            )
 
         if moved:
             self._publish_target(velocities)
+        elif self._was_moving:
+            # Everything just stopped. The last trajectory sent ended with a non-zero
+            # feed-forward velocity, so the controller is still planning to keep moving
+            # past it - send one zero-velocity point at the current targets so it brakes
+            # and holds instead of drifting on after the stick/trigger is released.
+            self._publish_target(dict.fromkeys(JOINT_ORDER, 0.0))
+
+        self._was_moving = moved
 
     def _publish_target(self, velocities: dict[str, float]) -> None:
         msg = JointTrajectory()

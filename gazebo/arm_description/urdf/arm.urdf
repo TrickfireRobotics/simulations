@@ -2815,19 +2815,18 @@
                 <parent link="arm_left_finger_plate_top_section_1" />
                 <child link="arm_washer_spacer_2" />
         </joint>
-        <joint name="revolute_5" type="fixed">
+        <joint name="claw_open_close_follower" type="revolute">
                 <origin xyz="-2.77556e-17 -0.0075 0.0028" rpy="3.14159 -2.32221e-16 0.181211" />
                 <axis xyz="-0 -0 -1" />
                 <parent link="arm_washer_spacer_3" />
                 <child link="arm_left_finger_plate_top_section_2" />
+        <limit effort="10" velocity="10" lower="-0.8" upper="0.8" />
         </joint>
-        <joint name="claw_open_close_follower" type="revolute">
+        <joint name="claw_follower_shaft_fixed" type="fixed">
                 <origin xyz="-0.018345 -0.0892102 -0.003175" rpy="3.14159 -2.71137e-15 2.72574e-15" />
                 <axis xyz="0 0 -1" />
                 <parent link="arm_left_finger_plate_top_section" />
                 <child link="arm_washer_spacer_1" />
-        <limit effort="10" velocity="10" lower="-0.8" upper="0.8" />
-        <mimic joint="claw_open_close" multiplier="-1" offset="0" />
         </joint>
         <joint name="revolute_9" type="fixed">
                 <origin xyz="0.0664582 0.006 -0.0138902" rpy="0 1.5708 -7.54605e-16" />

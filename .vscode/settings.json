@@ -60,11 +60,9 @@
         "**/*.egg-info": true,
         "build/": true,
         "**/.venv": true,
-        ".vscode/browse.vc.db": true,
-        ".vscode/browse.vc.db-shm": true,
-        ".vscode/browse.vc.db-wal": true,
-        ".cache/": true,
-        ".pixi/": true
+        ".pytest_cache": true,
+        ".vscode/browse.*": true,
+        ".cache/": true
     },
 
     "clangd.arguments": ["--clang-tidy", "--header-insertion=never"],

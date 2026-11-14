@@ -23,6 +23,7 @@ from sim_common.launch_utils import (
     controller_spawner_node,
     gazebo_launch_actions,
     get_asset,
+    joint_gui_node,
     joint_state_broadcaster_spawner,
     process_robot_description,
     robot_state_publisher_node,
@@ -80,7 +81,7 @@ def robot_actions(context, controller_config, urdf_file):
             ),
         ],
         output="screen",
-        condition=IfCondition(LaunchConfiguration("gui")),
+        condition=IfCondition(LaunchConfiguration("follow_rover")),
     )
 
     return [
@@ -96,7 +97,8 @@ def robot_actions(context, controller_config, urdf_file):
             event_handler=OnProcessExit(
                 target_action=spawn_robot,
                 on_exit=[TimerAction(period=3.0, actions=[follow_camera])],
-            )
+            ),
+            condition=IfCondition(LaunchConfiguration("gui")),
         ),
     ]
 
@@ -200,6 +202,16 @@ def generate_launch_description():
                 default_value="false",
                 description="Spawn the TTT task model ahead of Viator.",
             ),
+            DeclareLaunchArgument(
+                "follow_rover",
+                default_value="true",
+                description="Make the Gazebo camera follow Viator.",
+            ),
+            DeclareLaunchArgument(
+                "joint_gui",
+                default_value="false",
+                description="Open the arm joint control GUI.",
+            ),
             *gazebo_launch_actions(
                 world_file,
                 gz_gui_config,
@@ -209,6 +221,7 @@ def generate_launch_description():
             TimerAction(period=5.0, actions=[spawn_ttt]),
             clock_bridge_node(),
             rviz_node(rviz_config),
+            joint_gui_node(urdf_file),
             drivebase_bridge,
             arm_bridge,
             sensor_bridge,
