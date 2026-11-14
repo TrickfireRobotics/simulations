@@ -9,7 +9,7 @@ import threading
 from .chrono import chrono
 from .drpc import rpc_start
 from .output import die, info
-from .paths import GAZEBO_WORKSPACE_DIR
+from .paths import GAZEBO_BUILD_DIR, GAZEBO_INSTALL_DIR, GAZEBO_LOG_DIR, GAZEBO_WORKSPACE_DIR
 
 _GAZEBO_SUBCOMMANDS = frozenset({"clean", "create", "update"})
 _LAUNCH_ARG_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*:=.*")
@@ -19,7 +19,7 @@ def _build_gazebo_parser(subparsers: argparse._SubParsersAction) -> tuple:
     gazebo = subparsers.add_parser("gazebo", help="Gazebo + ROS2 robot simulation")
     gsubs = gazebo.add_subparsers(dest="command")
 
-    gsubs.add_parser("clean", help="Delete build artifacts (build/, install/, log/)")
+    gsubs.add_parser("clean", help="Delete Gazebo build artifacts")
 
     create_p = gsubs.add_parser("create", help="Generate robot packages from an OnShape model")
     create_p.add_argument("robot", help="Robot name (e.g., arm, gripper)")
@@ -196,10 +196,9 @@ def _dispatch_gazebo(args, create_p) -> None:
     from .gazebo.create.commands import cmd_local, cmd_raw
 
     if args.command == "clean":
-        for name in ("build", "install", "log"):
-            path = GAZEBO_WORKSPACE_DIR / name
+        for path in (GAZEBO_BUILD_DIR, GAZEBO_INSTALL_DIR, GAZEBO_LOG_DIR):
             if path.exists():
-                info(f"Removing {name}/...")
+                info(f"Removing {path.relative_to(GAZEBO_WORKSPACE_DIR)}/...")
                 shutil.rmtree(path)
         info("Cleaned")
 

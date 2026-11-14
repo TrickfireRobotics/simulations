@@ -8,6 +8,7 @@ controller spawners, or RViz here.
 """
 
 import os
+from pathlib import Path
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
@@ -28,6 +29,10 @@ def generate_launch_description():
     arducopter_bin = os.environ.get("ARDUCOPTER_BIN")
     if not arducopter_bin or not os.path.isfile(arducopter_bin):
         err("ARDUCOPTER_BIN not set or missing - ArduPilot SITL is not built into this image.")
+
+    drone_artifacts_dir = os.environ.get("TF_GAZEBO_DRONE_ARTIFACTS_DIR")
+    if drone_artifacts_dir:
+        Path(drone_artifacts_dir).mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------
     # ArduCopter SITL
@@ -50,6 +55,7 @@ def generate_launch_description():
             "--serial0=udpclient:127.0.0.1:14550",
         ],
         output="screen",
+        cwd=drone_artifacts_dir,
     )
 
     # ------------------------------------------------

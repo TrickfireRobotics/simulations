@@ -14,7 +14,14 @@ from pathlib import Path
 
 from .. import paths
 from ..output import die, info, warn
-from ..paths import REPO_DIR, WORKSPACE_DIR
+from ..paths import (
+    GAZEBO_BUILD_DIR,
+    GAZEBO_DRONE_ARTIFACTS_DIR,
+    GAZEBO_INSTALL_DIR,
+    GAZEBO_LOG_DIR,
+    REPO_DIR,
+    WORKSPACE_DIR,
+)
 
 _ANSI_RE = re.compile(r"\x1B\[[0-9;]*[mK]")
 
@@ -401,19 +408,23 @@ def build_and_launch(
     launch = not build_only
     robot_type = _robot_type(robot_name)
     env = os.environ.copy()
+    env["ROS_LOG_DIR"] = str(GAZEBO_LOG_DIR / "ros")
+    env["TF_GAZEBO_DRONE_ARTIFACTS_DIR"] = str(GAZEBO_DRONE_ARTIFACTS_DIR)
     render_prefix = _configure_rendering(env)
     _configure_ardupilot_env(robot_type, env)
     launch_pkg, description_packages, launch_file_name = _validate_robot_layout(robot_name)
 
     if build:
-        for directory_name in ("build", "install", "log"):
-            directory_path = WORKSPACE_DIR / directory_name
-            if directory_path.exists():
-                shutil.rmtree(directory_path)
+        for directory in (GAZEBO_BUILD_DIR, GAZEBO_INSTALL_DIR, GAZEBO_LOG_DIR):
+            if directory.exists():
+                shutil.rmtree(directory)
         _drop_missing_prefix_paths(env)
 
-    log_dir = WORKSPACE_DIR / "log"
+    log_dir = GAZEBO_LOG_DIR
     log_dir.mkdir(parents=True, exist_ok=True)
+    (log_dir / "ros").mkdir(exist_ok=True)
+    if robot_type == "ardupilot":
+        GAZEBO_DRONE_ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{robot_name}-gazebo-{datetime.now():%Y-%m-%d_%H-%M}.log"  # noqa: DTZ005
 
     _print_launch_banner(
@@ -425,7 +436,7 @@ def build_and_launch(
         controller_gui=controller_gui,
     )
 
-    setup_bash = WORKSPACE_DIR / "install" / "setup.bash"
+    setup_bash = GAZEBO_INSTALL_DIR / "setup.bash"
 
     if build:
         info("Building ROS2 workspace...")
@@ -433,6 +444,12 @@ def build_and_launch(
             [
                 "colcon",
                 "build",
+                "--build-base",
+                str(GAZEBO_BUILD_DIR),
+                "--install-base",
+                str(GAZEBO_INSTALL_DIR),
+                "--log-base",
+                str(GAZEBO_LOG_DIR),
                 "--packages-up-to",
                 launch_pkg,
                 *description_packages,
@@ -448,7 +465,9 @@ def build_and_launch(
         info("Build complete")
 
     if not setup_bash.is_file():
-        die("Missing install/setup.bash - run without --no-build once to generate it")
+        die(
+            "Missing gazebo/.artifacts/install/setup.bash - run without --no-build once to generate it"
+        )
 
     if not launch:
         info("Build-only requested; skipping launch")
@@ -466,9 +485,9 @@ def build_and_launch(
     controller_gui_line = "ros2 run sim_common controller_gui &\n" if controller_gui else ""
     launch_script = f"""
 set -e
-source install/setup.bash
+source {shlex.quote(str(setup_bash))}
 
-SIM_WORLDS_SHARE=\"$PWD/install/sim_worlds/share/sim_worlds\"
+SIM_WORLDS_SHARE={shlex.quote(str(GAZEBO_INSTALL_DIR / "sim_worlds" / "share" / "sim_worlds"))}
 if [ -d \"$SIM_WORLDS_SHARE/worlds\" ]; then
     export GZ_SIM_RESOURCE_PATH=\"${{GZ_SIM_RESOURCE_PATH:+$GZ_SIM_RESOURCE_PATH:}}$SIM_WORLDS_SHARE:$SIM_WORLDS_SHARE/models\"
     echo \"[INFO] GZ_SIM_RESOURCE_PATH set to: $GZ_SIM_RESOURCE_PATH\"

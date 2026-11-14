@@ -20,17 +20,8 @@ __pycache__
 build/
 **/.venv
 
-# ros
-gazebo/install
-gazebo/build
-gazebo/log
-
-# drone stuff
-gazebo/eeprom.bin
-gazebo/logs/
-gazebo/terrain/
-gazebo/dumpcore.sh_arducopter.*.out
-gazebo/dumpstack.sh_arducopter.*.out
+# Gazebo and ArduPilot generated files
+gazebo/.artifacts/
 
 # sim tests
 cli/gazebo/create/tests

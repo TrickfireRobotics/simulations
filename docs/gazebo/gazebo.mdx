@@ -58,7 +58,7 @@ To remove build artifacts and do a clean rebuild:
 sim gazebo clean
 ```
 
-This deletes `gazebo/build/`, `gazebo/install/`, and `gazebo/log/`. Use this when you encounter unexplained build failures.
+This deletes the ROS build, install, and log directories under `gazebo/.artifacts/`. It keeps ArduPilot's EEPROM, terrain cache, logs, and crash dumps in `gazebo/.artifacts/drone/` so a ROS rebuild does not reset the drone.
 
 ## Troubleshooting
 

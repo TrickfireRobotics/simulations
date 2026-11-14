@@ -36,9 +36,14 @@ source "/opt/ros/${ros_distro}/setup.bash"
 set -u
 
 cd "${workspace_dir}"
-colcon build --base-paths gazebo --packages-select "${build_packages[@]}"
+artifacts_dir="${workspace_dir}/gazebo/.artifacts"
+colcon build --base-paths gazebo \
+    --build-base "${artifacts_dir}/build" \
+    --install-base "${artifacts_dir}/install" \
+    --log-base "${artifacts_dir}/log" \
+    --packages-select "${build_packages[@]}"
 set +u
-source "${workspace_dir}/install/setup.bash"
+source "${artifacts_dir}/install/setup.bash"
 set -u
 
 unset WAYLAND_DISPLAY

@@ -119,4 +119,4 @@ ruff check .
 ruff format .
 ```
 
-Configuration lives in `ruff.toml`. The `gazebo/build`, `gazebo/install`, and `gazebo/log` directories are excluded automatically.
+Configuration lives in `ruff.toml`. Generated Gazebo files under `gazebo/.artifacts` are excluded automatically.

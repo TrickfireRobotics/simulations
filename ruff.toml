@@ -1,4 +1,4 @@
-exclude = ["gazebo/build", "gazebo/log", "gazebo/install"]
+exclude = ["gazebo/.artifacts"]
 line-length = 100
 indent-width = 4
 target-version = "py310"

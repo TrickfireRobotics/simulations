@@ -187,8 +187,9 @@ ros2 control list_hardware_interfaces
 
 ```bash
 cd gazebo
-colcon build --packages-select arm_description
-source install/setup.bash
+colcon build --build-base .artifacts/build --install-base .artifacts/install \
+    --log-base .artifacts/log --packages-select arm_description
+source .artifacts/install/setup.bash
 ```
 
 ## Community `apt` repository (Dev Container)
@@ -210,7 +211,7 @@ apt-get update
 
 <Accordions>
     <Accordion title="Forgetting to source after build">
-        ROS 2 can't find packages until you run `source gazebo/install/setup.bash`. The launch
+        ROS 2 can't find packages until you run `source gazebo/.artifacts/install/setup.bash`. The launch
         script does this automatically, but if you're running ROS commands manually, you need to
         source first.
     </Accordion>
