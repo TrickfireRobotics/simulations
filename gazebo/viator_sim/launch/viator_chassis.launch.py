@@ -15,6 +15,7 @@ from sim_common.launch_utils import (
     controller_spawner_node,
     gazebo_launch_actions,
     get_asset,
+    heartbeat_responder_node,
     joint_state_broadcaster_spawner,
     process_robot_description,
     robot_state_publisher_node,
@@ -63,7 +64,11 @@ def generate_launch_description():
         executable="rosbridge_websocket",
         output="screen",
         parameters=[
-            {"port": ParameterValue(LaunchConfiguration("rosbridge_port"), value_type=int)}
+            {
+                "port": ParameterValue(LaunchConfiguration("rosbridge_port"), value_type=int),
+                "websocket_ping_interval": 5.0,
+                "websocket_ping_timeout": 10.0,
+            }
         ],
     )
 
@@ -85,6 +90,7 @@ def generate_launch_description():
             clock_bridge_node(),
             rviz_node(rviz_config),
             drivebase_bridge,
+            heartbeat_responder_node(),
             rosbridge,
         ]
     )

@@ -19,6 +19,7 @@ setup(
             "controller_gui = sim_common.controller_gui:main",
             "drivebase = sim_common.drivebase:main",
             "arm = sim_common.arm:main",
+            "heartbeat = sim_common.heartbeat:main",
         ],
     },
     install_requires=["setuptools", 'evdev; sys_platform == "linux"'],

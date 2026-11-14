@@ -192,6 +192,11 @@ def joint_gui_node(urdf_file, joint_gui_launch_arg="joint_gui"):
     )
 
 
+def heartbeat_responder_node():
+    """Respond to Mission Control heartbeats using the rover's topic contract."""
+    return Node(package="sim_common", executable="heartbeat", output="screen")
+
+
 def joint_state_broadcaster_spawner():
     return Node(
         package="controller_manager",
