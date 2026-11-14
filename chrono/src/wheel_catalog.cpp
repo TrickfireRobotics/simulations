@@ -1,6 +1,7 @@
 #include "wheel_catalog.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -21,9 +22,10 @@ std::string Trim(const std::string& s) {
 }
 
 /// Applies "<obj_path with .obj replaced by .toml>" onto `option`, if that file exists.
-/// Understands flat "key = value" lines with numeric values; everything else (blank
-/// lines, "# comments", unknown keys) is ignored, so the file stays valid TOML even
-/// though this is a hand-rolled parser rather than a real one.
+/// Understands flat "key = value" lines, numeric for every key except rotation_axis
+/// (a bare or quoted x/y/z); everything else (blank lines, "# comments", unknown keys)
+/// is ignored, so the file stays valid TOML even though this is a hand-rolled parser
+/// rather than a real one.
 void ApplyWheelConfig(const fs::path& obj_path, WheelOption& option) {
     fs::path config_path = obj_path;
     config_path.replace_extension(".toml");
@@ -40,6 +42,16 @@ void ApplyWheelConfig(const fs::path& obj_path, WheelOption& option) {
 
         std::string key = Trim(line.substr(0, eq));
         std::string value = Trim(line.substr(eq + 1));
+
+        if (key == "rotation_axis") {
+            if (!value.empty() && (value.front() == '"' || value.front() == '\''))
+                value = value.substr(1, value.size() - 2);
+            if (!value.empty()) {
+                char axis = static_cast<char>(std::tolower(static_cast<unsigned char>(value[0])));
+                if (axis == 'x' || axis == 'y' || axis == 'z') option.mesh_rotation_axis = axis;
+            }
+            continue;
+        }
 
         std::istringstream value_stream(value);
         double number;
@@ -62,12 +74,13 @@ void ApplyWheelConfig(const fs::path& obj_path, WheelOption& option) {
 
 std::vector<WheelOption> BuildWheelCatalog() {
     std::vector<WheelOption> catalog;
-    catalog.push_back({"cylindrical", false, "", 1.0, 0.0, {}, {}, {}});
+    catalog.push_back({"cylindrical", false, "", 1.0, 0.0, 'y', {}, {}, {}});
     catalog.push_back({"lugged",
                        true,
                        chrono::GetChronoDataFile("models/tractor_wheel/tractor_wheel.obj"),
                        1.0,
                        0.0,
+                       'y',
                        {},
                        {},
                        {}});

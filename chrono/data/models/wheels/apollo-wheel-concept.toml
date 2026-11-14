@@ -1,0 +1,6 @@
+rotation_deg = 90
+rotation_axis = "z"
+
+mass = 1.7     # kg
+inertia = 0.04 # kg*m^2
+radius = 0.22  # m

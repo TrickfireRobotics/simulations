@@ -26,6 +26,7 @@ struct SimConfig {
     std::string wheel_mesh_path;
     double wheel_mesh_scale = 1.0;
     double wheel_mesh_rotation_deg = 0.0;
+    char wheel_mesh_rotation_axis = 'y';
 
     // --- terrain ---
     double terrain_length = 6;

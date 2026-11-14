@@ -13,9 +13,10 @@ namespace trickfire {
 struct WheelOption {
     std::string name;
     bool is_mesh;
-    std::string mesh_path;         // unused when !is_mesh
-    double mesh_scale = 1.0;       // multiplies mesh vertices, to convert its units to meters
-    double mesh_rotation_deg = 0;  // corrective yaw (about the vertical axis) applied after scaling
+    std::string mesh_path;          // unused when !is_mesh
+    double mesh_scale = 1.0;        // multiplies mesh vertices, to convert its units to meters
+    double mesh_rotation_deg = 0;   // corrective rotation, about mesh_rotation_axis, after scaling
+    char mesh_rotation_axis = 'y';  // which local axis mesh_rotation_deg rotates about: x, y, or z
 
     std::optional<double> mass;     // kg
     std::optional<double> inertia;  // kg*m^2, applied equally to all three axes
@@ -29,8 +30,11 @@ struct WheelOption {
 /// A sibling "<name>.toml" file next to "<name>.obj" can set any of:
 ///
 ///   scale = 0.0254        # mesh units -> meters (CAD exports are often cm or inches)
-///   rotation_deg = 90     # corrective yaw, for meshes not authored with the roll axis
+///   rotation_deg = 90     # corrective rotation, for meshes not authored with the roll axis
 ///                         # this scene expects
+///   rotation_axis = "x"   # which axis rotation_deg turns around: x, y (default), or z -
+///                         # y is a yaw, for a wheel that's upright but facing the wrong way;
+///                         # x or z tips a wheel that's lying flat onto its side
 ///   mass = 3.0            # kg, overrides SimConfig's generic default
 ///   inertia = 0.05        # kg*m^2, overrides SimConfig's generic default
 ///   radius = 0.26         # m, overrides SimConfig's generic default

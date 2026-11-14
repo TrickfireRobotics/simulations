@@ -50,6 +50,7 @@ int main() {
     config.wheel_mesh_path = wheel.mesh_path;
     config.wheel_mesh_scale = wheel.mesh_scale;
     config.wheel_mesh_rotation_deg = wheel.mesh_rotation_deg;
+    config.wheel_mesh_rotation_axis = wheel.mesh_rotation_axis;
     if (wheel.mass) config.wheel_mass = *wheel.mass;
     if (wheel.inertia) config.wheel_inertia = *wheel.inertia;
     if (wheel.radius) config.tire_radius = *wheel.radius;

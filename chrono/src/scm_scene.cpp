@@ -13,6 +13,18 @@ namespace trickfire {
 
 namespace {
 
+/// QuatFromAngleX/Y/Z picked at runtime by a wheel's configured rotation_axis.
+ChQuaterniond QuatFromAngleOnAxis(double angle, char axis) {
+    switch (axis) {
+        case 'x':
+            return QuatFromAngleX(angle);
+        case 'z':
+            return QuatFromAngleZ(angle);
+        default:
+            return QuatFromAngleY(angle);
+    }
+}
+
 /// Location-dependent soil properties. The SCM reference frame has its own x/y in the
 /// ground plane, so y > 0 is one half of the patch and y < 0 the other.
 class SplitSoilParams : public SCMTerrain::SoilParametersCallback {
@@ -66,9 +78,10 @@ void ScmScene::BuildWheel() {
             // authored with their roll axis matching the one this scene spins the wheel about.
             ChMatrix33<> transform(m_config.wheel_mesh_scale);
             if (m_config.wheel_mesh_rotation_deg != 0.0) {
-                transform =
-                    ChMatrix33<>(QuatFromAngleY(m_config.wheel_mesh_rotation_deg * CH_DEG_TO_RAD)) *
-                    transform;
+                transform = ChMatrix33<>(QuatFromAngleOnAxis(
+                                m_config.wheel_mesh_rotation_deg * CH_DEG_TO_RAD,
+                                m_config.wheel_mesh_rotation_axis)) *
+                            transform;
             }
             trimesh->Transform(VNULL, transform);
 
