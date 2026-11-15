@@ -7,14 +7,14 @@ Rover simulation environments for TrickFire Robotics.
 Two complementary environments, both driven by a single Python `sim` CLI: [**Gazebo Harmonic**](https://gazebosim.org/docs/harmonic/install/) with [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/index.html) for simulating robot subsystems and joint control, and [**Project Chrono**](https://projectchrono.org/) for high-fidelity terrain and wheel-soil physics. The whole project is containerized in a Docker environment with user environment passthrough or using with [pixi](https://pixi.prefix.dev/latest/).
 
 ## Highlights
-k
+
 - **Viator** - our rover and its arm, generated directly from [OnShape](https://www.onshape.com/) CAD via `sim gazebo create`
 - **Marsyard terrain** - a heightmap of the European Rover Challenge terrain, for realistic Mars-like drive and arm testing
 - **Deformable terrain** - wheel-soil interaction in Chrono via the [SCM model](https://api.projectchrono.org/manual_SCM.html)
 - **Drone** - simulated through [ArduPilot](https://ardupilot.org/)
 
-<img src="assets/screenshots/gazebo-viator.png" width="100" alt="Gazebo Rover screenshot">
-<img src="assets/screenshots/chrono-apollo-wheel.png" width="100" alt="Chrono screenshot">
+<img src="assets/screenshots/gazebo-viator.png" width="100%" alt="Gazebo Rover screenshot">
+<img src="assets/screenshots/chrono-apollo-wheel.png" width="100%" alt="Chrono screenshot">
 
 ## Documentation
 
