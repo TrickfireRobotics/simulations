@@ -1,3 +1,7 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+
 gazebo/sim_worlds/models/**/*.png filter=lfs diff=lfs merge=lfs -text
 gazebo/sim_worlds/models/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 gazebo/sim_worlds/models/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
