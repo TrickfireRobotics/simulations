@@ -50,13 +50,16 @@ def rpc_start(is_docker: bool = False, robot_name: str = "Unknown Robot") -> Non
             # so it works both natively and inside the devcontainer (/run/host-runtime).
             os.environ["TMPDIR"] = socket_dir
 
-        client_id = "1504990746527404063"
+        client_id = "1572534143911206942"
         rpc = Presence(client_id)
         rpc.connect()
         rpc.update(
             name="TrickFire Simulation (" + robot_name + ")",
             details="Running TrickFire Simulation on " + robot_name,
             state="Running in Docker" if is_docker else "Running locally",
+            buttons=[
+                {"label": "GitHub", "url": "https://github.com/TrickFireRobotics/simulations"}
+            ],
         )
         atexit.register(_shutdown)
         try:
