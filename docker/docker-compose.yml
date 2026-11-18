@@ -27,7 +27,7 @@ services:
             QT_X11_NO_MITSHM: "1"
             TZ: ${TZ:-UTC}
             WAYLAND_DISPLAY: "${WAYLAND_DISPLAY:-}"
-            XDG_RUNTIME_DIR: /run/host-runtime
+            XDG_RUNTIME_DIR: /run/user/1000
             QT_SCALE_FACTOR: "${QT_SCALE_FACTOR:-}"
             QT_ENABLE_HIGHDPI_SCALING: "${QT_ENABLE_HIGHDPI_SCALING:-}"
             GDK_SCALE: "${GDK_SCALE:-}"
