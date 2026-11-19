@@ -1,0 +1,110 @@
+---
+title: Connecting to trickfire-urc
+description: Bridge ROS 2 topics between this simulator and the trickfire-urc rover container.
+---
+
+The rover's main codebase, [trickfire-urc](https://github.com/TrickfireRobotics/trickfire-urc), always runs in its own Docker container. This simulator runs either natively through pixi or in its own Docker container. Either way, ROS 2 discovers nodes over DDS multicast, and multicast can't cross a Docker boundary, so neither side can see the other's topics by default.
+
+To fix that, one [zenoh bridge](https://github.com/eclipse-zenoh/zenoh-plugin-ros2dds) runs next to each side. Each bridge discovers its local ROS 2 graph normally and forwards topics, services and actions to the other bridge over a single TCP port (`7447`, bound to `127.0.0.1` only). The urc-side bridge runs as a background process inside the trickfire-urc devcontainer itself, so no extra container is needed there. Neither repository's RMW or packages change.
+
+```text
+ this repo: simulations (native or container)           trickfire-urc devcontainer
+ Gazebo ─DDS─ sim-side bridge ── tcp 127.0.0.1:7447 ──► urc-side bridge ─DDS─ robot
+```
+
+The bridge scripts themselves live in trickfire-urc, under `simulation/` - `sim-bridge.sh` (sim side) and `start-sim-bridge.sh` (urc side, started automatically). This repository doesn't need any scripts or config of its own to use it.
+
+## Which mode to use
+
+| How this sim runs                             | OS                   | Sim-side bridge                  |
+| ---------------------------------------------- | -------------------- | --------------------------------- |
+| Native with `pixi run sim ...`                 | macOS, Linux, WSL2   | `simulation/sim-bridge.sh native` |
+| In its devcontainer (`simulations` container)  | Windows, macOS       | `simulation/sim-bridge.sh docker` |
+| In its devcontainer on Linux Docker Engine     | Linux                | `native` is recommended instead (see troubleshooting) |
+
+## Steps
+
+<Callout type="warning" title="Host terminal, not a devcontainer">
+    `simulation/sim-bridge.sh` runs on the **host** (a regular terminal on your machine, outside
+    VS Code's devcontainer terminal) - not inside this repo's devcontainer, and not inside
+    trickfire-urc's. The sim-side bridge has to see this sim's traffic, and devcontainers have no
+    Docker access. Running it inside either devcontainer exits with an error.
+</Callout>
+
+<Steps>
+    <Step>Start this simulator as usual, e.g. `sim gazebo viator` (or `pixi run sim gazebo viator`).</Step>
+    <Step>
+        Open `trickfire-urc` in its devcontainer. The urc-side bridge starts inside it
+        automatically (`simulation/start-sim-bridge.sh`, logging to `/tmp/sim-bridge.log`).
+    </Step>
+    <Step>
+        In a **host** terminal, from the `trickfire-urc` repo root, start the sim-side bridge and
+        leave it running:
+
+        ```bash title="Host terminal"
+        simulation/sim-bridge.sh native   # or: docker
+        ```
+    </Step>
+    <Step>
+        Back in the trickfire-urc devcontainer, this sim's topics are now available:
+
+        ```bash title="trickfire-urc devcontainer"
+        ros2 topic list
+        ros2 topic echo /clock --once
+        ```
+    </Step>
+</Steps>
+
+If the trickfire-urc devcontainer was built before the bridge was added to it, run **Dev
+Containers: Rebuild Container** once there. The first `native` run downloads the bridge (~20 MB)
+into `~/.cache/trickfire/`.
+
+<Callout type="info" title="Windows without WSL">
+    `sim-bridge.sh` works from Git Bash. From PowerShell, run the sim-side bridge directly:
+
+    ```powershell
+    docker run --rm -it --network container:simulations -e ROS_DISTRO=jazzy eclipse/zenoh-bridge-ros2dds:1.10.1 client -e tcp/host.docker.internal:7447 --no-multicast-scouting
+    ```
+</Callout>
+
+## Limits
+
+Only topics that someone subscribes to on the other side are forwarded. Control, odometry, TF, GPS and `/clock` arrive at full rate. Raw camera streams are heavy: the ZED depth image and point cloud (around 22 MB per message at 24-30 Hz) are much more than the TCP link can carry through Docker Desktop, so expect them at a reduced rate. To cap a topic's rate so it doesn't crowd out the rest, pass a flag such as `--pub-max-frequency '.*/point_cloud/.*=2'` after `native` or `docker` (extra arguments go straight to the bridge).
+
+## Troubleshooting
+
+<Accordions>
+    <Accordion title="Topics don't appear">
+        Check the urc-side bridge is running: `pgrep -a zenoh-bridge` in the trickfire-urc
+        devcontainer, and see `/tmp/sim-bridge.log`. If it isn't, start it in a devcontainer
+        terminal with `simulation/start-sim-bridge.sh`.
+
+        Both bridges must run the same version - `ZENOH_BRIDGE_VERSION` in trickfire-urc's
+        `.devcontainer/Dockerfile` and `VERSION` in `simulation/sim-bridge.sh` must match.
+
+        `ROS_DOMAIN_ID` must be the same in this sim, in the trickfire-urc devcontainer, and in
+        the environment you run `simulation/sim-bridge.sh` from.
+    </Accordion>
+    <Accordion title="[sim-bridge] run this from a host terminal">
+        You ran the script inside a devcontainer. Open a terminal on your machine instead.
+    </Accordion>
+    <Accordion title="The trickfire-urc devcontainer fails to start on port 7447">
+        If the log mentions an orphan `trickfire-urc_devcontainer-sim-bridge-1` container, it's
+        left over from an older version of this setup. Remove it with
+        `docker rm -f trickfire-urc_devcontainer-sim-bridge-1` and reopen. Otherwise another
+        process is using the port - check with `lsof -i :7447` (macOS/Linux) or
+        `netstat -ano | findstr 7447` (Windows).
+    </Accordion>
+    <Accordion title="Native sim on an offline Mac">
+        With no network, CycloneDDS falls back to `lo0`, which has no multicast. Set
+        `CYCLONEDDS_URI` to a config that uses `lo0` with multicast disabled and `127.0.0.1` as a
+        peer. Export it in both the sim terminal and the `simulation/sim-bridge.sh native`
+        terminal.
+    </Accordion>
+    <Accordion title="This sim's container cannot connect to the urc-side bridge">
+        The `docker` mode connects this sim's container to the trickfire-urc devcontainer's
+        Docker network automatically, then reaches the bridge at `trickfire-urc:7447`. If either
+        container has a custom name, set `SIM_CONTAINER` or `URC_CONTAINER` before running the
+        script.
+    </Accordion>
+</Accordions>

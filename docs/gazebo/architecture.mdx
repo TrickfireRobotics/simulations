@@ -94,7 +94,7 @@ As with the GPS, Gazebo produces noise-free ground truth on `/viator/zed/*` and 
 
 Images and depth publish at the `zed_frame_rate` launch argument (default 15 Hz; the real camera grabs at 60). Above 15 Hz the launch file thins the depth rays so their data rate stays constant, which keeps the sim real-time. Like the wrapper, each output is only computed while something subscribes to it.
 
-The point cloud follows the wrapper's `depth.point_cloud_freq` and `depth.point_cloud_res` through the `zed_point_cloud_freq` (default 5 Hz) and `zed_point_cloud_res` launch arguments. `REDUCED` (the default) keeps every second pixel for a 640x360 cloud of about 3.7 MB; `COMPACT` publishes the full 1280x720 (about 14.7 MB). The smaller cloud is what Nav2's costmaps need, and keeps the sim's ROS traffic light enough to bridge to another machine or container.
+The point cloud follows the wrapper's `depth.point_cloud_freq` and `depth.point_cloud_res` through the `zed_point_cloud_freq` (default 5 Hz) and `zed_point_cloud_res` launch arguments. `REDUCED` (the default) keeps every second pixel for a 640x360 cloud of about 3.7 MB; `COMPACT` publishes the full 1280x720 (about 14.7 MB). The smaller cloud is what Nav2's costmaps need, and keeps the sim's ROS traffic light enough to [bridge to trickfire-urc](../connecting-to-trickfire-urc.mdx), which carries point clouds over a more constrained TCP link.
 
 How the real camera is approximated:
 
