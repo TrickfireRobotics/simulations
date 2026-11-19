@@ -155,6 +155,12 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
         help="Spawn the TTT task model (Viator only, default: false)",
     )
     p.add_argument(
+        "--ar-tags",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Spawn 3 ArUco test tags for ar_tag_detection (Viator only, default: false)",
+    )
+    p.add_argument(
         "--follow-rover",
         action=argparse.BooleanOptionalAction,
         default=None,
@@ -179,11 +185,13 @@ def _launch_gazebo(robot: str, remaining: list[str]) -> None:
 
     launch_flags = {
         "ttt": args.ttt,
+        "ar_tags": args.ar_tags,
         "follow_rover": args.follow_rover,
         "joint_gui": args.joint_gui,
     }
     flag_targets = {
         "ttt": {"viator"},
+        "ar_tags": {"viator"},
         "follow_rover": {"viator"},
         "joint_gui": {"viator", "arm"},
     }
