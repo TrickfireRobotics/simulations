@@ -56,6 +56,10 @@
             ]
         },
         {
+            "label": "Connecting to trickfire-urc",
+            "slug": "connecting-to-trickfire-urc"
+        },
+        {
             "label": "Dev Notes",
             "slug": "dev-notes"
         }

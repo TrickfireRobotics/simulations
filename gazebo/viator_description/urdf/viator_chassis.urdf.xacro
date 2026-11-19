@@ -144,6 +144,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/bogie_bracket_leg_v2_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
         
 		<collision>
@@ -171,6 +179,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/bogie_plate_v1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
         
 		<collision>
@@ -309,6 +325,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/leg_bracket_long_v7.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
         
 		<collision>
@@ -480,6 +504,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Rocker_crank_arm_plate_v1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
         
 		<collision>
@@ -561,24 +593,56 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Drilled_Broached_Hexagon_Socket_Head_Cap_Screw_6_Holes_ASME_B18_3_1M___M5x0_8_x_65_Steel_Grade_2_Pla.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Rocker_crank_arm_plate_v1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_Head_Bolt_DIN_EN_ISO_4014___M8_x_80_Steel_4_6_Plain_v1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hex_Flange_Nut_ANSI_B18_2_4_4M___M5_x_0_8_Steel_Grade_2H_Plain_v1_20.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
@@ -594,6 +658,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Washer_BS_4320___M8___Form_E_Steel_100_HV_Plain_v1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
@@ -609,6 +681,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_High_Nut_UNI_EN_24033___M8_Steel_6_Plain_v1_2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
@@ -651,30 +731,70 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Washer_BS_4320___M8___Form_E_Steel_100_HV_Plain_v1_2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Drilled_Broached_Hexagon_Socket_Head_Cap_Screw_6_Holes_ASME_B18_3_1M___M5x0_8_x_65_Steel_Grade_2_Pla_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/bogie_plate_v1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Shortened_short_leg_bracket_v4_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hex_Flange_Nut_ANSI_B18_2_4_4M___M5_x_0_8_Steel_Grade_2H_Plain_v1_3.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -699,6 +819,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_Head_Bolt_DIN_EN_ISO_4014___M8_x_80_Steel_4_6_Plain_v1_1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -732,6 +860,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_High_Nut_UNI_EN_24033___M8_Steel_6_Plain_v1_3.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0587941 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -747,24 +883,56 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Drilled_Broached_Hexagon_Socket_Head_Cap_Screw_6_Holes_ASME_B18_3_1M___M5x0_8_x_65_Steel_Grade_2_Pla_2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Washer_BS_4320___M8___Form_E_Steel_100_HV_Plain_v1_3.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_High_Nut_UNI_EN_24033___M8_Steel_6_Plain_v1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_Head_Bolt_DIN_EN_ISO_4014___M8_x_80_Steel_4_6_Plain_v1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
@@ -789,6 +957,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Hex_Flange_Nut_ANSI_B18_2_4_4M___M5_x_0_8_Steel_Grade_2H_Plain_v1_2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="-0.257562 0.301933 -0.258678" rpy="-1.59881e-06 -8.12093e-20 -1.5708" />
@@ -831,24 +1007,56 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Drilled_Broached_Hexagon_Socket_Head_Cap_Screw_6_Holes_ASME_B18_3_1M___M5x0_8_x_65_Steel_Grade_2_Pla_3.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hex_Flange_Nut_ANSI_B18_2_4_4M___M5_x_0_8_Steel_Grade_2H_Plain_v1_17.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_Head_Bolt_DIN_EN_ISO_4014___M8_x_80_Steel_4_6_Plain_v1_1_2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/Hexagon_High_Nut_UNI_EN_24033___M8_Steel_6_Plain_v1_2_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -873,6 +1081,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/leg_bracket_long_v7_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -906,12 +1122,28 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Washer_BS_4320___M8___Form_E_Steel_100_HV_Plain_v1_1_1.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
                         <geometry>
                                 <mesh filename="${mesh_path}/bogie_bracket_leg_v2.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
                 <visual>
                         <origin xyz="0.0638741 0.301933 -0.258677" rpy="1.59881e-06 -3.33068e-16 -1.5708" />
@@ -1037,6 +1269,14 @@
                         <geometry>
                                 <mesh filename="${mesh_path}/Shortened_short_leg_bracket_v4.stl" scale="1 1 1" />
                         </geometry>
+                        <!-- PLACEHOLDER COLOR: Onshape export gave this part no material (missing/default
+                             material in CAD), so it fell back to each renderer's own default (white in Gazebo,
+                             red in RViz) instead of a real color. Set to a plausible steel grey, matching the
+                             rest of this file's generic-hardware convention, pending a real material
+                             assignment from CAD. -->
+                        <material name="0.647059_0.647059_0.647059_0.000000_0.000000">
+                                <color rgba="0.647059 0.647059 0.647059 1" />
+                        </material>
                 </visual>
         
 		<collision>

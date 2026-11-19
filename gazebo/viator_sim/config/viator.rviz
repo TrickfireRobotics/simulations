@@ -9,7 +9,7 @@ Panels:
         - /RobotModel1
         - /RobotModel1/Description Topic1
       Splitter Ratio: 0.5
-    Tree Height: 827
+    Tree Height: 509
 Visualization Manager:
   Class: ""
   Displays:
@@ -49,199 +49,875 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        ak10_9v2_0:
+        arm_0_4m_shaft:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ak10_9v2_0_1:
+        arm_0_4m_shaft_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ak10_9v2_0_2:
+        arm_1911_0025_0836_assembly:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ak10_9v2_0_3:
+        arm_1911_0025_0836_assembly_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ak10_9v2_0_4:
+        arm_1mt_054_006:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        ak10_9v2_0_5:
+        arm_1mt_054_006_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        arm_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        battery:
+        arm_200mm_linear_actuator_base:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        batterymount:
+        arm_200mm_linear_actuator_piston:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        bicep_actuator:
+        arm_57545k631_steel_worm_57545k631:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        bogie_bracket_leg_v2_1:
+        arm_57545k756_metal_worm_gear_57545k756:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        bogie_bracket_leg_v2_1__1_:
+        arm_6056n16_carbon_steel_set_screw_collar_6056n16:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        bogie_plate_v1_1:
+        arm_6056n16_carbon_steel_set_screw_collar_6056n16_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        bogie_plate_v1_1__1_:
+        arm_actuator_linkage:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        camera:
+        arm_actuator_linkage_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        chassismain:
+        arm_camera_mount_v1_0:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        crossbar:
+        arm_camerabracket:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        drivebaseplate:
+        arm_cylindrical_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_cylindrical_2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_deleteface2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        drivebaseplate_1:
+        arm_exampleballbearing:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        elbow_linkage:
+        arm_exampleballbearing_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        forearm:
+        arm_exampleballbearing_2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gripper_assembly:
+        arm_exampleballbearing_3:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        joint:
+        arm_examplemotor:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        leg_bracket_long_v7:
+        arm_extrude_thin1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        leg_bracket_long_v7__1_:
+        arm_extrude_thin1_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2:
+        arm_finger_pad_3_0:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2_1:
+        arm_finger_pad_3_0_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2_2:
+        arm_left_finger_plate_top_section:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2_3:
+        arm_left_finger_plate_top_section_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2_4:
+        arm_left_finger_plate_top_section_2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        part_2_5:
+        arm_left_finger_plate_top_section_3:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        rocker_crank_arm_plate_v1_1:
+        arm_left_l_part:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        rocker_crank_arm_plate_v1_1__1_:
+        arm_left_l_part_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shortened_short_leg_bracket_v4:
+        arm_long_motor_l_piece:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shortened_short_leg_bracket_v4_3__1_:
+        arm_longmotorbracketspacer:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shortened_short_leg_bracket_v4_3__1__1:
+        arm_metal_worm_gear__right_hand__57545k756:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shortened_short_leg_bracket_v4__1_:
+        arm_newbasemount:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        shoulder_assembly:
+        arm_part_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        arm_part_1_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_10:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_11:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_12:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_13:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_14:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_15:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_16:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_17:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_18:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_19:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_20:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_21:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_22:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_23:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_24:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_25:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_26:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_27:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_28:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_29:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_30:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_31:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_32:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_33:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_34:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_35:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_36:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_37:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_38:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_39:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_40:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_41:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_42:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_43:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_44:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_45:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_46:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_47:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_48:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_49:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_50:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_51:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_52:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_53:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_54:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_55:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_56:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_57:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_58:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_8:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_1_9:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_part_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_right_l_part:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_right_l_part_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_10:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_11:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_12:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_13:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_14:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_15:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_16:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_17:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_18:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_19:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_20:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_8:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rmd_x8pro_p9_v2_9:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_root:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_shaft_support:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_short_motor_l_piece:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_turntable_plate:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_washer_spacer:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_washer_spacer_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_washer_spacer_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_washer_spacer_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_ak10_9v2_0_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_battery:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_batterymount:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_bogie_bracket_leg_v2_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_bogie_bracket_leg_v2_1__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_bogie_plate_v1_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_bogie_plate_v1_1__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_camera:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_chassismain:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_crossbar:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_drivebaseplate:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_drivebaseplate_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_leg_bracket_long_v7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_leg_bracket_long_v7__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_part_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_1_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_1_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_1_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_1_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_1_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_part_2_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_rocker_crank_arm_plate_v1_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_rocker_crank_arm_plate_v1_1__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_shortened_short_leg_bracket_v4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        chassis_shortened_short_leg_bracket_v4_3__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_shortened_short_leg_bracket_v4_3__1__1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_shortened_short_leg_bracket_v4__1_:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gps:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        zed_camera_center:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_left_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_left_camera_frame_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_right_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_right_camera_frame_optical:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
@@ -255,7 +931,21 @@ Visualization Manager:
       Max Value: 1
       Median window: 5
       Min Value: 0
-      Name: Object Detections
+      Name: Ar Tag Detection
+      Normalize Range: true
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /camera_0/tags
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Object Detection
       Normalize Range: true
       Topic:
         Depth: 1
@@ -266,15 +956,27 @@ Visualization Manager:
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
       Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
       Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
       Name: ZED Point Cloud
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 2
-      Size (m): 0.01
+      Size (m): 0.009999999776482582
       Style: Points
       Topic:
         Depth: 1
@@ -352,14 +1054,16 @@ Visualization Manager:
       Yaw: 1.053583025932312
     Saved: ~
 Window Geometry:
+  Ar Tag Detection:
+    collapsed: false
   Displays:
     collapsed: false
   Height: 1515
   Hide Left Dock: false
   Hide Right Dock: false
-  Object Detections:
+  Object Detection:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002f900000595fc0200000002fb00000022004f0062006a00650063007400200044006500740065006300740069006f006e0073010000003b000001cb0000001600fffffffb000000100044006900730070006c006100790073010000020c000003c4000000c700ffffff000006c10000059500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000029800000595fc0200000003fb0000002000410072002000540061006700200044006500740065006300740069006f006e010000003b000001820000001600fffffffb00000020004f0062006a00650063007400200044006500740065006300740069006f006e01000001c3000001810000001600fffffffb000000100044006900730070006c006100790073010000034a00000286000000c700ffffff000007220000059500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Width: 2496
   X: 32
   Y: 116

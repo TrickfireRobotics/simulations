@@ -153,13 +153,38 @@ def generate_launch_description():
             "-file",
             get_asset("sim_worlds", "models", "TTT", "model.sdf"),
             "-x",
-            "6.5",
+            "0",
+            "-y",
+            "-3.0",
+            "-z",
+            "0.1",
             "-Y",
-            str(math.pi),
+            str(math.pi / 2),
         ],
         output="screen",
         condition=IfCondition(LaunchConfiguration("ttt")),
     )
+    spawn_ar_tags = [
+        Node(
+            package="ros_gz_sim",
+            executable="create",
+            arguments=[
+                "-name",
+                f"ar_tag_{tag_id}",
+                "-file",
+                get_asset("sim_worlds", "models", f"ar_tag_{tag_id}", "model.sdf"),
+                "-x",
+                str(x),
+                "-y",
+                "-1.5",
+                "-Y",
+                str(math.pi / 2),
+            ],
+            output="screen",
+            condition=IfCondition(LaunchConfiguration("ar_tags")),
+        )
+        for tag_id, x in enumerate((-0.3, 0.0, 0.3))
+    ]
     rosbridge = Node(
         package="rosbridge_server",
         executable="rosbridge_websocket",
@@ -208,6 +233,12 @@ def generate_launch_description():
                 description="Spawn the TTT task model ahead of Viator.",
             ),
             DeclareLaunchArgument(
+                "ar_tags",
+                default_value="false",
+                description="Spawn 3 ArUco test tags (ids 0-2) ahead of Viator, "
+                "for testing ar_tag_detection.",
+            ),
+            DeclareLaunchArgument(
                 "follow_rover",
                 default_value="true",
                 description="Make the Gazebo camera follow Viator.",
@@ -234,5 +265,6 @@ def generate_launch_description():
             zed_camera,
             heartbeat_responder_node(),
             rosbridge,
+            TimerAction(period=5.0, actions=spawn_ar_tags),
         ]
     )
