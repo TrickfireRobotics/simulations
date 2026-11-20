@@ -1,5 +1,6 @@
 """Shared launch utilities for simulation packages"""
 
+import atexit
 import os
 import shutil
 import subprocess
@@ -213,10 +214,29 @@ def spawn_robot_node(robot_name, robot_desc, z=0.1):
     drops onto the surface instead of spawning underneath it.
     """
     spawn_desc = prepare_spawn_description(robot_desc)
+
+    spawn_file = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".sdf", prefix=f"sim-spawn-{robot_name}-", delete=False
+    )
+    spawn_file.write(spawn_desc)
+    spawn_file.close()
+    atexit.register(os.unlink, spawn_file.name)
+
     return Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=["-name", robot_name, "-string", spawn_desc, "-x", "0", "-y", "0", "-z", str(z)],
+        arguments=[
+            "-name",
+            robot_name,
+            "-file",
+            spawn_file.name,
+            "-x",
+            "0",
+            "-y",
+            "0",
+            "-z",
+            str(z),
+        ],
         output="screen",
     )
 

@@ -1,5 +1,3 @@
-"""Launch the complete Viator rover in Gazebo."""
-
 import math
 import os
 import sys
