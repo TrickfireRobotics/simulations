@@ -215,11 +215,10 @@ def spawn_robot_node(robot_name, robot_desc, z=0.1):
     """
     spawn_desc = prepare_spawn_description(robot_desc)
 
-    spawn_file = tempfile.NamedTemporaryFile(
+    with tempfile.NamedTemporaryFile(
         mode="w", suffix=".sdf", prefix=f"sim-spawn-{robot_name}-", delete=False
-    )
-    spawn_file.write(spawn_desc)
-    spawn_file.close()
+    ) as spawn_file:
+        spawn_file.write(spawn_desc)
     atexit.register(os.unlink, spawn_file.name)
 
     return Node(
