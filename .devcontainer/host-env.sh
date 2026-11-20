@@ -13,7 +13,8 @@ uname_s="$(uname -s 2>/dev/null || echo unknown)"
 log() { printf "\033[1;36m%s\033[0m\n" "$1"; }
 
 get_xauthority() {
-    local x_auth_file=$(echo "$XAUTHORITY" | awk 'BEGIN {FS="/"} {print $NF}')
+    local xauth="${XAUTHORITY:-""}"
+    local x_auth_file="${xauth##*/}"
     echo "/run/user/1000/${x_auth_file}"
 }
 
