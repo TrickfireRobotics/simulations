@@ -382,6 +382,9 @@ def _setup_pixi_env() -> None:
     if os.environ.get("QT_QPA_PLATFORM") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
 
+    # use 9091 on pixi
+    os.environ.setdefault("ROSBRIDGE_PORT", "9091")
+
 
 def build_and_launch(
     robot_name: str,

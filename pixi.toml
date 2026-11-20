@@ -34,3 +34,9 @@ evdev = "*"
 
 [target.linux-aarch64.pypi-dependencies]
 evdev = "*"
+
+[target.linux-64.dependencies]
+ros-jazzy-gz-ros2-control = "==1.2.18"
+
+[target.linux-aarch64.dependencies]
+ros-jazzy-gz-ros2-control = "==1.2.18"
