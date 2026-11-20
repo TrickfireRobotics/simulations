@@ -4,13 +4,32 @@
     "service": "sim",
     "runServices": ["sim"],
 
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "24"
+        }
+    },
+
     "workspaceFolder": "/home/trickfire/simulations",
+    "mounts": [
+        "source=simulations-launcher-node-modules,target=/home/trickfire/simulations/node_modules,type=volume"
+    ],
+    "containerEnv": {
+        "TRICKFIRE_DEVCONTAINER": "1"
+    },
     "remoteEnv": {
         "HOST_WORKSPACE": "${localWorkspaceFolder}"
     },
     "initializeCommand": "bash .devcontainer/host-env.sh || true",
-    "postCreateCommand": "pip3 install --break-system-packages -e .", // install the sim cli
+    "postCreateCommand": "pip3 install --break-system-packages -e . && npm ci",
     "postStartCommand": "bash ./.devcontainer/x_server.sh || true",
+    "forwardPorts": [5173],
+    "portsAttributes": {
+        "5173": {
+            "label": "Launcher UI preview",
+            "onAutoForward": "openBrowser"
+        }
+    },
 
     "customizations": {
         "vscode": {

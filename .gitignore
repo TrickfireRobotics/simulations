@@ -40,6 +40,11 @@ docker/.env.local
 # trickfire-docs
 dist/
 
+# desktop launcher
+node_modules/
+.vite/
+out/
+
 # chrono sim
 results/
 

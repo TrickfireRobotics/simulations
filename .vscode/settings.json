@@ -43,6 +43,18 @@
         "editor.formatOnSave": true,
         "editor.formatOnPaste": true
     },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
     "json.format.keepLines": true,
     "json.format.enable": true,
 
@@ -62,7 +74,9 @@
         "**/.venv": true,
         ".pytest_cache": true,
         ".vscode/browse.*": true,
-        ".cache/": true
+        ".cache/": true,
+        ".vite": true,
+        "node_modules": true
     },
 
     "clangd.arguments": ["--clang-tidy", "--header-insertion=never"],

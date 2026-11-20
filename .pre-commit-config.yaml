@@ -19,6 +19,15 @@ repos:
             args: [-i, "4", -s, -w]
             files: ^(\.devcontainer|docker)/
 
+    - repo: local
+      hooks:
+          - id: prettier
+            name: prettier
+            entry: npm run format:check
+            language: system
+            pass_filenames: false
+            files: ^(launcher/|forge\.config\.ts|vite\..*\.config\.ts|package(-lock)?\.json|tsconfig\.json|\.devcontainer/.*\.json|\.vscode/settings\.json|\.github/workflows/code-style\.yml)$
+
     - repo: https://github.com/jorisroovers/gitlint
       rev: v0.19.1
       hooks:

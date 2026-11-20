@@ -93,6 +93,10 @@ The primary workflow uses pixi for a self-contained native environment. Follow t
 
 For `docs/` changes, only Node.js is required.
 
+For launcher changes, run `npm ci` once and use `npm run dev` from a host terminal. The launcher
+intentionally refuses to start in the Dev Container because it needs to manage that container.
+Use `npm run dev:renderer` inside the Dev Container for a browser preview with representative data.
+
 After installing, run `make hooks` once to register the git pre-commit and commit-msg hooks locally.
 
 ## Formatting
@@ -117,6 +121,14 @@ For Python specifically:
 ```bash
 ruff check .
 ruff format .
+```
+
+For the launcher:
+
+```bash
+npm run format
+npm run format:check
+npm run lint:launcher
 ```
 
 Configuration lives in `ruff.toml`. Generated Gazebo files under `gazebo/.artifacts` are excluded automatically.

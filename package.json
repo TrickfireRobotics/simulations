@@ -1,0 +1,39 @@
+{
+    "name": "trickfire-sim-launcher",
+    "productName": "TrickFire Sim",
+    "version": "0.1.0",
+    "description": "Host-side operator console for TrickFire simulations",
+    "main": ".vite/build/main.cjs",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "predev": "node launcher/scripts/require-host.mjs",
+        "dev": "electron-forge start",
+        "dev:renderer": "vite --config vite.renderer.config.ts --mode preview --host 0.0.0.0",
+        "prestart": "node launcher/scripts/require-host.mjs",
+        "start": "electron-forge start",
+        "package": "electron-forge package",
+        "make": "electron-forge make",
+        "lint:launcher": "tsc --noEmit",
+        "format": "prettier --write launcher forge.config.ts \"vite.*.config.ts\" package.json package-lock.json tsconfig.json \".devcontainer/*.json\" .vscode/settings.json .github/workflows/code-style.yml",
+        "format:check": "prettier --check launcher forge.config.ts \"vite.*.config.ts\" package.json package-lock.json tsconfig.json \".devcontainer/*.json\" .vscode/settings.json .github/workflows/code-style.yml"
+    },
+    "author": "TrickFire Robotics",
+    "license": "MIT",
+    "devDependencies": {
+        "@electron-forge/cli": "8.0.1",
+        "@electron-forge/maker-deb": "8.0.1",
+        "@electron-forge/maker-rpm": "8.0.1",
+        "@electron-forge/maker-squirrel": "8.0.1",
+        "@electron-forge/maker-zip": "8.0.1",
+        "@electron-forge/plugin-auto-unpack-natives": "8.0.1",
+        "@electron-forge/plugin-fuses": "8.0.1",
+        "@electron-forge/plugin-vite": "8.0.1",
+        "@electron-forge/shared-types": "8.0.1",
+        "@electron/fuses": "2.1.3",
+        "electron": "45.4.1",
+        "prettier": "3.10.1",
+        "typescript": "7.0.2",
+        "vite": "8.3.8"
+    }
+}

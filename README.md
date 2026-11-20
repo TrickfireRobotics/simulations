@@ -26,6 +26,30 @@ Two complementary environments, both driven by a single Python `sim` CLI: [**Gaz
 - [Adding a New Robot](https://docs.trickfirerobotics.com/simulations/gazebo/adding-robots) - OnShape to Gazebo with `sim gazebo create`
 - [Dev Notes](https://docs.trickfirerobotics.com/simulations/dev-notes) - architecture decisions, Docker environment internals, CLI tips
 
+## Desktop launcher
+
+The host-side launcher is an operator console for setting up Docker, checking display forwarding,
+choosing simulation options, starting optional bridges, and managing the running process without a
+Dev Container or VS Code.
+
+```bash
+npm install
+npm run dev
+```
+
+Use `npm run make` to build an installer for the current operating system.
+
+The real launcher is host-only because it manages Docker. Inside the Dev Container, use the
+browser-backed interface preview instead:
+
+```bash
+npm run dev:renderer
+```
+
+The preview uses representative local data and is available on port `5173`. Use `npm run format`
+to apply the repository's Prettier configuration, `npm run format:check` to verify it, and
+`npm run lint:launcher` to type-check the application.
+
 ## Credits
 
 Some simulation assets are vendored from outside sources:
