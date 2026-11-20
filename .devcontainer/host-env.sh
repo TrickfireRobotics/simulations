@@ -12,6 +12,11 @@ uname_s="$(uname -s 2>/dev/null || echo unknown)"
 
 log() { printf "\033[1;36m%s\033[0m\n" "$1"; }
 
+get_xauthority() {
+    local x_auth_file = echo "$XAUTHORITY" | awk 'BEGIN {FS="/"} {print $NF}'
+    echo "/run/user/1000/${x_auth_file}"
+}
+
 gpu_available() {
     [ "$uname_s" = "Linux" ] || return 1
     command -v nvidia-smi >/dev/null 2>&1 || return 1
@@ -43,6 +48,7 @@ write_display_env() {
     Linux)
         echo "# host: Linux/WSLg (direct socket passthrough)"
         echo "DISPLAY=${DISPLAY:-:0}"
+        echo "XAUTHORITY=$(get_xauthority)"
         ;;
     *)
         echo "# host: unknown ($uname_s) - falling back to local display :0"
