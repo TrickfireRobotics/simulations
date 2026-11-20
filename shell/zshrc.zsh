@@ -13,6 +13,7 @@ setopt correct interactive_comments
 
 # source
 source "$HOME/simulations/shell/source.sh" || echo "sourcing ROS & Gazebo failed"
+source "$HOME/simulations/docker/.env" || echo "sourcing docker envs failed"
 
 # display setup
 if [[ -n "${FORCE_VNC:-}" ]]; then
