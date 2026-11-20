@@ -87,7 +87,9 @@ COPY docker/xorg.nvidia.conf /etc/X11/xorg.nvidia.conf
 COPY docker/xorg.dummy.conf /etc/X11/xorg.dummy.conf
 COPY docker/xorg.vkms.conf /etc/X11/xorg.vkms.conf
 
-RUN ln -s /home/trickfire/simulations/shell/zshrc.zsh /home/trickfire/.zshrc
+
+RUN rm -f /home/trickfire/.zshrc && ln -s /home/trickfire/simulations/shell/zshrc.zsh /home/trickfire/.zshrc
+RUN rm -f /home/trickfire/.bashrc && ln -s /home/trickfire/simulations/shell/bashrc.bash /home/trickfire/.bashrc
 
 EXPOSE ${NOVNC_PORT}
 EXPOSE ${VNC_PORT}
