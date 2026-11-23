@@ -62,7 +62,7 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    rust \
+    rustup \
     python3-pip \
     python3-rosdep \
     python3-colcon-common-extensions \
