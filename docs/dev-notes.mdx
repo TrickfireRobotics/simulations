@@ -59,7 +59,7 @@ of host-side scripts that configure display and GPU access before the container 
 
 `docker/vsg-chrono.Dockerfile` builds VSG and Chrono from source - a slow, rarely-changing C++
 build - and publishes it as `ghcr.io/trickfirerobotics/simulations-vsg-chrono` via
-[CI](https://github.com/TrickfireRobotics/simulations/blob/main/.github/workflows/vsg-chrono.yml)
+[CI](https://github.com/TrickfireRobotics/simulations/blob/main/.github/workflows/images.yml)
 on every push to `main` that touches it (or on manual dispatch), for both `amd64` and `arm64`.
 `docker/Dockerfile`'s `sim` stage then copies `/opt/vsg` and `/home/trickfire/chrono` out of that
 image and builds everything else on top as `simulations:latest` - changing the app Dockerfile

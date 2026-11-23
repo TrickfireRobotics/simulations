@@ -1,0 +1,95 @@
+name: Build Images
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - ".github/workflows/images.yml"
+            - ".github/workflows/build-image.yml"
+            - "docker/base.Dockerfile"
+            - "docker/ardupilot.Dockerfile"
+            - "docker/vsg-chrono.Dockerfile"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    changes:
+        runs-on: ubuntu-24.04
+        outputs:
+            base: ${{ steps.filter.outputs.base }}
+            ardupilot: ${{ steps.filter.outputs.ardupilot }}
+            vsg_chrono: ${{ steps.filter.outputs.vsg_chrono }}
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+
+            - name: Detect changed Dockerfiles
+              id: filter
+              env:
+                  BEFORE: ${{ github.event.before }}
+              run: |
+                  all=false
+                  files=""
+                  if [ "$GITHUB_EVENT_NAME" != "push" ] ||
+                     [ -z "$BEFORE" ] ||
+                     ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+                      all=true
+                  else
+                      files="$(git diff --name-only "$BEFORE" "$GITHUB_SHA")"
+                      # a change to the workflows themselves rebuilds everything
+                      if printf '%s\n' "$files" |
+                         grep -qxE '\.github/workflows/(images|build-image)\.yml'; then
+                          all=true
+                      fi
+                  fi
+
+                  emit() {
+                      if [ "$all" = true ] || printf '%s\n' "$files" | grep -qxF "docker/$2"; then
+                          echo "$1=true" >>"$GITHUB_OUTPUT"
+                      else
+                          echo "$1=false" >>"$GITHUB_OUTPUT"
+                      fi
+                  }
+                  emit base base.Dockerfile
+                  emit ardupilot ardupilot.Dockerfile
+                  emit vsg_chrono vsg-chrono.Dockerfile
+
+                  cat "$GITHUB_OUTPUT"
+
+    base:
+        needs: changes
+        if: needs.changes.outputs.base == 'true'
+        uses: ./.github/workflows/build-image.yml
+        with:
+            image-name: ghcr.io/trickfirerobotics/simulations-base
+            dockerfile: docker/base.Dockerfile
+            cache-scope: base
+
+    # runs when its own Dockerfile changed, or when base was rebuilt, pinned to
+    # the digest base just produced so a mutable :latest can never race in
+    ardupilot:
+        needs: [changes, base]
+        if: >-
+            !cancelled() && needs.base.result != 'failure' &&
+            (needs.changes.outputs.ardupilot == 'true' || needs.base.result == 'success')
+        uses: ./.github/workflows/build-image.yml
+        with:
+            image-name: ghcr.io/trickfirerobotics/simulations-ardupilot
+            dockerfile: docker/ardupilot.Dockerfile
+            cache-scope: ardupilot
+            build-args: >-
+                BASE_REF=ghcr.io/trickfirerobotics/simulations-base${{
+                needs.base.outputs.digest && format('@{0}', needs.base.outputs.digest) || ':latest' }}
+
+    vsg-chrono:
+        needs: changes
+        if: needs.changes.outputs.vsg_chrono == 'true'
+        uses: ./.github/workflows/build-image.yml
+        with:
+            image-name: ghcr.io/trickfirerobotics/simulations-vsg-chrono
+            dockerfile: docker/vsg-chrono.Dockerfile
+            cache-scope: vsg-chrono

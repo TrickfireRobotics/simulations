@@ -1,5 +1,5 @@
-ARG BASE_TAG=latest
-FROM ghcr.io/trickfirerobotics/simulations-base:${BASE_TAG}
+ARG BASE_REF=ghcr.io/trickfirerobotics/simulations-base:latest
+FROM ${BASE_REF}
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG BUILD_JOBS

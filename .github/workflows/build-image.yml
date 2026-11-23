@@ -1,14 +1,29 @@
-name: Build VSG + Chrono Image
+name: Build Image
 
 on:
-    push:
-        branches: [main]
-        paths:
-            - "docker/vsg-chrono.Dockerfile"
-    workflow_dispatch:
-
-env:
-    IMAGE_NAME: ghcr.io/trickfirerobotics/simulations-vsg-chrono
+    workflow_call:
+        inputs:
+            image-name:
+                description: Fully qualified image name, without a tag
+                required: true
+                type: string
+            dockerfile:
+                description: Dockerfile path, relative to the repo root
+                required: true
+                type: string
+            cache-scope:
+                description: GHA cache scope, also used to namespace digest artifacts
+                required: true
+                type: string
+            build-args:
+                description: Newline-separated KEY=VALUE build args
+                required: false
+                type: string
+                default: ""
+        outputs:
+            digest:
+                description: Digest of the pushed multi-arch manifest list
+                value: ${{ jobs.merge.outputs.digest }}
 
 jobs:
     build:
@@ -41,11 +56,12 @@ jobs:
               uses: docker/build-push-action@v7
               with:
                   context: .
-                  file: docker/vsg-chrono.Dockerfile
+                  file: ${{ inputs.dockerfile }}
                   platforms: linux/${{ matrix.platform }}
-                  outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-                  cache-from: type=gha,scope=vsg-chrono-${{ matrix.platform }}
-                  cache-to: type=gha,mode=max,scope=vsg-chrono-${{ matrix.platform }}
+                  build-args: ${{ inputs.build-args }}
+                  outputs: type=image,name=${{ inputs.image-name }},push-by-digest=true,name-canonical=true,push=true
+                  cache-from: type=gha,scope=${{ inputs.cache-scope }}-${{ matrix.platform }}
+                  cache-to: type=gha,mode=max,scope=${{ inputs.cache-scope }}-${{ matrix.platform }}
 
             - name: Export digest
               run: |
@@ -56,7 +72,7 @@ jobs:
             - name: Upload digest
               uses: actions/upload-artifact@v7
               with:
-                  name: digests-${{ matrix.platform }}
+                  name: digests-${{ inputs.cache-scope }}-${{ matrix.platform }}
                   path: /tmp/digests/*
                   if-no-files-found: error
                   retention-days: 1
@@ -66,12 +82,14 @@ jobs:
         runs-on: ubuntu-24.04
         permissions:
             packages: write
+        outputs:
+            digest: ${{ steps.manifest.outputs.digest }}
         steps:
             - name: Download digests
               uses: actions/download-artifact@v8
               with:
                   path: /tmp/digests
-                  pattern: digests-*
+                  pattern: digests-${{ inputs.cache-scope }}-*
                   merge-multiple: true
 
             - name: Log in to GHCR
@@ -85,12 +103,17 @@ jobs:
               uses: docker/setup-buildx-action@v4
 
             - name: Create manifest list and push
+              id: manifest
               working-directory: /tmp/digests
               run: |
                   docker buildx imagetools create \
-                    -t ${{ env.IMAGE_NAME }}:latest \
-                    -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
-                    $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
+                    -t ${{ inputs.image-name }}:latest \
+                    -t ${{ inputs.image-name }}:${{ github.sha }} \
+                    $(printf '${{ inputs.image-name }}@sha256:%s ' *)
+                  digest="$(docker buildx imagetools inspect \
+                    --format '{{ .Manifest.Digest }}' \
+                    '${{ inputs.image-name }}:${{ github.sha }}')"
+                  echo "digest=$digest" >>"$GITHUB_OUTPUT"
 
             - name: Inspect image
-              run: docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:latest
+              run: docker buildx imagetools inspect ${{ inputs.image-name }}:latest
