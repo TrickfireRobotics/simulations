@@ -33,6 +33,17 @@ jobs:
             - name: Check shell formatting
               run: shfmt -d .devcontainer/ docker/
 
+    Rust:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Install toolchain
+              run: rustup show active-toolchain || rustup toolchain install
+
+            - name: Check Rust formatting
+              run: cargo fmt --all --check
+
     Cpp:
         runs-on: ubuntu-latest
         steps:

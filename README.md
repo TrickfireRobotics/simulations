@@ -4,7 +4,7 @@
 
 Rover simulation environments for TrickFire Robotics.
 
-Two complementary environments, both driven by a single Python `sim` CLI: [**Gazebo Harmonic**](https://gazebosim.org/docs/harmonic/install/) with [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/index.html) for simulating robot subsystems and joint control, and [**Project Chrono**](https://projectchrono.org/) for high-fidelity terrain and wheel-soil physics. The whole project is containerized in a Docker environment with user environment passthrough or using with [pixi](https://pixi.prefix.dev/latest/).
+Two complementary environments, both driven by a single `sim` CLI: [**Gazebo Harmonic**](https://gazebosim.org/docs/harmonic/install/) with [ROS 2 Jazzy](https://docs.ros.org/en/jazzy/index.html) for simulating robot subsystems and joint control, and [**Project Chrono**](https://projectchrono.org/) for high-fidelity terrain and wheel-soil physics. The whole project is containerized in a Docker environment with user environment passthrough or using with [pixi](https://pixi.prefix.dev/latest/).
 
 ## Highlights
 

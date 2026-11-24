@@ -6,12 +6,16 @@
 !.vscode/c_cpp_properties.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/tasks.json
 
 # pixi
 .pixi/
 
 # native builds
 .native/
+
+# rust
+/target/
 
 # python
 .mypy_cache
@@ -24,7 +28,7 @@ build/
 gazebo/.artifacts/
 
 # sim tests
-cli/gazebo/create/tests
+cli-python/gazebo/create/tests
 
 # chrono outputs
 # imgui writes the window layout back on every run

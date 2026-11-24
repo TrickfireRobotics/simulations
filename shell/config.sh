@@ -12,6 +12,13 @@ esac
 source "$HOME/simulations/shell/source.sh" || echo "sourcing ROS & Gazebo failed"
 source "$HOME/simulations/docker/.env" || echo "sourcing docker envs failed"
 
+# rust
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+case ":${PATH:-}:" in
+*":/usr/local/cargo/bin:"*) ;;
+*) [ -d /usr/local/cargo/bin ] && export PATH="/usr/local/cargo/bin${PATH:+:$PATH}" ;;
+esac
+
 # display setup
 if [[ -n "${FORCE_VNC:-}" ]]; then
     export DISPLAY="${FORCE_VNC_DISPLAY:-:77}"

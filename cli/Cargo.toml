@@ -1,0 +1,18 @@
+[package]
+name = "sim"
+description = "TrickFire Robotics simulation environment manager"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "sim"
+path = "src/main.rs"
+
+[dependencies]
+
+[lints]
+workspace = true

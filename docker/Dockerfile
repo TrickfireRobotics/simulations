@@ -75,6 +75,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install ruff pre-commit --break-system-packages --ignore-installed
 
+ARG RUST_TOOLCHAIN=1.100
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+RUN rustup toolchain install "${RUST_TOOLCHAIN}" --profile minimal \
+    --component cargo,clippy,rust-analyzer,rust-src,rustc,rustfmt && \
+    rustup default "${RUST_TOOLCHAIN}" && \
+    chmod -R a+rwX "${RUSTUP_HOME}" "${CARGO_HOME}"
+
 RUN curl -sSL "https://github.com/mvdan/sh/releases/latest/download/shfmt_$(curl -sSL https://api.github.com/repos/mvdan/sh/releases/latest | grep -oP '(?<="tag_name": ")v[^"]+')_linux_$(dpkg --print-architecture)" \
     -o /usr/local/bin/shfmt && \
     chmod +x /usr/local/bin/shfmt

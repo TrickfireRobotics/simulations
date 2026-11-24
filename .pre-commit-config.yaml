@@ -19,6 +19,23 @@ repos:
             args: [-i, "4", -s, -w]
             files: ^(\.devcontainer|docker)/
 
+    - repo: local
+      hooks:
+          - id: cargo-fmt
+            name: cargo fmt
+            entry: cargo fmt --all
+            language: system
+            types: [rust]
+            pass_filenames: false
+
+          - id: cargo-clippy
+            name: cargo clippy
+            entry: cargo clippy --workspace --all-targets --all-features -- -D warnings
+            language: system
+            types: [rust]
+            pass_filenames: false
+            stages: [pre-push]
+
     - repo: https://github.com/jorisroovers/gitlint
       rev: v0.19.1
       hooks:

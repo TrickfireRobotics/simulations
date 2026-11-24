@@ -8,20 +8,19 @@ Thanks for wanting to contribute to this repo! This guide covers the layout of t
 simulations/
 ├── gazebo/          # ROS 2 workspace - Gazebo simulation packages
 ├── chrono/          # Project Chrono terrain/wheel simulation
-├── cli/             # Python CLI (the `sim` command)
-│   ├── cli.py       # Main entry point and argument parsing
-│   ├── access.py    # sim access code prompt for dashboard OnShape requests
-│   ├── drpc.py      # Discord RPC integration
-│   ├── paths.py     # Workspace path utilities
-│   ├── output.py    # Terminal output helpers (info, warn, die)
-│   ├── gazebo/      # `sim gazebo *` sub-commands
-│   └── chrono/      # `sim chrono *` sub-commands
+├── cli/             # Rust CLI (the `sim` command)
+│   ├── src/         # binary sources
+│   ├── tests/       # integration tests, run the built binary
+│   └── Cargo.toml   # package manifest
+├── cli-python/      # the previous Python CLI, kept for reference during the port
 ├── docker/          # Dockerfile and docker-compose files
 ├── pixi.toml        # Native environment definition (ROS 2 Jazzy + Gazebo Harmonic)
 ├── assets/          # Club branding
 ├── robots.json      # Robot configuration registry
 ├── ruff.toml        # Ruff linter/formatter configuration
-└── pyproject.toml   # Python package config
+├── Cargo.toml       # Cargo workspace (lints and release profile live here)
+├── rust-toolchain.toml  # pinned Rust version, CI uses the same one
+└── rustfmt.toml     # Rust formatter configuration
 ```
 
 ## Projects
@@ -65,23 +64,45 @@ interface dependency of `Chrono::Chrono_vsg`). Do not vendor a second copy of Im
 
 ### `cli/` - Simulation CLI
 
-Python package providing the `sim` command. Two top-level subcommands:
+Rust binary crate providing the `sim` command. It lives in a Cargo workspace rooted at the repo
+root, so `cargo` commands work from anywhere in the tree.
 
-**`sim gazebo`** - Gazebo/ROS 2 simulation:
+The CLI is mid-port from Python. The old implementation is still in `cli-python/` for reference and
+will be deleted once the Rust side reaches parity.
 
-- `cli/gazebo/docker.py` - `sim gazebo docker` build and launch logic
-- `cli/gazebo/native.py` - `sim gazebo native` build and launch logic (pixi environment)
-- `cli/gazebo/create/` - `sim gazebo create` / `sim gazebo update` (OnShape → URDF pipeline)
+```bash
+make build         # debug build
+make release       # optimized build
+make rebuild       # clean just the sim crate, then build
+make run ARGS="gazebo launch"
+make test          # cargo test --workspace --all-targets
+make lint          # clippy, warnings are errors
+make check         # fmt + lint + test, same gate as CI
+make doc           # build and open the API docs
+```
 
-**`sim chrono`** - Chrono SCM terrain simulation:
+#### Getting `sim` on your PATH
 
-- `cli/chrono/chrono.py` - `sim chrono run` / `sim chrono clean`
+```bash
+make link
+```
 
-**Shared:**
+That symlinks `target/debug/sim` into `~/.local/bin`, which `shell/config.sh` already puts on your
+PATH. Because it is a symlink to the build output, `make build` is all you need after a change -
+no reinstall step. `make unlink` removes it.
 
-- `cli/access.py` - sim access code prompt (asked for on every OnShape request)
-- `cli/paths.py` - Workspace path utilities
-- `cli/output.py` - Terminal output helpers (`info`, `warn`, `die`)
+For a standalone optimized copy in `~/.cargo/bin` instead, use `make install` / `make uninstall`.
+The Dev Container runs `make link` on create.
+
+#### Tests
+
+Integration tests in `cli/tests/` spawn the real binary through `env!("CARGO_BIN_EXE_sim")`, so
+they exercise the CLI exactly as a user would. Unit tests go in `#[cfg(test)]` modules next to the
+code they cover. `make test` runs both.
+
+Shared lints are declared once in the workspace `Cargo.toml` under `[workspace.lints]` and
+inherited by the package, so adding a crate later picks them up automatically. Clippy runs with
+`clippy::all` and `clippy::pedantic`, and CI fails on any warning.
 
 ### `docs/` - Documentation site
 
@@ -101,6 +122,7 @@ All formatters run automatically on save in VS Code. Install the recommended ext
 
 | Language               | Formatter                                                                                                         |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Rust                   | rustfmt via [rust-analyzer](https://rust-analyzer.github.io/) (`rust-lang.rust-analyzer`)                         |
 | Python                 | [Ruff](https://docs.astral.sh/ruff/) (`charliermarsh.ruff`)                                                       |
 | JS / TS / JSON / JSONC | Prettier (`esbenp.prettier-vscode`) - follow the project's Prettier configuration (including 4-space indentation) |
 | XML                    | XML Tools (`DotJoshJohnson.xml`)                                                                                  |
@@ -112,6 +134,19 @@ Pre-commit hooks enforce all formatters automatically at commit time. You can al
 pre-commit run
 ```
 
+`make format` runs every formatter in the repo at once (Rust, Python, C++, shell).
+
+For Rust specifically:
+
+```bash
+cargo fmt --all        # or make format
+make lint              # clippy with -D warnings
+make check             # what CI runs
+```
+
+Configuration lives in `rustfmt.toml`, and lint levels in the `[workspace.lints]` section of the
+root `Cargo.toml`.
+
 For Python specifically:
 
 ```bash
@@ -120,3 +155,17 @@ ruff format .
 ```
 
 Configuration lives in `ruff.toml`. Generated Gazebo files under `gazebo/.artifacts` are excluded automatically.
+
+## CI
+
+| Workflow                           | Checks                                                  |
+| ---------------------------------- | ------------------------------------------------------- |
+| `code-style.yml` ("Style Check")   | `ruff check`, `shfmt -d`, `cargo fmt --check`, clang-format |
+| `rust.yml` ("Rust")                | clippy (`-D warnings`), `cargo test`, release build      |
+
+The Rust workflow only triggers on changes under `cli/`, the Cargo manifests, or the toolchain
+file. It installs the toolchain from `rust-toolchain.toml`, so CI and your machine always run the
+same compiler.
+
+`cargo fmt` runs as a pre-commit hook and clippy as a pre-push hook, so CI should rarely be the
+first place you find out something is off. `make hooks` installs both.

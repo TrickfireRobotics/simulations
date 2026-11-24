@@ -20,6 +20,11 @@
             "source.organizeImports.ruff": "explicit"
         }
     },
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.formatOnSave": true,
+        "editor.semanticHighlighting.enabled": true
+    },
     "[cpp]": {
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
         "editor.formatOnSave": true
@@ -62,8 +67,18 @@
         "**/.venv": true,
         ".pytest_cache": true,
         ".vscode/browse.*": true,
-        ".cache/": true
+        ".cache/": true,
+        "target/": true
     },
+
+    "rust-analyzer.check.command": "clippy",
+    "rust-analyzer.check.extraArgs": ["--all-targets", "--all-features"],
+    "rust-analyzer.cargo.features": "all",
+    "rust-analyzer.imports.granularity.group": "module",
+    "rust-analyzer.imports.prefix": "crate",
+    "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "with_block",
+    "rust-analyzer.inlayHints.parameterHints.enable": false,
+    "rust-analyzer.testExplorer": true,
 
     "clangd.arguments": ["--clang-tidy", "--header-insertion=never"],
 

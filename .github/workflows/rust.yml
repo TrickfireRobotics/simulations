@@ -1,0 +1,73 @@
+name: Rust
+
+on:
+    push:
+        paths:
+            - "cli/**"
+            - "Cargo.toml"
+            - "Cargo.lock"
+            - "rust-toolchain.toml"
+            - ".cargo/**"
+            - ".github/workflows/rust.yml"
+    pull_request:
+        paths:
+            - "cli/**"
+            - "Cargo.toml"
+            - "Cargo.lock"
+            - "rust-toolchain.toml"
+            - ".cargo/**"
+            - ".github/workflows/rust.yml"
+
+concurrency:
+    group: rust-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    CARGO_TERM_COLOR: always
+    RUSTFLAGS: -D warnings
+
+jobs:
+    Clippy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Install toolchain
+              run: rustup show active-toolchain || rustup toolchain install
+
+            - uses: Swatinem/rust-cache@v2
+
+            - name: Run Clippy
+              run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+    Test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Install toolchain
+              run: rustup show active-toolchain || rustup toolchain install
+
+            - uses: Swatinem/rust-cache@v2
+
+            - name: Run tests
+              run: cargo test --workspace --all-targets
+
+    Build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Install toolchain
+              run: rustup show active-toolchain || rustup toolchain install
+
+            - uses: Swatinem/rust-cache@v2
+
+            - name: Build release
+              run: cargo build --workspace --release --locked
+
+            - uses: actions/upload-artifact@v7
+              with:
+                  name: sim-linux-x86_64
+                  path: target/release/sim
+                  if-no-files-found: error

@@ -9,7 +9,7 @@
         "HOST_WORKSPACE": "${localWorkspaceFolder}"
     },
     "initializeCommand": "bash .devcontainer/host-env.sh || true",
-    "postCreateCommand": "pip3 install --break-system-packages -e .", // install the sim cli
+    "postCreateCommand": "make link", // build the sim cli and put it on PATH
     "postStartCommand": "bash ./.devcontainer/x_server.sh || true",
 
     "customizations": {
@@ -36,6 +36,9 @@
                 "yzhang.markdown-all-in-one",
                 "DotJoshJohnson.xml",
                 "tamasfe.even-better-toml",
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb",
+                "fill-labs.dependi",
                 "github.vscode-github-actions",
                 "mkhl.shfmt",
                 "unifiedjs.vscode-mdx"

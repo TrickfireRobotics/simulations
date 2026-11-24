@@ -1,3 +1,9 @@
 {
-    "recommendations": ["ms-vscode-remote.remote-containers"]
+    "recommendations": [
+        "ms-vscode-remote.remote-containers",
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi"
+    ]
 }
